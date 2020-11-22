@@ -1,6 +1,5 @@
 package cz.vutbr.fit.pdb.projekt.eventsAndStuff.subscribers;
 
-import cz.vutbr.fit.pdb.projekt.eventsAndStuff.ConfirmedEventAdapter;
 import cz.vutbr.fit.pdb.projekt.eventsAndStuff.events.UserCreatedEvent;
 import cz.vutbr.fit.pdb.projekt.features.PersistentUser;
 import cz.vutbr.fit.pdb.projekt.features.sqlfeatures.user.UserTable;
@@ -17,7 +16,7 @@ public class OracleSourceOfTruthSubscriber extends AbstractSubscriber {
     }
 
     @Subscribe
-    public PersistentUser onConfirmedBookingCreatedEvent(ConfirmedEventAdapter<UserCreatedEvent> confirmedBookingCreatedEvent) {
+    public PersistentUser onConfirmedBookingCreatedEvent(UserCreatedEvent confirmedBookingCreatedEvent) {
         return confirmedBookingCreatedEvent.apply(EMPTY_USER_DOCUMENT);
     }
 }

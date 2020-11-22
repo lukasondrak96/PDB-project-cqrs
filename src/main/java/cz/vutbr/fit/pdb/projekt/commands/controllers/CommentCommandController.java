@@ -1,7 +1,6 @@
 package cz.vutbr.fit.pdb.projekt.commands.controllers;
 
 import cz.vutbr.fit.pdb.projekt.commands.services.CommentCommandService;
-import cz.vutbr.fit.pdb.projekt.eventsAndStuff.ConfirmedEventAdapter;
 import cz.vutbr.fit.pdb.projekt.eventsAndStuff.events.UserCreatedEvent;
 import cz.vutbr.fit.pdb.projekt.eventsAndStuff.subscribers.MorphiaReadCacheSubscriber;
 import cz.vutbr.fit.pdb.projekt.eventsAndStuff.subscribers.OracleSourceOfTruthSubscriber;
@@ -23,14 +22,12 @@ public class CommentCommandController {
     @GetMapping("test")
     public void test() {
         final EventBus eventBus = EventBus.getDefault();
-        final UserDocument userDocument = new UserDocument("jmeno", "surname", 15, null, null, null, null, null );
-        final UserTable userTable = new UserTable("jmeno", "surname", 15, null, null);
+        final UserDocument userDocument = new UserDocument("cc", "cc", 15, null, null, null, null, null );
+        final UserTable userTable = new UserTable("cc", "cc", 15, null, null);
         new OracleSourceOfTruthSubscriber(eventBus);
         new MorphiaReadCacheSubscriber(eventBus);
         final UserCreatedEvent createdEvent = new UserCreatedEvent(userTable, userDocument, commentCommandService);
-
-        final ConfirmedEventAdapter<UserCreatedEvent> userEventAdapter = new ConfirmedEventAdapter<>(createdEvent);
-        eventBus.post(userEventAdapter);
+        eventBus.post(createdEvent);
 
     }
 }

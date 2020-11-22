@@ -1,6 +1,5 @@
 package cz.vutbr.fit.pdb.projekt.eventsAndStuff.subscribers;
 
-import cz.vutbr.fit.pdb.projekt.eventsAndStuff.ConfirmedEventAdapter;
 import cz.vutbr.fit.pdb.projekt.eventsAndStuff.events.UserCreatedEvent;
 import cz.vutbr.fit.pdb.projekt.features.PersistentUser;
 import cz.vutbr.fit.pdb.projekt.features.nosqlfeatures.user.UserDocument;
@@ -16,8 +15,8 @@ public class MorphiaReadCacheSubscriber extends AbstractSubscriber {
     }
 
     @Subscribe
-    public PersistentUser onConfirmedBookingCreatedEvent(ConfirmedEventAdapter<UserCreatedEvent> confirmedUserCreatedEvent) {
-        return confirmedUserCreatedEvent.apply(EMPTY_USER_DOCUMENT);
+    public PersistentUser onConfirmedBookingCreatedEvent(UserCreatedEvent confirmedBookingCreatedEvent) {
+        return confirmedBookingCreatedEvent.apply(EMPTY_USER_DOCUMENT);
     }
 
 }
