@@ -9,8 +9,8 @@ import java.util.List;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class ConversationInheritted {
+public class ConversationInherited {
     private String name;
     private String surname;
-    private List<MessagesInheritted> messages;
+    private List<MessageInherited> messages;
 }

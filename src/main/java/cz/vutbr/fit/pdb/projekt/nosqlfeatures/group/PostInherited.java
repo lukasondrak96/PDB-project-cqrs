@@ -1,17 +1,19 @@
-package cz.vutbr.fit.pdb.projekt.nosqlfeatures.user;
+package cz.vutbr.fit.pdb.projekt.nosqlfeatures.group;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.Date;
+import java.util.List;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class MessagesInheritted {
-    private boolean sent;
+public class PostInherited {
+    private String title;
     private String text;
     private Date createdAt;
-    private Date readAt;
+    private AuthorInherited author;
+    private List<CommentInherited> comments;
 }

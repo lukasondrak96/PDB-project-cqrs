@@ -8,12 +8,11 @@ import java.util.List;
 
 @Document
 @Data
-@AllArgsConstructor
 @NoArgsConstructor
 public class UserDocument {
 
-    public UserDocument(String name, String surname, int age, String sex, String state, List<GroupInheritted> groupsMember,
-                        List<GroupInheritted> groupsAdmin, List<ConversationInheritted> conversations_with_user) {
+    public UserDocument(String name, String surname, int age, String sex, String state, List<GroupInherited> groupsMember,
+                        List<GroupInherited> groupsAdmin, List<ConversationInherited> conversations_with_user) {
         this.name = name;
         this.surname = surname;
         this.age = age;
@@ -31,7 +30,7 @@ public class UserDocument {
     private int age;
     private String sex;
     private String state;
-    private List<GroupInheritted> groupsMember;
-    private List<GroupInheritted> groupsAdmin;
-    private List<ConversationInheritted> conversations_with_user;
+    private List<GroupInherited> groupsMember;
+    private List<GroupInherited> groupsAdmin;
+    private List<ConversationInherited> conversations_with_user;
 }

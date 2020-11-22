@@ -1,6 +1,6 @@
 package cz.vutbr.fit.pdb.projekt.sqlfeatures.group;
 
-import cz.vutbr.fit.pdb.projekt.nosqlfeatures.user.GroupInheritted;
+import cz.vutbr.fit.pdb.projekt.nosqlfeatures.user.GroupInherited;
 import cz.vutbr.fit.pdb.projekt.nosqlfeatures.user.UserDocument;
 import cz.vutbr.fit.pdb.projekt.nosqlfeatures.user.UserNoSqlRepository;
 import lombok.AllArgsConstructor;
@@ -20,9 +20,9 @@ public class GroupServiceImpl implements GroupService {
         GroupTable group = new GroupTable(groupDto.getName(), groupDto.getDescription(), groupDto.getState(), null);
         groupRepository.save(group);
 
-        GroupInheritted groupInheritted = new GroupInheritted(group.getName());
+        GroupInherited groupInherited = new GroupInherited(group.getName());
 
-        UserDocument userDocument = new UserDocument("jemno", "nejm", Collections.singletonList(groupInheritted), Collections.singletonList(groupInheritted));
+        UserDocument userDocument = new UserDocument("jemno", "nejm", 9, "Man", "Active", Collections.singletonList(groupInherited), Collections.singletonList(groupInherited), null);
         userNoSqlRepository.save(userDocument);
         return ResponseEntity.ok("CAJK");
     }
