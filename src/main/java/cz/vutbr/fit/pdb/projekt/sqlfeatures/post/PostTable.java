@@ -30,4 +30,7 @@ public class PostTable {
     @JoinColumn(name = "idGroup", referencedColumnName = "idGroup")
     @OnDelete(action = OnDeleteAction.CASCADE)
     private GroupTable groupTableReference;
+
+    //TODO Id author
+
 }
