@@ -1,8 +1,10 @@
 package cz.vutbr.fit.pdb.projekt.features.nosqlfeatures.user;
 
+import cz.vutbr.fit.pdb.projekt.features.PersistentUser;
 import cz.vutbr.fit.pdb.projekt.features.nosqlfeatures.user.inherited.ConversationInherited;
 import cz.vutbr.fit.pdb.projekt.features.nosqlfeatures.user.inherited.GroupInherited;
 import lombok.*;
+import org.bson.types.ObjectId;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import javax.persistence.*;
@@ -11,7 +13,7 @@ import java.util.List;
 @Document
 @Data
 @NoArgsConstructor
-public class UserDocument {
+public class UserDocument implements PersistentUser {
 
     public UserDocument(String name, String surname, int age, String sex, String state, List<GroupInherited> groupsMember,
                         List<GroupInherited> groupsAdmin, List<ConversationInherited> conversations_with_user) {
@@ -26,7 +28,7 @@ public class UserDocument {
     }
 
     @Id
-    private int id;
+    private String id;
     private String name;
     private String surname;
     private int age;

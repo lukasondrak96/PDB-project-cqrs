@@ -1,5 +1,6 @@
 package cz.vutbr.fit.pdb.projekt.features.sqlfeatures.user;
 
+import cz.vutbr.fit.pdb.projekt.features.PersistentUser;
 import cz.vutbr.fit.pdb.projekt.features.sqlfeatures.group.GroupTable;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -13,7 +14,7 @@ import java.util.List;
 @Getter
 @Setter
 @NoArgsConstructor
-public class UserTable {
+public class UserTable implements PersistentUser {
     public UserTable(String name, String surname, int age, String sex, String state) {
         this.name = name;
         this.surname = surname;
