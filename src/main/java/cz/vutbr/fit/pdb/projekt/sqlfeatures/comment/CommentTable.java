@@ -1,6 +1,7 @@
 package cz.vutbr.fit.pdb.projekt.sqlfeatures.comment;
 
 import cz.vutbr.fit.pdb.projekt.sqlfeatures.post.PostTable;
+import cz.vutbr.fit.pdb.projekt.sqlfeatures.user.UserTable;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -16,6 +17,13 @@ import java.util.Date;
 @NoArgsConstructor
 public class CommentTable {
 
+    public CommentTable(String text, Date createdAt, PostTable postTableReference, UserTable userTableReference) {
+        this.text = text;
+        this.createdAt = createdAt;
+        this.postTableReference = postTableReference;
+        this.userTableReference = userTableReference;
+    }
+
     @Id
     @SequenceGenerator(name = "CommentIdGenerator", sequenceName = "COMMENT_SEQUENCE", allocationSize = 1)
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "CommentIdGenerator")
@@ -30,6 +38,9 @@ public class CommentTable {
     @OnDelete(action = OnDeleteAction.CASCADE)
     private PostTable postTableReference;
 
-    //TODO Id author
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "idUser", referencedColumnName = "idUser")
+    @OnDelete(action = OnDeleteAction.CASCADE)
+    private UserTable userTableReference;
 
 }

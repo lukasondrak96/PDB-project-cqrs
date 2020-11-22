@@ -24,13 +24,13 @@ public class UserTable {
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "UserIdGenerator")
     private int idUser;
 
-    String name;
+    private String name;
 
-    String surname;
+    private String surname;
 
-    int age;
+    private int age;
 
-    String sex;
+    private String sex;
 
-    String state;
+    private String state;
 }

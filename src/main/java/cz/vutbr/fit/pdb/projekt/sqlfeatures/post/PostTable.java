@@ -1,6 +1,7 @@
 package cz.vutbr.fit.pdb.projekt.sqlfeatures.post;
 
 import cz.vutbr.fit.pdb.projekt.sqlfeatures.group.GroupTable;
+import cz.vutbr.fit.pdb.projekt.sqlfeatures.user.UserTable;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -31,6 +32,9 @@ public class PostTable {
     @OnDelete(action = OnDeleteAction.CASCADE)
     private GroupTable groupTableReference;
 
-    //TODO Id author
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "idUser", referencedColumnName = "idUser")
+    @OnDelete(action = OnDeleteAction.CASCADE)
+    private UserTable userTableReference;
 
 }

@@ -1,8 +1,11 @@
 package cz.vutbr.fit.pdb.projekt.sqlfeatures.group;
 
+import cz.vutbr.fit.pdb.projekt.sqlfeatures.user.UserTable;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 import javax.persistence.*;
 
@@ -28,5 +31,8 @@ public class GroupTable {
 
     private String state;
 
-    //TODO Id creator
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "idUser", referencedColumnName = "idUser")
+    @OnDelete(action = OnDeleteAction.CASCADE)
+    private UserTable userTableReference;
 }
