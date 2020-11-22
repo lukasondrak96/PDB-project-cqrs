@@ -7,16 +7,14 @@ import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 
 public class MorphiaReadCacheSubscriber extends AbstractSubscriber {
-
-    private static final UserDocument EMPTY_USER_DOCUMENT = new UserDocument();
-
-    public MorphiaReadCacheSubscriber(EventBus... eventBuses) {
+    public MorphiaReadCacheSubscriber(UserDocument user, EventBus... eventBuses) {
         super(eventBuses);
+        this.persistentUser = user;
     }
 
     @Subscribe
     public PersistentUser onConfirmedBookingCreatedEvent(UserCreatedEvent confirmedBookingCreatedEvent) {
-        return confirmedBookingCreatedEvent.apply(EMPTY_USER_DOCUMENT);
+        return confirmedBookingCreatedEvent.apply(persistentUser);
     }
 
 }

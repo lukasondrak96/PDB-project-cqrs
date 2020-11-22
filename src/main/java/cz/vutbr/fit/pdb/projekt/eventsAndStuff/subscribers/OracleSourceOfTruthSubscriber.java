@@ -8,15 +8,13 @@ import org.greenrobot.eventbus.Subscribe;
 
 public class OracleSourceOfTruthSubscriber extends AbstractSubscriber {
 
-    private static final UserTable EMPTY_USER_DOCUMENT = new UserTable();
-
-
-    public OracleSourceOfTruthSubscriber(EventBus... eventBuses) {
+    public OracleSourceOfTruthSubscriber(UserTable user, EventBus... eventBuses) {
         super(eventBuses);
+        this.persistentUser = user;
     }
 
     @Subscribe
     public PersistentUser onConfirmedBookingCreatedEvent(UserCreatedEvent confirmedBookingCreatedEvent) {
-        return confirmedBookingCreatedEvent.apply(EMPTY_USER_DOCUMENT);
+        return confirmedBookingCreatedEvent.apply(persistentUser);
     }
 }

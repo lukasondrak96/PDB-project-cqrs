@@ -1,5 +1,6 @@
 package cz.vutbr.fit.pdb.projekt.eventsAndStuff.subscribers;
 
+import cz.vutbr.fit.pdb.projekt.features.PersistentUser;
 import org.greenrobot.eventbus.EventBus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,6 +13,7 @@ public abstract class AbstractSubscriber {
     private static final Logger LOGGER = LoggerFactory.getLogger(AbstractSubscriber.class);
 
     final List<EventBus> eventBuses = new LinkedList<>();
+    PersistentUser persistentUser;
 
     public AbstractSubscriber(EventBus... eventBuses) {
         LOGGER.info("Constructing a subscriber and registering {} event buses", eventBuses.length);
