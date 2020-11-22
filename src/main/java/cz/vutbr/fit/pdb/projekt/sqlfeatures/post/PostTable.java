@@ -16,6 +16,15 @@ import java.util.Date;
 @Setter
 @NoArgsConstructor
 public class PostTable {
+
+    public PostTable(String title, String text, Date createdAt, GroupTable groupTableReference, UserTable userTableReference) {
+        this.title = title;
+        this.text = text;
+        this.createdAt = createdAt;
+        this.groupTableReference = groupTableReference;
+        this.userTableReference = userTableReference;
+    }
+
     @Id
     @SequenceGenerator(name = "PostIdGenerator", sequenceName = "POST_SEQUENCE", allocationSize = 1)
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "PostIdGenerator")
