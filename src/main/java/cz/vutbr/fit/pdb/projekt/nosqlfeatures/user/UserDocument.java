@@ -11,38 +11,27 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class UserDocument {
-//    @Id
-//    @SequenceGenerator(name = "PostIdGenerator", sequenceName = "POST_SEQUENCE", allocationSize = 1)
-//    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "PostIdGenerator")
-//    private int idPost;
-//
-//    private String title;
-//
-//    private String text;
-//
-//    private Date createdAt;
-//
-//    @ManyToOne(fetch = FetchType.LAZY)
-//    @JoinColumn(name = "idGroup", referencedColumnName = "idGroup")
-//    @OnDelete(action = OnDeleteAction.CASCADE)
-//    private GroupTable groupTableReference;
 
-
-    public UserDocument(String name, String surname, List<GroupInheritted> groupsMember, List<GroupInheritted> groupsAdmin) {
+    public UserDocument(String name, String surname, int age, String sex, String state, List<GroupInheritted> groupsMember,
+                        List<GroupInheritted> groupsAdmin, List<ConversationInheritted> conversations_with_user) {
         this.name = name;
         this.surname = surname;
+        this.age = age;
+        this.sex = sex;
+        this.state = state;
         this.groupsMember = groupsMember;
         this.groupsAdmin = groupsAdmin;
+        this.conversations_with_user = conversations_with_user;
     }
 
     @Id
     private int id;
     private String name;
     private String surname;
-//    private int age;
-//    private String sex;
-//    private String state;
+    private int age;
+    private String sex;
+    private String state;
     private List<GroupInheritted> groupsMember;
     private List<GroupInheritted> groupsAdmin;
-//    private List<ConversationInheritted> conversations_with_user;
+    private List<ConversationInheritted> conversations_with_user;
 }
