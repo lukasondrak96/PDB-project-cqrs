@@ -1,6 +1,6 @@
 package cz.vutbr.fit.pdb.projekt.features.sqlfeatures.user;
 
-import cz.vutbr.fit.pdb.projekt.features.PersistentUser;
+import cz.vutbr.fit.pdb.projekt.features.persistent.PersistentUser;
 import cz.vutbr.fit.pdb.projekt.features.sqlfeatures.group.GroupTable;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

@@ -1,10 +1,9 @@
 package cz.vutbr.fit.pdb.projekt.features.nosqlfeatures.user;
 
-import cz.vutbr.fit.pdb.projekt.features.PersistentUser;
+import cz.vutbr.fit.pdb.projekt.features.persistent.PersistentUser;
 import cz.vutbr.fit.pdb.projekt.features.nosqlfeatures.user.inherited.ConversationInherited;
 import cz.vutbr.fit.pdb.projekt.features.nosqlfeatures.user.inherited.GroupInherited;
 import lombok.*;
-import org.bson.types.ObjectId;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import javax.persistence.*;
