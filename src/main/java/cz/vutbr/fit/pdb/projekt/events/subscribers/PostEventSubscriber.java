@@ -15,7 +15,7 @@ public class PostEventSubscriber<T extends PersistentPost> extends AbstractSubsc
     }
 
     @Subscribe
-    public PersistentPost onUserCreatedEvent(PostCreatedEvent postCreatedEvent) {
+    public PersistentPost onPostCreatedEvent(PostCreatedEvent postCreatedEvent) {
         return postCreatedEvent.apply(persistentObject);
     }
 }

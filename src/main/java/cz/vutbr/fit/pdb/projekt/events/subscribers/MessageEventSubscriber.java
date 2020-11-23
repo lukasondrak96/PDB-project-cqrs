@@ -15,7 +15,7 @@ public class MessageEventSubscriber<T extends PersistentMessage> extends Abstrac
     }
 
     @Subscribe
-    public PersistentUser onUserCreatedEvent(MessageCreatedEvent messageCreatedEvent) {
+    public PersistentUser onMessageCreatedEvent(MessageCreatedEvent messageCreatedEvent) {
         return messageCreatedEvent.apply(persistentObject);
     }
 }
