@@ -2,10 +2,8 @@ package cz.vutbr.fit.pdb.projekt.commands.controllers;
 
 import cz.vutbr.fit.pdb.projekt.commands.services.UserCommandService;
 import cz.vutbr.fit.pdb.projekt.events.events.user.UserCreatedEvent;
-import cz.vutbr.fit.pdb.projekt.events.subscribers.MorphiaReadCacheSubscriber;
-import cz.vutbr.fit.pdb.projekt.events.subscribers.OracleSourceOfTruthSubscriber;
+import cz.vutbr.fit.pdb.projekt.events.subscribers.EventSubscriber;
 import cz.vutbr.fit.pdb.projekt.features.nosqlfeatures.user.UserDocument;
-import cz.vutbr.fit.pdb.projekt.features.persistent.PersistentUser;
 import cz.vutbr.fit.pdb.projekt.features.sqlfeatures.user.UserTable;
 import lombok.AllArgsConstructor;
 import org.greenrobot.eventbus.EventBus;
@@ -22,10 +20,13 @@ public class UserCommandController {
     @GetMapping("test")
     public void test() {
         final EventBus eventBus = EventBus.getDefault();
-        final UserDocument userDocument = new UserDocument("111", "111", 111, null, null, null, null, null );
-        final UserTable userTable = new UserTable("111", "111", 111, null, null);
-        new OracleSourceOfTruthSubscriber<PersistentUser>(userTable, eventBus);
-        new MorphiaReadCacheSubscriber<PersistentUser>(userDocument, eventBus);
+
+        final UserDocument userDocument = new UserDocument("testtesttest", "111", 111, null, null, null, null, null );
+        new EventSubscriber<>(userDocument, eventBus);
+
+        final UserTable userTable = new UserTable("testtesttest", "111", 111, null, null);
+        new EventSubscriber<>(userTable, eventBus);
+
         final UserCreatedEvent createdEvent = new UserCreatedEvent(userCommandService);
         eventBus.post(createdEvent);
 

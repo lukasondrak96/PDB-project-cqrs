@@ -6,9 +6,9 @@ import cz.vutbr.fit.pdb.projekt.features.persistent.PersistentUser;
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 
-public class MorphiaReadCacheSubscriber<T extends PersistentObject> extends AbstractSubscriber<T> {
+public class EventSubscriber<T extends PersistentObject> extends AbstractSubscriber<T> {
 
-    public MorphiaReadCacheSubscriber(T object, EventBus... eventBuses) {
+    public EventSubscriber(T object, EventBus... eventBuses) {
         super(eventBuses);
         this.persistentObject = object;
     }
@@ -17,5 +17,4 @@ public class MorphiaReadCacheSubscriber<T extends PersistentObject> extends Abst
     public PersistentUser onUserCreatedEvent(UserCreatedEvent userCreatedEvent) {
         return userCreatedEvent.apply((PersistentUser) persistentObject);
     }
-
 }
