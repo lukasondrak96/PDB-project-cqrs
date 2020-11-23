@@ -1,6 +1,11 @@
 package cz.vutbr.fit.pdb.projekt.events.subscribers;
 
+import cz.vutbr.fit.pdb.projekt.events.events.post.PostCreatedEvent;
+import cz.vutbr.fit.pdb.projekt.events.events.post.PostDeletedEvent;
+import cz.vutbr.fit.pdb.projekt.events.events.post.PostUpdatedEvent;
 import cz.vutbr.fit.pdb.projekt.events.events.user.UserCreatedEvent;
+import cz.vutbr.fit.pdb.projekt.events.events.user.UserDeletedEvent;
+import cz.vutbr.fit.pdb.projekt.events.events.user.UserUpdatedEvent;
 import cz.vutbr.fit.pdb.projekt.features.persistent.PersistentObject;
 import cz.vutbr.fit.pdb.projekt.features.persistent.PersistentPost;
 import cz.vutbr.fit.pdb.projekt.features.persistent.PersistentUser;
@@ -17,5 +22,15 @@ public class PostEventSubscriber<T extends PersistentPost> extends AbstractSubsc
     @Subscribe
     public PersistentPost onPostCreatedEvent(PostCreatedEvent postCreatedEvent) {
         return postCreatedEvent.apply(persistentObject);
+    }
+
+    @Subscribe
+    public PersistentPost onPostUpdatedEvent(PostUpdatedEvent postUpdatedEvent) {
+        return postUpdatedEvent.apply(persistentObject);
+    }
+
+    @Subscribe
+    public PersistentPost onPostDeletedEvent(PostDeletedEvent postDeletedEvent) {
+        return postDeletedEvent.apply(persistentObject);
     }
 }

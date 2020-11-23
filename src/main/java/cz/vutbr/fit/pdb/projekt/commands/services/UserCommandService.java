@@ -21,4 +21,14 @@ public class UserCommandService {
         else
             return userDocumentRepository.save((UserDocument) user);
     }
+
+    public PersistentUser updateUser(PersistentUser persistentUser) {
+        //todo
+        return null;
+    }
+
+    public PersistentUser deleteUser(PersistentUser persistentUser) {
+        //todo
+        return null;
+    }
 }
