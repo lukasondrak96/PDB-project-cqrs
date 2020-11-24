@@ -1,9 +1,15 @@
 package cz.vutbr.fit.pdb.projekt.commands.controllers;
 
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/commands/message")
+@RequestMapping("/command/messages")
 public class MessageCommandController {
+    @PostMapping("new")
+    public ResponseEntity<?> createNewMessage() {
+        return null;
+    }
 }
