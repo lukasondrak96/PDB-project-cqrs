@@ -2,9 +2,8 @@ package cz.vutbr.fit.pdb.projekt.commands.services;
 
 import cz.vutbr.fit.pdb.projekt.commands.dto.group.NewGroupDto;
 import cz.vutbr.fit.pdb.projekt.events.events.group.GroupCreatedEvent;
-import cz.vutbr.fit.pdb.projekt.events.events.user.UserCreatedEvent;
+import cz.vutbr.fit.pdb.projekt.events.events.group.GroupDeletedEvent;
 import cz.vutbr.fit.pdb.projekt.events.subscribers.GroupEventSubscriber;
-import cz.vutbr.fit.pdb.projekt.events.subscribers.UserEventSubscriber;
 import cz.vutbr.fit.pdb.projekt.features.nosqlfeatures.group.GroupDocument;
 import cz.vutbr.fit.pdb.projekt.features.nosqlfeatures.group.GroupDocumentRepository;
 import cz.vutbr.fit.pdb.projekt.features.nosqlfeatures.group.inherited.AuthorInherited;
@@ -76,8 +75,25 @@ public class GroupCommandService {
         return null;
     }
 
-    public PersistentGroup deleteGroup(PersistentGroup persistentGroup) {
-        return null;
+    public ResponseEntity<?> deleteGroup(String groupId) {
+        Optional<GroupDocument> groupDocumentOptional = groupDocumentRepository.findById(groupId);
+        if (groupDocumentOptional.isEmpty())
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Skupina s tímto id neexistuje");
+
+        GroupDocument groupDocument = groupDocumentOptional.get();
+
+        Optional<GroupTable> groupTableOptional = groupRepository.findByName(groupDocument.getName());
+        if (groupTableOptional.isEmpty())
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Group s tímto id neexistuje v oracle (v mongo existuje -> nekompatibilní stav databází)");
+        GroupTable groupTable = groupTableOptional.get();
+
+        new GroupEventSubscriber<>(groupTable, EVENT_BUS);
+        new GroupEventSubscriber<>(groupDocument, EVENT_BUS);
+
+        final GroupDeletedEvent deletedEvent = new GroupDeletedEvent(this);
+        EVENT_BUS.post(deletedEvent);
+
+        return ResponseEntity.ok().body("Skupina byla smazána");
     }
 
 /* methods called from events */
@@ -86,5 +102,12 @@ public class GroupCommandService {
             return groupRepository.save((GroupTable) group);
         else
             return groupDocumentRepository.save((GroupDocument) group);
+    }
+
+    public void finishGroupDeleting(PersistentGroup group) {
+        if (group instanceof GroupTable)
+            groupRepository.delete((GroupTable) group);
+        else
+            groupDocumentRepository.delete((GroupDocument) group);
     }
 }

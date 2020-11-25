@@ -9,7 +9,7 @@ import java.util.Optional;
 import java.util.List;
 
 @Repository
-public interface UserDocumentRepository extends MongoRepository<UserDocument, Integer> {
+public interface UserDocumentRepository extends MongoRepository<UserDocument, String> {
     Optional<UserDocument> findByEmail(String email);
 
     @Query(value="{ 'state' : ?0 }", fields="{ 'email' : 1, 'name' : 1, 'surname' : 1}")

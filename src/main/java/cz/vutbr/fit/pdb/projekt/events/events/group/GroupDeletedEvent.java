@@ -14,7 +14,8 @@ public class GroupDeletedEvent implements EventInterface<PersistentGroup> {
 
     @Override
     public PersistentGroup apply(PersistentGroup persistentGroup) {
-        return service.deleteGroup(persistentGroup);
+        service.finishGroupDeleting(persistentGroup);
+        return null;
     }
 
     @Override
