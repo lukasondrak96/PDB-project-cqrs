@@ -1,5 +1,6 @@
 package cz.vutbr.fit.pdb.projekt.features.nosqlfeatures.user;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import cz.vutbr.fit.pdb.projekt.features.nosqlfeatures.user.inherited.ConversationInherited;
 import cz.vutbr.fit.pdb.projekt.features.nosqlfeatures.user.inherited.GroupInherited;
 import cz.vutbr.fit.pdb.projekt.features.persistent.PersistentUser;
@@ -16,6 +17,7 @@ import java.util.List;
 @Document
 @Data
 @NoArgsConstructor
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class UserDocument implements PersistentUser {
 
     public UserDocument(String email, String name, String surname, Date birthDate, UserSex sex, List<GroupInherited> groupsMember,
