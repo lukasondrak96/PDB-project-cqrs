@@ -82,10 +82,6 @@ public class UserCommandService {
         else
             return userDocumentRepository.save((UserDocument) user);
     }
-//
-//    public PersistentUser deleteUser(PersistentUser persistentUser) {
-//        return null;
-//    }
 
     public PersistentUser finishUserUpdating(PersistentUser user) {
         if (user instanceof UserTable) {
