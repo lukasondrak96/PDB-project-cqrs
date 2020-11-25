@@ -17,8 +17,4 @@ public class CommentDeletedEvent implements EventInterface<PersistentComment> {
         return service.deleteComment(persistentComment);
     }
 
-    @Override
-    public PersistentComment reverse(PersistentComment persistentComment) {
-        return null;
-    }
 }

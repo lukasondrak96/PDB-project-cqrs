@@ -18,8 +18,4 @@ public class PostUpdatedEvent implements EventInterface<PersistentPost> {
         return service.updatePost(persistentPost);
     }
 
-    @Override
-    public PersistentPost reverse(PersistentPost persistentPost) {
-        return null;
-    }
 }

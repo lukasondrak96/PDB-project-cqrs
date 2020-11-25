@@ -18,8 +18,4 @@ public class MessageCreatedEvent implements EventInterface<PersistentMessage> {
         return service.saveMessage(persistentMessage);
     }
 
-    @Override
-    public PersistentMessage reverse(PersistentMessage persistentMessage) {
-        return null;
-    }
 }

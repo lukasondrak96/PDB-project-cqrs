@@ -17,8 +17,4 @@ public class UserCreatedEvent implements EventInterface<PersistentUser> {
         return service.finishUserSaving(persistentUser);
     }
 
-    @Override
-    public PersistentUser reverse(PersistentUser persistentUser) {
-        return null;
-    }
 }

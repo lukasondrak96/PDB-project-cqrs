@@ -18,8 +18,4 @@ public class GroupDeletedEvent implements EventInterface<PersistentGroup> {
         return null;
     }
 
-    @Override
-    public PersistentGroup reverse(PersistentGroup persistentGroup) {
-        return null;
-    }
 }

@@ -18,8 +18,4 @@ public class UserDeletedEvent implements EventInterface<PersistentUser> {
         return service.deleteUser(persistentUser);
     }
 
-    @Override
-    public PersistentUser reverse(PersistentUser persistentUser) {
-        return null;
-    }
 }

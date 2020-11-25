@@ -18,8 +18,4 @@ public class UserUpdatedEvent implements EventInterface<PersistentUser> {
         return service.updateUser(persistentUser);
     }
 
-    @Override
-    public PersistentUser reverse(PersistentUser persistentUser) {
-        return null;
-    }
 }

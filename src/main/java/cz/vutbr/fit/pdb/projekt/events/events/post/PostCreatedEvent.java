@@ -17,8 +17,4 @@ public class PostCreatedEvent implements EventInterface<PersistentPost> {
         return service.savePost(persistentPost);
     }
 
-    @Override
-    public PersistentPost reverse(PersistentPost persistentPost) {
-        return null;
-    }
 }

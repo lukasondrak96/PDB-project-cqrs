@@ -17,8 +17,4 @@ public class GroupUpdatedEvent implements EventInterface<PersistentGroup> {
         return service.updateGroup(persistentGroup);
     }
 
-    @Override
-    public PersistentGroup reverse(PersistentGroup persistentGroup) {
-        return null;
-    }
 }

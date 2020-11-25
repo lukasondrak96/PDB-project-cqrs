@@ -17,8 +17,4 @@ public class MessageUpdatedEvent implements EventInterface<PersistentMessage> {
         return service.updateMessage(persistentMessage);
     }
 
-    @Override
-    public PersistentMessage reverse(PersistentMessage persistentMessage) {
-        return null;
-    }
 }

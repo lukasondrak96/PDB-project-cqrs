@@ -18,8 +18,4 @@ public class MessageDeletedEvent implements EventInterface<PersistentMessage> {
         return service.deleteMessage(persistentMessage);
     }
 
-    @Override
-    public PersistentMessage reverse(PersistentMessage persistentMessage) {
-        return null;
-    }
 }

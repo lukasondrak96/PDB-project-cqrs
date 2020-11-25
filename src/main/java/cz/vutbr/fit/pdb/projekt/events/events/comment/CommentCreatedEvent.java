@@ -17,8 +17,4 @@ public class CommentCreatedEvent implements EventInterface<PersistentComment> {
         return service.saveComment(persistentComment);
     }
 
-    @Override
-    public PersistentComment reverse(PersistentComment persistentComment) {
-        return null;
-    }
 }
