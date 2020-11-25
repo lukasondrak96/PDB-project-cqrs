@@ -1,6 +1,7 @@
 package cz.vutbr.fit.pdb.projekt.commands.controllers;
 
 import cz.vutbr.fit.pdb.projekt.commands.dto.user.NewUserDto;
+import cz.vutbr.fit.pdb.projekt.commands.dto.user.UpdateUserDto;
 import cz.vutbr.fit.pdb.projekt.commands.services.UserCommandService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -20,17 +21,17 @@ public class UserCommandController {
     }
 
     @GetMapping("{id}/activate")
-    public ResponseEntity<?> activateUserAccount(@PathVariable(value = "id") int userId) {
+    public ResponseEntity<?> activateUserAccount(@PathVariable(value = "id") String userId) {
         return null;
     }
 
     @GetMapping("{id}/deactivate")
-    public ResponseEntity<?> deactivateUserAccount(@PathVariable(value = "id") int userId) {
+    public ResponseEntity<?> deactivateUserAccount(@PathVariable(value = "id") String userId) {
         return null;
     }
 
     @PutMapping("{id}/edit")
-    public ResponseEntity<?> editUserAccount(@PathVariable(value = "id") int userId) {
-        return null;
+    public ResponseEntity<?> editUserAccount(@PathVariable(value = "id") String userId, @Valid @RequestBody UpdateUserDto updateUserDto) {
+        return userCommandService.updateUser(userId, updateUserDto);
     }
 }

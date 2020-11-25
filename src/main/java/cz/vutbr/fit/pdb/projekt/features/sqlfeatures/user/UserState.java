@@ -1,5 +1,8 @@
 package cz.vutbr.fit.pdb.projekt.features.sqlfeatures.user;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 public enum UserState {
-    ACTIVATED, DEACTIVATED
+    @JsonProperty("activated") ACTIVATED,
+    @JsonProperty("deactivated") DEACTIVATED
 }
