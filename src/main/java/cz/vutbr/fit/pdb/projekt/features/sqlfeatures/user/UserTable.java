@@ -8,6 +8,7 @@ import lombok.Setter;
 
 import javax.persistence.*;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 @Entity
@@ -15,12 +16,13 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 public class UserTable implements PersistentUser {
-    public UserTable(String name, String surname, int age, String sex, String state) {
+    public UserTable(String email, String name, String surname, Date birthDate, UserSex sex) {
+        this.email = email;
         this.name = name;
         this.surname = surname;
-        this.age = age;
+        this.birthDate = birthDate;
         this.sex = sex;
-        this.state = state;
+        this.state = UserState.ACTIVATED;
     }
 
     @Id
@@ -28,15 +30,17 @@ public class UserTable implements PersistentUser {
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "UserIdGenerator")
     private int idUser;
 
+    private String email;
+
     private String name;
 
     private String surname;
 
-    private int age;
+    private Date birthDate;
 
-    private String sex;
+    private UserSex sex;
 
-    private String state;
+    private UserState state;
 
     @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinTable(

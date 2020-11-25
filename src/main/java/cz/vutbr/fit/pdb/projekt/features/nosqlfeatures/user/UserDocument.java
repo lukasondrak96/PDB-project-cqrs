@@ -1,12 +1,16 @@
 package cz.vutbr.fit.pdb.projekt.features.nosqlfeatures.user;
 
-import cz.vutbr.fit.pdb.projekt.features.persistent.PersistentUser;
 import cz.vutbr.fit.pdb.projekt.features.nosqlfeatures.user.inherited.ConversationInherited;
 import cz.vutbr.fit.pdb.projekt.features.nosqlfeatures.user.inherited.GroupInherited;
-import lombok.*;
+import cz.vutbr.fit.pdb.projekt.features.persistent.PersistentUser;
+import cz.vutbr.fit.pdb.projekt.features.sqlfeatures.user.UserSex;
+import cz.vutbr.fit.pdb.projekt.features.sqlfeatures.user.UserState;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import javax.persistence.*;
+import javax.persistence.Id;
+import java.util.Date;
 import java.util.List;
 
 @Document
@@ -14,13 +18,14 @@ import java.util.List;
 @NoArgsConstructor
 public class UserDocument implements PersistentUser {
 
-    public UserDocument(String name, String surname, int age, String sex, String state, List<GroupInherited> groupsMember,
+    public UserDocument(String email, String name, String surname, Date birthDate, UserSex sex, List<GroupInherited> groupsMember,
                         List<GroupInherited> groupsAdmin, List<ConversationInherited> conversations_with_user) {
+        this.email = email;
         this.name = name;
         this.surname = surname;
-        this.age = age;
+        this.birthDate = birthDate;
         this.sex = sex;
-        this.state = state;
+        this.state = UserState.ACTIVATED;
         this.groupsMember = groupsMember;
         this.groupsAdmin = groupsAdmin;
         this.conversations_with_user = conversations_with_user;
@@ -28,11 +33,12 @@ public class UserDocument implements PersistentUser {
 
     @Id
     private String id;
+    private String email;
     private String name;
     private String surname;
-    private int age;
-    private String sex;
-    private String state;
+    private Date birthDate;
+    private UserSex sex;
+    private UserState state;
     private List<GroupInherited> groupsMember;
     private List<GroupInherited> groupsAdmin;
     private List<ConversationInherited> conversations_with_user;

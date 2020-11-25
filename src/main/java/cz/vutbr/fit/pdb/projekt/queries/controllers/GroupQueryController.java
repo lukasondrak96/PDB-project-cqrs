@@ -11,6 +11,11 @@ import org.springframework.web.bind.annotation.RestController;
 @AllArgsConstructor
 @RequestMapping("/query/groups")
 public class GroupQueryController {
+    @GetMapping
+    public ResponseEntity<?> getAllGroups() {
+        return null;
+    }
+
     @GetMapping("{id}/members")
     public ResponseEntity<?> getGroupMembers(@PathVariable(value = "id") int groupId) {
         return null;

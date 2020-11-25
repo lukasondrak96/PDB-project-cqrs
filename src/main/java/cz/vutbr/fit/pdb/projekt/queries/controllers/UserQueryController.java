@@ -11,6 +11,11 @@ import org.springframework.web.bind.annotation.RestController;
 @AllArgsConstructor
 @RequestMapping("/query/users")
 public class UserQueryController {
+    @GetMapping
+    public ResponseEntity<?> getAllUsers() {
+        return null;
+    }
+
     @GetMapping("{id}")
     public ResponseEntity<?> getInformationAboutUser(@PathVariable(value = "id") int userId) {
         return null;
