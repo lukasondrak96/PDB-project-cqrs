@@ -1,16 +1,23 @@
 package cz.vutbr.fit.pdb.projekt.commands.controllers;
 
+import cz.vutbr.fit.pdb.projekt.commands.dto.group.NewGroupDto;
+import cz.vutbr.fit.pdb.projekt.commands.services.GroupCommandService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import javax.validation.Valid;
 
 @RestController
 @AllArgsConstructor
 @RequestMapping("/command/groups")
 public class GroupCommandController {
+    private final GroupCommandService groupCommandService;
+
+
     @PostMapping("new")
-    public ResponseEntity<?> createNewGroup() {
-        return null;
+    public ResponseEntity<?> createNewGroup(@Valid @RequestBody NewGroupDto newGroupDto) {
+        return groupCommandService.createGroup(newGroupDto);
     }
 
     @PutMapping("{id}/edit")

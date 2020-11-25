@@ -28,9 +28,9 @@ public class UserCommandService {
         }
 
         final UserTable userTable = new UserTable(newUserDto.getEmail(), newUserDto.getName(), newUserDto.getSurname(), newUserDto.getBirthDate(), newUserDto.getSex());
-        new UserEventSubscriber<>(userTable, EVENT_BUS);
-
         final UserDocument userDocument = new UserDocument(newUserDto.getEmail(), newUserDto.getName(), newUserDto.getSurname(), newUserDto.getBirthDate(), newUserDto.getSex(), null, null, null);
+
+        new UserEventSubscriber<>(userTable, EVENT_BUS);
         new UserEventSubscriber<>(userDocument, EVENT_BUS);
 
         final UserCreatedEvent createdEvent = new UserCreatedEvent(this);

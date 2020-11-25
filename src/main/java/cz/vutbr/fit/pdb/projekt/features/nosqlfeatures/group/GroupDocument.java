@@ -3,6 +3,7 @@ package cz.vutbr.fit.pdb.projekt.features.nosqlfeatures.group;
 import cz.vutbr.fit.pdb.projekt.features.nosqlfeatures.group.inherited.AuthorInherited;
 import cz.vutbr.fit.pdb.projekt.features.nosqlfeatures.group.inherited.MemberInherited;
 import cz.vutbr.fit.pdb.projekt.features.nosqlfeatures.group.inherited.PostInherited;
+import cz.vutbr.fit.pdb.projekt.features.persistent.PersistentGroup;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -13,7 +14,7 @@ import java.util.List;
 @Document
 @Data
 @NoArgsConstructor
-public class GroupDocument {
+public class GroupDocument implements PersistentGroup {
 
     public GroupDocument(String name, String description, String state, AuthorInherited author, List<PostInherited> posts, List<MemberInherited> members) {
         this.name = name;

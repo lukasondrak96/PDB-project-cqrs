@@ -1,5 +1,6 @@
 package cz.vutbr.fit.pdb.projekt.features.sqlfeatures.group;
 
+import cz.vutbr.fit.pdb.projekt.features.persistent.PersistentGroup;
 import cz.vutbr.fit.pdb.projekt.features.sqlfeatures.user.UserTable;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -15,8 +16,8 @@ import java.util.List;
 @Getter
 @Setter
 @NoArgsConstructor
-public class GroupTable {
-    public GroupTable(String name, String description, String state, UserTable userTableReference) {
+public class GroupTable implements PersistentGroup {
+    public GroupTable(String name, String description, GroupState state, UserTable userTableReference) {
         this.name = name;
         this.description = description;
         this.state = state;
@@ -32,7 +33,7 @@ public class GroupTable {
 
     private String description;
 
-    private String state;
+    private GroupState state;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "idUser", referencedColumnName = "idUser")
