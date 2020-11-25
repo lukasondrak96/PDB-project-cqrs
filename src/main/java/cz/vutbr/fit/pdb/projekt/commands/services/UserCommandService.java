@@ -39,8 +39,8 @@ public class UserCommandService {
         return ResponseEntity.ok().body("Účet byl vytvořen");
     }
 
-
-    public PersistentUser saveUser(PersistentUser user) {
+/* methods called from events */
+    public PersistentUser finishUserSaving(PersistentUser user) {
         if (user instanceof UserTable)
             return userRepository.save((UserTable) user);
         else

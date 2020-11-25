@@ -76,14 +76,15 @@ public class GroupCommandService {
         return null;
     }
 
-    public PersistentGroup saveGroup(PersistentGroup group) {
+    public PersistentGroup deleteGroup(PersistentGroup persistentGroup) {
+        return null;
+    }
+
+/* methods called from events */
+    public PersistentGroup finishGroupSaving(PersistentGroup group) {
         if (group instanceof GroupTable)
             return groupRepository.save((GroupTable) group);
         else
             return groupDocumentRepository.save((GroupDocument) group);
-    }
-
-    public PersistentGroup deleteGroup(PersistentGroup persistentGroup) {
-        return null;
     }
 }

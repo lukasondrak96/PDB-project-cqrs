@@ -14,7 +14,7 @@ public class GroupCreatedEvent implements EventInterface<PersistentGroup> {
 
     @Override
     public PersistentGroup apply(PersistentGroup persistentGroup) {
-        return service.saveGroup(persistentGroup);
+        return service.finishGroupSaving(persistentGroup);
     }
 
     @Override
