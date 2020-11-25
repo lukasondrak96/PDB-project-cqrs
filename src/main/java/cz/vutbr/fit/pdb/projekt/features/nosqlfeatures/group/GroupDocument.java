@@ -1,5 +1,6 @@
 package cz.vutbr.fit.pdb.projekt.features.nosqlfeatures.group;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import cz.vutbr.fit.pdb.projekt.features.nosqlfeatures.group.inherited.AuthorInherited;
 import cz.vutbr.fit.pdb.projekt.features.nosqlfeatures.group.inherited.MemberInherited;
 import cz.vutbr.fit.pdb.projekt.features.nosqlfeatures.group.inherited.PostInherited;
@@ -14,6 +15,7 @@ import java.util.List;
 @Document
 @Data
 @NoArgsConstructor
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class GroupDocument implements PersistentGroup {
 
     public GroupDocument(String name, String description, String state, AuthorInherited author, List<PostInherited> posts, List<MemberInherited> members) {
