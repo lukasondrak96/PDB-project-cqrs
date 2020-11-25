@@ -12,6 +12,7 @@ import cz.vutbr.fit.pdb.projekt.features.nosqlfeatures.user.UserDocument;
 import cz.vutbr.fit.pdb.projekt.features.nosqlfeatures.user.UserDocumentRepository;
 import cz.vutbr.fit.pdb.projekt.features.persistent.PersistentGroup;
 import cz.vutbr.fit.pdb.projekt.features.sqlfeatures.group.GroupRepository;
+import cz.vutbr.fit.pdb.projekt.features.sqlfeatures.group.GroupState;
 import cz.vutbr.fit.pdb.projekt.features.sqlfeatures.group.GroupTable;
 import cz.vutbr.fit.pdb.projekt.features.sqlfeatures.user.UserRepository;
 import cz.vutbr.fit.pdb.projekt.features.sqlfeatures.user.UserTable;
@@ -38,6 +39,10 @@ public class GroupCommandService {
     public ResponseEntity<?> createGroup(NewGroupDto newGroupDto) {
         if (groupRepository.countByName(newGroupDto.getName()) != 0) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Skupina s tímto názvem již existuje");
+        }
+
+        if (newGroupDto.getState() == GroupState.ARCHIVED) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Nelze vytvořit archivovanou skupinu");
         }
 
         Optional<UserTable> userOptional = userRepository.findById(newGroupDto.getIdUser());

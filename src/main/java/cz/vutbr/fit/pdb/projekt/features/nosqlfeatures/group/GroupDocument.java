@@ -28,7 +28,7 @@ public class GroupDocument implements PersistentGroup {
     }
 
     @Id
-    private int id;
+    private String id;
     private String name;
     private String description;
     private String state;
