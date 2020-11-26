@@ -47,11 +47,11 @@ public class UserCommandService {
     public ResponseEntity<?> updateUser(Integer userId, UpdateUserDto updateUserDto) {
         Optional<UserTable> userTableOptional = userRepository.findById(userId);
         if(userTableOptional.isEmpty())
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("User s tímto emailem neexistuje v oracle (v mongo existuje -> nekompatibilní stav databází)");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Tento uživatel neexistuje");
 
         Optional<UserDocument> userDocumentOptional = userDocumentRepository.findById(userId);
         if (userDocumentOptional.isEmpty())
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Tento uživatel neexistuje");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("User s tímto emailem neexistuje v mongu (v oraclu existuje -> nekompatibilní stav databází)");
 
         UserTable oldUserTable = userTableOptional.get();
         UserDocument oldUserDocument = userDocumentOptional.get();
@@ -59,8 +59,6 @@ public class UserCommandService {
         if (userTableEqualsUpdateUserDto(oldUserTable, updateUserDto)) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Nebyl nalezen záznam pro editaci");
         }
-
-
 
         final UserTable userTable = new UserTable(updateUserDto.getEmail(), updateUserDto.getName(),
                 updateUserDto.getSurname(), updateUserDto.getBirthDate(), updateUserDto.getSex(), updateUserDto.getState());
