@@ -33,6 +33,19 @@ public class UserDocument implements PersistentUser {
         this.conversations_with_user = conversations_with_user;
     }
 
+    public UserDocument(String email, String name, String surname, Date birthDate, UserSex sex, UserState state,
+                        List<GroupInherited> groupsMember, List<GroupInherited> groupsAdmin, List<ConversationInherited> conversations_with_user) {
+        this.email = email;
+        this.name = name;
+        this.surname = surname;
+        this.birthDate = birthDate;
+        this.sex = sex;
+        this.state = state;
+        this.groupsMember = groupsMember;
+        this.groupsAdmin = groupsAdmin;
+        this.conversations_with_user = conversations_with_user;
+    }
+
     @Id
     private String id;
     private String email;

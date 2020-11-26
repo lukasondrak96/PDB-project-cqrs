@@ -25,6 +25,15 @@ public class UserTable implements PersistentUser {
         this.state = UserState.ACTIVATED;
     }
 
+    public UserTable(String email, String name, String surname, Date birthDate, UserSex sex, UserState state) {
+        this.email = email;
+        this.name = name;
+        this.surname = surname;
+        this.birthDate = birthDate;
+        this.sex = sex;
+        this.state = state;
+    }
+
     @Id
     @SequenceGenerator(name = "UserIdGenerator", sequenceName = "USER_SEQUENCE", allocationSize = 1)
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "UserIdGenerator")

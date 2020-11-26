@@ -3,10 +3,7 @@ package cz.vutbr.fit.pdb.projekt.events.subscribers;
 import cz.vutbr.fit.pdb.projekt.events.events.group.GroupCreatedEvent;
 import cz.vutbr.fit.pdb.projekt.events.events.group.GroupDeletedEvent;
 import cz.vutbr.fit.pdb.projekt.events.events.group.GroupUpdatedEvent;
-import cz.vutbr.fit.pdb.projekt.events.events.user.UserCreatedEvent;
 import cz.vutbr.fit.pdb.projekt.features.persistent.PersistentGroup;
-import cz.vutbr.fit.pdb.projekt.features.persistent.PersistentObject;
-import cz.vutbr.fit.pdb.projekt.features.persistent.PersistentUser;
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 
