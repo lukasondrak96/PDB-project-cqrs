@@ -44,9 +44,8 @@ public class UserCommandService {
     @Transactional
     public ResponseEntity<?> updateUser(String userId, UpdateUserDto updateUserDto) {
         Optional<UserDocument> userDocumentOptional = userDocumentRepository.findById(userId);
-        if (userDocumentOptional.isEmpty()) {
+        if (userDocumentOptional.isEmpty())
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Tento uživatel neexistuje");
-        }
 
         UserDocument oldUserDocument = userDocumentOptional.get();
         String email = oldUserDocument.getEmail();
@@ -56,11 +55,14 @@ public class UserCommandService {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("User s tímto emailem neexistuje v oracle (v mongo existuje -> nekompatibilní stav databází)");
 
         UserTable oldUserTable = userTableOptional.get();
-
-
         if (userTableEqualsUpdateUserDto(oldUserTable, updateUserDto)) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Nebyl nalezen záznam pro editaci");
         }
+
+        Optional<UserTable> anotherUserWithThisEmailOptional = userRepository.findByEmail(updateUserDto.getEmail());
+        if(anotherUserWithThisEmailOptional.isPresent() &&
+                anotherUserWithThisEmailOptional.get().getIdUser() != oldUserTable.getIdUser())
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Tento email už je používán jiným uživatelem");
 
         final UserTable userTable = new UserTable(updateUserDto.getEmail(), updateUserDto.getName(),
                 updateUserDto.getSurname(), updateUserDto.getBirthDate(), updateUserDto.getSex(), updateUserDto.getState());
