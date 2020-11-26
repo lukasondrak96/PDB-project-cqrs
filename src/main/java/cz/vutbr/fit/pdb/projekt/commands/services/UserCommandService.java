@@ -9,6 +9,7 @@ import cz.vutbr.fit.pdb.projekt.features.nosqlfeatures.user.UserDocument;
 import cz.vutbr.fit.pdb.projekt.features.nosqlfeatures.user.UserDocumentRepository;
 import cz.vutbr.fit.pdb.projekt.features.persistent.PersistentUser;
 import cz.vutbr.fit.pdb.projekt.features.sqlfeatures.user.UserRepository;
+import cz.vutbr.fit.pdb.projekt.features.sqlfeatures.user.UserState;
 import cz.vutbr.fit.pdb.projekt.features.sqlfeatures.user.UserTable;
 import lombok.AllArgsConstructor;
 import org.greenrobot.eventbus.EventBus;
@@ -81,6 +82,26 @@ public class UserCommandService {
         return ResponseEntity.ok().body("Data byla aktualizována");
     }
 
+    public ResponseEntity<?> activateUser(String userId) {
+        Optional<UserDocument> userDocumentOptional = userDocumentRepository.findById(userId);
+        if (userDocumentOptional.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Tento uživatel neexistuje");
+        }
+        UserDocument doc = userDocumentOptional.get();
+        UpdateUserDto updateUserDto = new UpdateUserDto(doc.getEmail(), doc.getName(), doc.getSurname(), doc.getBirthDate(), doc.getSex(), UserState.ACTIVATED);
+        return updateUser(userId, updateUserDto);
+    }
+
+    public ResponseEntity<?> deactivateUser(String userId) {
+        Optional<UserDocument> userDocumentOptional = userDocumentRepository.findById(userId);
+        if (userDocumentOptional.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Tento uživatel neexistuje");
+        }
+        UserDocument doc = userDocumentOptional.get();
+        UpdateUserDto updateUserDto = new UpdateUserDto(doc.getEmail(), doc.getName(), doc.getSurname(), doc.getBirthDate(), doc.getSex(), UserState.DEACTIVATED);
+        return updateUser(userId, updateUserDto);
+    }
+
     /* methods called from events */
     public PersistentUser finishUserSaving(PersistentUser user) {
         if (user instanceof UserTable)
@@ -106,8 +127,5 @@ public class UserCommandService {
                 dto.getBirthDate().equals(table.getBirthDate()) &&
                 dto.getSex() == table.getSex() &&
                 dto.getState() == table.getState();
-    }
-
-    public PersistentUser finishUserDeleting(PersistentUser persistentUser) { return null;
     }
 }
