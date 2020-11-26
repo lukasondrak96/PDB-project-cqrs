@@ -22,4 +22,5 @@ public class UserEventSubscriber<T extends PersistentUser> extends AbstractSubsc
     public PersistentUser onUserUpdatedEvent(UserUpdatedEvent userUpdatedEvent) {
         return userUpdatedEvent.apply(persistentObject);
     }
+
 }

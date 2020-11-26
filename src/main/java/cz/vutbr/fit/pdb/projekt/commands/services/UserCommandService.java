@@ -2,6 +2,7 @@ package cz.vutbr.fit.pdb.projekt.commands.services;
 
 import cz.vutbr.fit.pdb.projekt.commands.dto.user.NewUserDto;
 import cz.vutbr.fit.pdb.projekt.commands.dto.user.UpdateUserDto;
+import cz.vutbr.fit.pdb.projekt.events.events.EventInterface;
 import cz.vutbr.fit.pdb.projekt.events.events.user.UserCreatedEvent;
 import cz.vutbr.fit.pdb.projekt.events.events.user.UserUpdatedEvent;
 import cz.vutbr.fit.pdb.projekt.events.subscribers.UserEventSubscriber;
@@ -16,6 +17,7 @@ import org.greenrobot.eventbus.EventBus;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
@@ -35,15 +37,11 @@ public class UserCommandService {
         final UserTable userTable = new UserTable(newUserDto.getEmail(), newUserDto.getName(), newUserDto.getSurname(), newUserDto.getBirthDate(), newUserDto.getSex());
         final UserDocument userDocument = new UserDocument(newUserDto.getEmail(), newUserDto.getName(), newUserDto.getSurname(), newUserDto.getBirthDate(), newUserDto.getSex(), null, null, null);
 
-        new UserEventSubscriber<>(userTable, EVENT_BUS);
-        new UserEventSubscriber<>(userDocument, EVENT_BUS);
-
-        final UserCreatedEvent createdEvent = new UserCreatedEvent(this);
-        EVENT_BUS.post(createdEvent);
-
+        subscribeAndPostEvent(userTable, userDocument, new UserCreatedEvent(this));
         return ResponseEntity.ok().body("Účet byl vytvořen");
     }
 
+    @Transactional
     public ResponseEntity<?> updateUser(String userId, UpdateUserDto updateUserDto) {
         Optional<UserDocument> userDocumentOptional = userDocumentRepository.findById(userId);
         if (userDocumentOptional.isEmpty()) {
@@ -73,15 +71,11 @@ public class UserCommandService {
                 null, null, null);
         userDocument.setId(userId);
 
-        new UserEventSubscriber<>(userTable, EVENT_BUS);
-        new UserEventSubscriber<>(userDocument, EVENT_BUS);
-
-        final UserUpdatedEvent updatedEvent = new UserUpdatedEvent(this);
-        EVENT_BUS.post(updatedEvent);
-
+        subscribeAndPostEvent(userTable, userDocument, new UserUpdatedEvent(this));
         return ResponseEntity.ok().body("Data byla aktualizována");
     }
 
+    @Transactional
     public ResponseEntity<?> activateUser(String userId) {
         Optional<UserDocument> userDocumentOptional = userDocumentRepository.findById(userId);
         if (userDocumentOptional.isEmpty()) {
@@ -92,6 +86,7 @@ public class UserCommandService {
         return updateUser(userId, updateUserDto);
     }
 
+    @Transactional
     public ResponseEntity<?> deactivateUser(String userId) {
         Optional<UserDocument> userDocumentOptional = userDocumentRepository.findById(userId);
         if (userDocumentOptional.isEmpty()) {
@@ -118,6 +113,18 @@ public class UserCommandService {
         } else {
             return userDocumentRepository.save((UserDocument) user);
         }
+    }
+
+
+    /* private methods */
+    private void subscribeAndPostEvent(UserTable userTable, UserDocument userDocument, EventInterface event) {
+        UserEventSubscriber<UserTable> sqlSubscriber = new UserEventSubscriber<>(userTable, EVENT_BUS);
+        UserEventSubscriber<UserDocument> noSqlSubscriber = new UserEventSubscriber<>(userDocument, EVENT_BUS);
+
+        EVENT_BUS.post(event);
+
+        EVENT_BUS.unregister(sqlSubscriber);
+        EVENT_BUS.unregister(noSqlSubscriber);
     }
 
     private boolean userTableEqualsUpdateUserDto(UserTable table, UpdateUserDto dto) {
