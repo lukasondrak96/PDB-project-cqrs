@@ -63,8 +63,14 @@ public class UserCommandService {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Nebyl nalezen záznam pro editaci");
         }
 
-        final UserTable userTable = new UserTable(updateUserDto.getEmail(), updateUserDto.getName(), updateUserDto.getSurname(), updateUserDto.getBirthDate(), updateUserDto.getSex(), updateUserDto.getState());
-        final UserDocument userDocument = new UserDocument(updateUserDto.getEmail(), updateUserDto.getName(), updateUserDto.getSurname(), updateUserDto.getBirthDate(), updateUserDto.getSex(), updateUserDto.getState(), null, null, null);
+        final UserTable userTable = new UserTable(updateUserDto.getEmail(), updateUserDto.getName(),
+                updateUserDto.getSurname(), updateUserDto.getBirthDate(), updateUserDto.getSex(), updateUserDto.getState());
+        userTable.setIdUser(oldUserTable.getIdUser());
+
+        final UserDocument userDocument = new UserDocument(updateUserDto.getEmail(), updateUserDto.getName(),
+                updateUserDto.getSurname(), updateUserDto.getBirthDate(), updateUserDto.getSex(), updateUserDto.getState(),
+                null, null, null);
+        userDocument.setId(userId);
 
         new UserEventSubscriber<>(userTable, EVENT_BUS);
         new UserEventSubscriber<>(userDocument, EVENT_BUS);
@@ -85,7 +91,9 @@ public class UserCommandService {
 
     public PersistentUser finishUserUpdating(PersistentUser user) {
         if (user instanceof UserTable) {
-            return userRepository.save((UserTable) user);
+            UserTable u = (UserTable) user;
+            userRepository.updateUser(u.getIdUser(), u.getEmail(), u.getName(), u.getSurname(), u.getBirthDate(), u.getSex(), u.getState());
+            return user;
         } else {
             return userDocumentRepository.save((UserDocument) user);
         }
