@@ -1,12 +1,10 @@
-package cz.vutbr.fit.pdb.projekt.events.subscribers;
+package cz.vutbr.fit.pdb.projekt.events.subscribers.message;
 
 import cz.vutbr.fit.pdb.projekt.events.events.message.MessageCreatedEvent;
 import cz.vutbr.fit.pdb.projekt.events.events.message.MessageDeletedEvent;
 import cz.vutbr.fit.pdb.projekt.events.events.message.MessageUpdatedEvent;
-import cz.vutbr.fit.pdb.projekt.events.events.user.UserCreatedEvent;
+import cz.vutbr.fit.pdb.projekt.events.subscribers.AbstractSubscriber;
 import cz.vutbr.fit.pdb.projekt.features.persistent.PersistentMessage;
-import cz.vutbr.fit.pdb.projekt.features.persistent.PersistentObject;
-import cz.vutbr.fit.pdb.projekt.features.persistent.PersistentUser;
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 

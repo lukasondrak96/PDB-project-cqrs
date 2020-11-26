@@ -1,8 +1,9 @@
-package cz.vutbr.fit.pdb.projekt.events.subscribers;
+package cz.vutbr.fit.pdb.projekt.events.subscribers.post;
 
 import cz.vutbr.fit.pdb.projekt.events.events.post.PostCreatedEvent;
 import cz.vutbr.fit.pdb.projekt.events.events.post.PostDeletedEvent;
 import cz.vutbr.fit.pdb.projekt.events.events.post.PostUpdatedEvent;
+import cz.vutbr.fit.pdb.projekt.events.subscribers.AbstractSubscriber;
 import cz.vutbr.fit.pdb.projekt.features.persistent.PersistentPost;
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;

@@ -13,9 +13,11 @@ public abstract class AbstractSubscriber<T extends PersistentObject> {
     private static final Logger LOGGER = LoggerFactory.getLogger(AbstractSubscriber.class);
 
     final List<EventBus> eventBuses = new LinkedList<>();
-    T persistentObject;
+    protected T persistentObject;
+    protected EventBus EVENT_BUS_MONGO;
 
     public AbstractSubscriber(EventBus... eventBuses) {
+        EVENT_BUS_MONGO = new EventBus();
         LOGGER.info("Constructing a subscriber and registering {} event buses", eventBuses.length);
         for (EventBus eventBus : eventBuses) {
             register(eventBus);

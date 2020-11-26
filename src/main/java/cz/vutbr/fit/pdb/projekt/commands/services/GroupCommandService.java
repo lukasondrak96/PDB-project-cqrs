@@ -3,7 +3,7 @@ package cz.vutbr.fit.pdb.projekt.commands.services;
 import cz.vutbr.fit.pdb.projekt.commands.dto.group.NewGroupDto;
 import cz.vutbr.fit.pdb.projekt.events.events.group.GroupCreatedEvent;
 import cz.vutbr.fit.pdb.projekt.events.events.group.GroupDeletedEvent;
-import cz.vutbr.fit.pdb.projekt.events.subscribers.GroupEventSubscriber;
+import cz.vutbr.fit.pdb.projekt.events.subscribers.group.GroupEventSubscriber;
 import cz.vutbr.fit.pdb.projekt.features.nosqlfeatures.group.GroupDocument;
 import cz.vutbr.fit.pdb.projekt.features.nosqlfeatures.group.GroupDocumentRepository;
 import cz.vutbr.fit.pdb.projekt.features.nosqlfeatures.group.inherited.AuthorInherited;

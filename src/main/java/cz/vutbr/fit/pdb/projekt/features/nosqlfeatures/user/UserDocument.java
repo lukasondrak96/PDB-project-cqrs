@@ -20,8 +20,13 @@ import java.util.List;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class UserDocument implements PersistentUser {
 
-    public UserDocument(String email, String name, String surname, Date birthDate, UserSex sex, List<GroupInherited> groupsMember,
-                        List<GroupInherited> groupsAdmin, List<ConversationInherited> conversations_with_user) {
+    @Id
+    private int id;
+    private List<ConversationInherited> conversationsWithUser;
+
+    public UserDocument(int id, String email, String name, String surname, Date birthDate, UserSex sex, List<GroupInherited> groupsMember,
+                        List<GroupInherited> groupsAdmin, List<ConversationInherited> conversationsWithUser) {
+        this.id = id;
         this.email = email;
         this.name = name;
         this.surname = surname;
@@ -30,24 +35,8 @@ public class UserDocument implements PersistentUser {
         this.state = UserState.ACTIVATED;
         this.groupsMember = groupsMember;
         this.groupsAdmin = groupsAdmin;
-        this.conversations_with_user = conversations_with_user;
+        this.conversationsWithUser = conversationsWithUser;
     }
-
-    public UserDocument(String email, String name, String surname, Date birthDate, UserSex sex, UserState state,
-                        List<GroupInherited> groupsMember, List<GroupInherited> groupsAdmin, List<ConversationInherited> conversations_with_user) {
-        this.email = email;
-        this.name = name;
-        this.surname = surname;
-        this.birthDate = birthDate;
-        this.sex = sex;
-        this.state = state;
-        this.groupsMember = groupsMember;
-        this.groupsAdmin = groupsAdmin;
-        this.conversations_with_user = conversations_with_user;
-    }
-
-    @Id
-    private String id;
     private String email;
     private String name;
     private String surname;
@@ -56,5 +45,17 @@ public class UserDocument implements PersistentUser {
     private UserState state;
     private List<GroupInherited> groupsMember;
     private List<GroupInherited> groupsAdmin;
-    private List<ConversationInherited> conversations_with_user;
+    public UserDocument(int id, String email, String name, String surname, Date birthDate, UserSex sex, UserState state,
+                        List<GroupInherited> groupsMember, List<GroupInherited> groupsAdmin, List<ConversationInherited> conversationsWithUser) {
+        this.id = id;
+        this.email = email;
+        this.name = name;
+        this.surname = surname;
+        this.birthDate = birthDate;
+        this.sex = sex;
+        this.state = state;
+        this.groupsMember = groupsMember;
+        this.groupsAdmin = groupsAdmin;
+        this.conversationsWithUser = conversationsWithUser;
+    }
 }
