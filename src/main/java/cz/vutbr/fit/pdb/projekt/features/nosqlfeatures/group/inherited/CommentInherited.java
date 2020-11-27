@@ -13,5 +13,5 @@ public class CommentInherited {
 
     private String text;
     private Date createdAt;
-    private AuthorInherited author;
+    private CreatorInherited creator;
 }

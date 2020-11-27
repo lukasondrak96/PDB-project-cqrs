@@ -42,13 +42,13 @@ public class GroupCommandService implements CommandService<PersistentGroup> {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Nelze vytvořit archivovanou skupinu");
         }
 
-        Optional<UserTable> userOptional = userRepository.findById(newGroupDto.getAuthorId());
+        Optional<UserTable> userOptional = userRepository.findById(newGroupDto.getCreatorId());
         if (userOptional.isEmpty()) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Uživatel s tímto id neexistuje");
         }
-        UserTable author = userOptional.get();
+        UserTable creator = userOptional.get();
 
-        final GroupTable groupTable = new GroupTable(newGroupDto.getName(), newGroupDto.getDescription(), newGroupDto.getState(), author);
+        final GroupTable groupTable = new GroupTable(newGroupDto.getName(), newGroupDto.getDescription(), newGroupDto.getState(), creator);
 
         OracleGroupEventSubscriber oracleSubscriber = new OracleGroupEventSubscriber(EVENT_BUS);
         MongoGroupEventSubscriber mongoSubscriber = new MongoGroupEventSubscriber(EVENT_BUS);

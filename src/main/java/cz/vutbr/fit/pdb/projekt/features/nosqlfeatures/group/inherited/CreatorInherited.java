@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class AuthorInherited implements UserReference {
+public class CreatorInherited implements UserReference {
     private int id;
     private String name;
     private String surname;

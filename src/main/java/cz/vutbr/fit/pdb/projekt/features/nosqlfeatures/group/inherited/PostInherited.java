@@ -14,6 +14,6 @@ public class PostInherited {
     private String title;
     private String text;
     private Date createdAt;
-    private AuthorInherited author;
+    private CreatorInherited creator;
     private List<CommentInherited> comments;
 }
