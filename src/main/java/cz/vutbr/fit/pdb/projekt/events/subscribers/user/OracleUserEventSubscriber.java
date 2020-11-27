@@ -27,6 +27,7 @@ public class OracleUserEventSubscriber extends AbstractSubscriber {
         UserTable userTable = (UserTable) userCreatedEvent.apply(REUSABLE_ORACLE_OBJECT);
         if(userTable != null) {
             final ConfirmedEventAdapter<PersistentUser> confirmedUserCreatedEvent = new ConfirmedEventAdapter<>(userTable, userCreatedEvent.getCommandService());
+            LOGGER.info(POSTING_EVENT, confirmedUserCreatedEvent.getClass().getSimpleName(), confirmedUserCreatedEvent);
             post(confirmedUserCreatedEvent);
         }
     }

@@ -1,10 +1,10 @@
 package cz.vutbr.fit.pdb.projekt.features.sqlfeatures.group;
 
+import cz.vutbr.fit.pdb.projekt.features.persistent.GroupInterface;
 import cz.vutbr.fit.pdb.projekt.features.persistent.PersistentGroup;
 import cz.vutbr.fit.pdb.projekt.features.sqlfeatures.user.UserTable;
-import lombok.Getter;
+import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
@@ -13,10 +13,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-@Getter
-@Setter
+@Data
 @NoArgsConstructor
-public class GroupTable implements PersistentGroup {
+public class GroupTable implements GroupInterface, PersistentGroup {
     public GroupTable(String name, String description, GroupState state, UserTable userTableReference) {
         this.name = name;
         this.description = description;
@@ -27,7 +26,7 @@ public class GroupTable implements PersistentGroup {
     @Id
     @SequenceGenerator(name = "GroupIdGenerator", sequenceName = "GROUP_SEQUENCE", allocationSize = 1)
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "GroupIdGenerator")
-    private int idGroup;
+    private int id;
 
     private String name;
 

@@ -19,7 +19,6 @@ import org.springframework.stereotype.Service;
 
 @Service
 @AllArgsConstructor
-//public class UserCommandService implements CommandService<PersistentUser> {
 public class UserCommandService implements CommandService<PersistentUser> {
 
     private final UserRepository userRepository;

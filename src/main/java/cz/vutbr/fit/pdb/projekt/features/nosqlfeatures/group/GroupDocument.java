@@ -4,7 +4,9 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import cz.vutbr.fit.pdb.projekt.features.nosqlfeatures.group.inherited.AuthorInherited;
 import cz.vutbr.fit.pdb.projekt.features.nosqlfeatures.group.inherited.MemberInherited;
 import cz.vutbr.fit.pdb.projekt.features.nosqlfeatures.group.inherited.PostInherited;
+import cz.vutbr.fit.pdb.projekt.features.persistent.GroupInterface;
 import cz.vutbr.fit.pdb.projekt.features.persistent.PersistentGroup;
+import cz.vutbr.fit.pdb.projekt.features.sqlfeatures.group.GroupState;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -16,9 +18,9 @@ import java.util.List;
 @Data
 @NoArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class GroupDocument implements PersistentGroup {
+public class GroupDocument implements GroupInterface, PersistentGroup {
 
-    public GroupDocument(String name, String description, String state, AuthorInherited author, List<PostInherited> posts, List<MemberInherited> members) {
+    public GroupDocument(String name, String description, GroupState state, AuthorInherited author, List<PostInherited> posts, List<MemberInherited> members) {
         this.name = name;
         this.description = description;
         this.state = state;
@@ -28,10 +30,10 @@ public class GroupDocument implements PersistentGroup {
     }
 
     @Id
-    private String id;
+    private int id;
     private String name;
     private String description;
-    private String state;
+    private GroupState state;
     private AuthorInherited author;
     private List<PostInherited> posts;
     private List<MemberInherited> members;

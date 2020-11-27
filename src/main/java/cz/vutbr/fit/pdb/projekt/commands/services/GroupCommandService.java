@@ -1,61 +1,60 @@
 package cz.vutbr.fit.pdb.projekt.commands.services;
 
 import cz.vutbr.fit.pdb.projekt.commands.dto.group.NewGroupDto;
+import cz.vutbr.fit.pdb.projekt.events.events.user.OracleCreatedEvent;
+import cz.vutbr.fit.pdb.projekt.events.subscribers.group.MongoGroupEventSubscriber;
+import cz.vutbr.fit.pdb.projekt.events.subscribers.group.OracleGroupEventSubscriber;
 import cz.vutbr.fit.pdb.projekt.features.nosqlfeatures.group.GroupDocument;
 import cz.vutbr.fit.pdb.projekt.features.nosqlfeatures.group.GroupDocumentRepository;
-import cz.vutbr.fit.pdb.projekt.features.nosqlfeatures.user.UserDocumentRepository;
+import cz.vutbr.fit.pdb.projekt.features.persistent.ObjectInterface;
 import cz.vutbr.fit.pdb.projekt.features.persistent.PersistentGroup;
 import cz.vutbr.fit.pdb.projekt.features.sqlfeatures.group.GroupRepository;
+import cz.vutbr.fit.pdb.projekt.features.sqlfeatures.group.GroupState;
 import cz.vutbr.fit.pdb.projekt.features.sqlfeatures.group.GroupTable;
 import cz.vutbr.fit.pdb.projekt.features.sqlfeatures.user.UserRepository;
+import cz.vutbr.fit.pdb.projekt.features.sqlfeatures.user.UserTable;
 import lombok.AllArgsConstructor;
 import org.greenrobot.eventbus.EventBus;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 @Service
 @AllArgsConstructor
-public class GroupCommandService {
+public class GroupCommandService implements CommandService<PersistentGroup> {
 
     private final GroupRepository groupRepository;
     private final UserRepository userRepository;
-    private final UserDocumentRepository userDocumentRepository;
 
 
     private final GroupDocumentRepository groupDocumentRepository;
     private static final EventBus EVENT_BUS = EventBus.getDefault();
 
     public ResponseEntity<?> createGroup(NewGroupDto newGroupDto) {
-//        if (groupRepository.countByName(newGroupDto.getName()) != 0) {
-//            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Skupina s tímto názvem již existuje");
-//        }
-//
-//        if (newGroupDto.getState() == GroupState.ARCHIVED) {
-//            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Nelze vytvořit archivovanou skupinu");
-//        }
-//
-//        Optional<UserTable> userOptional = userRepository.findById(newGroupDto.getIdUser());
-//        if (userOptional.isEmpty()) {
-//            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Uživatel s tímto id neexistuje");
-//        }
-//        UserTable author = userOptional.get();
-//
-//
-//        Optional<UserDocument> userDocumentOptional = userDocumentRepository.findByEmail(author.getEmail());
-//        if (userDocumentOptional.isEmpty()) {
-//            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Uživatel s tímto id neexistuje v mongo (v oracle existuje -> nekompatibilní stav databází)");
-//        }
-//
-//        final GroupTable groupTable = new GroupTable(newGroupDto.getName(), newGroupDto.getDescription(), newGroupDto.getState(), author);
-//
-//        AuthorInherited groupAuthor = new AuthorInherited(author.getName(), author.getSurname());
-//        final GroupDocument groupDocument = new GroupDocument(newGroupDto.getName(), newGroupDto.getDescription(), newGroupDto.getState().name(), groupAuthor, null, null);
-//
-//        new GroupEventSubscriber<>(groupTable, EVENT_BUS);
-//        new GroupEventSubscriber<>(groupDocument, EVENT_BUS);
-//
-//        final GroupCreatedEvent createdEvent = new GroupCreatedEvent(this);
-//        EVENT_BUS.post(createdEvent);
+        if (groupRepository.countByName(newGroupDto.getName()) != 0) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Skupina s tímto názvem již existuje");
+        }
+
+        if (newGroupDto.getState() == GroupState.ARCHIVED) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Nelze vytvořit archivovanou skupinu");
+        }
+
+        Optional<UserTable> userOptional = userRepository.findById(newGroupDto.getIdUser());
+        if (userOptional.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Uživatel s tímto id neexistuje");
+        }
+        UserTable author = userOptional.get();
+
+        final GroupTable groupTable = new GroupTable(newGroupDto.getName(), newGroupDto.getDescription(), newGroupDto.getState(), author);
+
+        OracleGroupEventSubscriber oracleSubscriber = new OracleGroupEventSubscriber(EVENT_BUS);
+        MongoGroupEventSubscriber mongoSubscriber = new MongoGroupEventSubscriber(EVENT_BUS);
+
+        EVENT_BUS.post(new OracleCreatedEvent<>(groupTable, this));
+        EVENT_BUS.unregister(oracleSubscriber);
+        EVENT_BUS.unregister(mongoSubscriber);
 
         return ResponseEntity.ok().body("Skupina byla vytvořena");
     }
@@ -99,5 +98,15 @@ public class GroupCommandService {
             groupRepository.delete((GroupTable) group);
         else
             groupDocumentRepository.delete((GroupDocument) group);
+    }
+
+    @Override
+    public PersistentGroup assignFromTo(ObjectInterface objectInterface, PersistentGroup persistentObject) {
+        return null;
+    }
+
+    @Override
+    public PersistentGroup save(PersistentGroup persistentObject) {
+        return null;
     }
 }
