@@ -2,7 +2,11 @@ package cz.vutbr.fit.pdb.projekt.api.commands.services;
 
 import cz.vutbr.fit.pdb.projekt.api.commands.dtos.user.NewUserDto;
 import cz.vutbr.fit.pdb.projekt.api.commands.dtos.user.UpdateUserDto;
+import cz.vutbr.fit.pdb.projekt.api.commands.services.helpingservices.UserService;
+import cz.vutbr.fit.pdb.projekt.events.events.AbstractEvent;
 import cz.vutbr.fit.pdb.projekt.events.events.OracleCreatedEvent;
+import cz.vutbr.fit.pdb.projekt.events.events.user.UserActivatedEvent;
+import cz.vutbr.fit.pdb.projekt.events.events.user.UserDeactivatedEvent;
 import cz.vutbr.fit.pdb.projekt.events.events.user.UserUpdatedEvent;
 import cz.vutbr.fit.pdb.projekt.events.subscribers.user.MongoUserEventSubscriber;
 import cz.vutbr.fit.pdb.projekt.events.subscribers.user.OracleUserChangeEventSubscriber;
@@ -30,7 +34,7 @@ import java.util.Optional;
 
 @Service
 @AllArgsConstructor
-public class UserCommandService implements CommandService<PersistentUser> {
+public class UserCommandService implements UserService<PersistentUser> {
 
     private final UserRepository userRepository;
     private final UserDocumentRepository userDocumentRepository;
@@ -70,40 +74,55 @@ public class UserCommandService implements CommandService<PersistentUser> {
         final UserTable userTable = new UserTable(userId, updateUserDto.getEmail(), updateUserDto.getName(),
                 updateUserDto.getSurname(), updateUserDto.getBirthDate(), updateUserDto.getSex(), updateUserDto.getState());
 
-
-        OracleUserChangeEventSubscriber sqlSubscriber = new OracleUserChangeEventSubscriber(EVENT_BUS);
-        MongoUserEventSubscriber noSqlSubscriber = new MongoUserEventSubscriber(EVENT_BUS);
-
         UserUpdatedEvent<PersistentUser> updatedEvent = new UserUpdatedEvent<>(userTable, this);
-
-        EVENT_BUS.post(updatedEvent);
-
-        EVENT_BUS.unregister(sqlSubscriber);
-        EVENT_BUS.unregister(noSqlSubscriber);
+        subscribeChangeEventToOracleAndMongo(updatedEvent);
 
         return ResponseEntity.ok().body("Data byla aktualizována");
     }
 
     @Transactional
     public ResponseEntity<?> activateUser(int userId) {
-        Optional<UserDocument> userDocumentOptional = userDocumentRepository.findById(userId);
-        if (userDocumentOptional.isEmpty()) {
+        Optional<UserTable> userTableOptional = userRepository.findById(userId);
+        if (userTableOptional.isEmpty()) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Tento uživatel neexistuje");
         }
-        UserDocument doc = userDocumentOptional.get();
-        UpdateUserDto updateUserDto = new UpdateUserDto(doc.getEmail(), doc.getName(), doc.getSurname(), doc.getBirthDate(), doc.getSex(), UserState.ACTIVATED);
-        return updateUser(userId, updateUserDto);
+
+        UserTable userTable = userTableOptional.get();
+
+        if (userTable.getState() == UserState.ACTIVATED) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Tento uživatel nemá deaktivovaný účet");
+        }
+
+        UserActivatedEvent<PersistentUser> userActivatedEvent = new UserActivatedEvent<>(userTable, this);
+        subscribeChangeEventToOracleAndMongo(userActivatedEvent);
+        return ResponseEntity.ok().body("Uživatel byl aktivován");
+    }
+
+    private void subscribeChangeEventToOracleAndMongo(AbstractEvent<PersistentUser> event) {
+        OracleUserChangeEventSubscriber sqlSubscriber = new OracleUserChangeEventSubscriber(EVENT_BUS);
+        MongoUserEventSubscriber noSqlSubscriber = new MongoUserEventSubscriber(EVENT_BUS);
+        EVENT_BUS.post(event);
+
+        EVENT_BUS.unregister(sqlSubscriber);
+        EVENT_BUS.unregister(noSqlSubscriber);
     }
 
     @Transactional
     public ResponseEntity<?> deactivateUser(int userId) {
-        Optional<UserDocument> userDocumentOptional = userDocumentRepository.findById(userId);
-        if (userDocumentOptional.isEmpty()) {
+        Optional<UserTable> userTableOptional = userRepository.findById(userId);
+        if (userTableOptional.isEmpty()) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Tento uživatel neexistuje");
         }
-        UserDocument doc = userDocumentOptional.get();
-        UpdateUserDto updateUserDto = new UpdateUserDto(doc.getEmail(), doc.getName(), doc.getSurname(), doc.getBirthDate(), doc.getSex(), UserState.DEACTIVATED);
-        return updateUser(userId, updateUserDto);
+
+        UserTable userTable = userTableOptional.get();
+
+        if (userTable.getState() == UserState.DEACTIVATED) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Tento uživatel nemá aktivovaný účet");
+        }
+
+        UserDeactivatedEvent<PersistentUser> userDeactivatedEvent = new UserDeactivatedEvent<>(userTable, this);
+        subscribeChangeEventToOracleAndMongo(userDeactivatedEvent);
+        return ResponseEntity.ok().body("Uživatel byl deaktivován");
     }
 
 /* methods called from events */
@@ -131,6 +150,28 @@ public class UserCommandService implements CommandService<PersistentUser> {
             return userRepository.save((UserTable) user);
         else
             return userDocumentRepository.save((UserDocument) user);
+    }
+
+    @Override
+    public PersistentUser finishActivating(PersistentUser persistentUser) {
+        if (persistentUser instanceof UserTable) {
+            UserTable userTable = (UserTable) persistentUser;
+            userTable.setState(UserState.ACTIVATED);
+            return userRepository.save(userTable);
+        } else {
+            return userDocumentRepository.save((UserDocument) persistentUser);
+        }
+    }
+
+    @Override
+    public PersistentUser finishDeactivating(PersistentUser persistentUser) {
+        if (persistentUser instanceof UserTable) {
+            UserTable userTable = (UserTable) persistentUser;
+            userTable.setState(UserState.DEACTIVATED);
+            return userRepository.save(userTable);
+        } else {
+            return userDocumentRepository.save((UserDocument) persistentUser);
+        }
     }
 
     @Override

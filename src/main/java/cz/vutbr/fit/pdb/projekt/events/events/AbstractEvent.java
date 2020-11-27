@@ -1,6 +1,6 @@
 package cz.vutbr.fit.pdb.projekt.events.events;
 
-import cz.vutbr.fit.pdb.projekt.api.commands.services.CommandService;
+import cz.vutbr.fit.pdb.projekt.api.commands.services.helpingservices.CommandService;
 import cz.vutbr.fit.pdb.projekt.features.helperInterfaces.ObjectInterface;
 import cz.vutbr.fit.pdb.projekt.features.helperInterfaces.PersistentObject;
 import lombok.AllArgsConstructor;
