@@ -102,6 +102,11 @@ public class GroupCommandService implements CommandService<PersistentGroup> {
     }
 
     @Override
+    public PersistentGroup finishUpdating(PersistentGroup persistentObject) {
+        return null;
+    }
+
+    @Override
     public PersistentGroup assignFromTo(ObjectInterface objectInterface, PersistentGroup group) {
         GroupInterface persistentGroupInterface = (GroupInterface) group;
         GroupInterface groupInterface = (GroupInterface) objectInterface;
@@ -116,7 +121,7 @@ public class GroupCommandService implements CommandService<PersistentGroup> {
     }
 
     @Override
-    public PersistentGroup save(PersistentGroup group) {
+    public PersistentGroup finishSaving(PersistentGroup group) {
         if (group instanceof GroupTable)
             return groupRepository.save((GroupTable) group);
         else

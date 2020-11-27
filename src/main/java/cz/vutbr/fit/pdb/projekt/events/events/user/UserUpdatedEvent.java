@@ -1,19 +1,21 @@
 package cz.vutbr.fit.pdb.projekt.events.events.user;
 
-import cz.vutbr.fit.pdb.projekt.api.commands.services.UserCommandService;
-import cz.vutbr.fit.pdb.projekt.events.events.EventInterface;
-import cz.vutbr.fit.pdb.projekt.features.helperInterfaces.persistent.PersistentUser;
-import lombok.AllArgsConstructor;
+import cz.vutbr.fit.pdb.projekt.api.commands.services.CommandService;
+import cz.vutbr.fit.pdb.projekt.events.events.AbstractEvent;
+import cz.vutbr.fit.pdb.projekt.features.helperInterfaces.ObjectInterface;
+import cz.vutbr.fit.pdb.projekt.features.helperInterfaces.PersistentObject;
 
-@AllArgsConstructor
-public class UserUpdatedEvent implements EventInterface<PersistentUser> {
+public class UserUpdatedEvent<T extends PersistentObject> extends AbstractEvent<T> {
 
-    private final UserCommandService service;
+    public UserUpdatedEvent(ObjectInterface objectInterface, CommandService<T> commandService) {
+        super(objectInterface, commandService);
+    }
 
     @Override
-    public PersistentUser apply(PersistentUser persistentUser) {
-//        return service.finishUpdating(persistentUser);
-        return null;
+    public T apply(T persistentObject) {
+        CommandService<T> commandService = getCommandService();
+        persistentObject = commandService.assignFromTo(getObjectInterface(), persistentObject);
+        return commandService.finishUpdating(persistentObject);
     }
 
 }

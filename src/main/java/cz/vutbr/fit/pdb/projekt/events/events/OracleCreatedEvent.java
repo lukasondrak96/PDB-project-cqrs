@@ -14,7 +14,7 @@ public class OracleCreatedEvent<T extends PersistentObject> extends AbstractEven
     public T apply(T persistentObject) {
         CommandService<T> commandService = getCommandService();
         persistentObject = commandService.assignFromTo(getObjectInterface(), persistentObject);
-        return commandService.save(persistentObject);
+        return commandService.finishSaving(persistentObject);
     }
 
 }

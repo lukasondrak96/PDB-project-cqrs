@@ -21,15 +21,13 @@ public class UserCommandController {
     }
 
     @GetMapping("{id}/activate")
-    public ResponseEntity<?> activateUserAccount(@PathVariable(value = "id") String userId) {
-        return null;
-//        return userCommandService.activateUser(userId);
+    public ResponseEntity<?> activateUserAccount(@PathVariable(value = "id") int userId) {
+        return userCommandService.activateUser(userId);
     }
 
     @GetMapping("{id}/deactivate")
-    public ResponseEntity<?> deactivateUserAccount(@PathVariable(value = "id") String userId) {
-        return null;
-//        return userCommandService.deactivateUser(userId);
+    public ResponseEntity<?> deactivateUserAccount(@PathVariable(value = "id") int userId) {
+        return userCommandService.deactivateUser(userId);
     }
 
     @PutMapping("{id}/edit")

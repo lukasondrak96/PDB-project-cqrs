@@ -1,6 +1,6 @@
 package cz.vutbr.fit.pdb.projekt.events.subscribers.user;
 
-import cz.vutbr.fit.pdb.projekt.events.events.ConfirmedEventAdapter;
+import cz.vutbr.fit.pdb.projekt.events.events.user.UserUpdatedEvent;
 import cz.vutbr.fit.pdb.projekt.events.subscribers.AbstractSubscriber;
 import cz.vutbr.fit.pdb.projekt.features.helperInterfaces.persistent.PersistentUser;
 import cz.vutbr.fit.pdb.projekt.features.sqlfeatures.user.UserTable;
@@ -20,9 +20,9 @@ public class OracleUserChangeEventSubscriber extends AbstractSubscriber {
     }
 
     @Subscribe
-    public void onUserUpdatedEvent(ConfirmedEventAdapter<PersistentUser> confirmedEventAdapter) {
-        LOGGER.info(RECEIVED_AND_APPLYING_EVENT, confirmedEventAdapter.getClass().getSimpleName(), confirmedEventAdapter);
-        confirmedEventAdapter.apply(REUSABLE_ORACLE_OBJECT);
+    public void onUserUpdatedEvent(UserUpdatedEvent<PersistentUser> userUpdatedEvent) {
+        LOGGER.info(RECEIVED_AND_APPLYING_EVENT, userUpdatedEvent.getClass().getSimpleName(), userUpdatedEvent);
+        userUpdatedEvent.apply(REUSABLE_ORACLE_OBJECT);
     }
 
 }
