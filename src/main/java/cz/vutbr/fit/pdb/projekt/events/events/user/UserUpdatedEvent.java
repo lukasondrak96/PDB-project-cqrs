@@ -1,8 +1,8 @@
 package cz.vutbr.fit.pdb.projekt.events.events.user;
 
-import cz.vutbr.fit.pdb.projekt.commands.services.UserCommandService;
+import cz.vutbr.fit.pdb.projekt.api.commands.services.UserCommandService;
 import cz.vutbr.fit.pdb.projekt.events.events.EventInterface;
-import cz.vutbr.fit.pdb.projekt.features.persistent.PersistentUser;
+import cz.vutbr.fit.pdb.projekt.features.helperInterfaces.persistent.PersistentUser;
 import lombok.AllArgsConstructor;
 
 @AllArgsConstructor

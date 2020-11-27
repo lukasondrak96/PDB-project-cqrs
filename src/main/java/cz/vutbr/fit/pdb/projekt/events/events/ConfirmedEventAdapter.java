@@ -1,6 +1,6 @@
 package cz.vutbr.fit.pdb.projekt.events.events;
 
-import cz.vutbr.fit.pdb.projekt.features.persistent.PersistentObject;
+import cz.vutbr.fit.pdb.projekt.features.helperInterfaces.PersistentObject;
 
 public class ConfirmedEventAdapter<T extends PersistentObject> extends AbstractEvent<T> implements EventInterface<T> {
 

@@ -1,8 +1,8 @@
 package cz.vutbr.fit.pdb.projekt.features.sqlfeatures.group;
 
-import cz.vutbr.fit.pdb.projekt.features.persistent.GroupInterface;
-import cz.vutbr.fit.pdb.projekt.features.persistent.PersistentGroup;
-import cz.vutbr.fit.pdb.projekt.features.persistent.UserReference;
+import cz.vutbr.fit.pdb.projekt.features.helperInterfaces.object.GroupInterface;
+import cz.vutbr.fit.pdb.projekt.features.helperInterfaces.persistent.PersistentGroup;
+import cz.vutbr.fit.pdb.projekt.features.helperInterfaces.reference.UserReference;
 import cz.vutbr.fit.pdb.projekt.features.sqlfeatures.user.UserTable;
 import lombok.Data;
 import lombok.NoArgsConstructor;

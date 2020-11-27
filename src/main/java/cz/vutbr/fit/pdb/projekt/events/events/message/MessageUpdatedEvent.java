@@ -1,8 +1,8 @@
 package cz.vutbr.fit.pdb.projekt.events.events.message;
 
-import cz.vutbr.fit.pdb.projekt.commands.services.MessageCommandService;
+import cz.vutbr.fit.pdb.projekt.api.commands.services.MessageCommandService;
 import cz.vutbr.fit.pdb.projekt.events.events.EventInterface;
-import cz.vutbr.fit.pdb.projekt.features.persistent.PersistentMessage;
+import cz.vutbr.fit.pdb.projekt.features.helperInterfaces.persistent.PersistentMessage;
 
 public class MessageUpdatedEvent implements EventInterface<PersistentMessage> {
 

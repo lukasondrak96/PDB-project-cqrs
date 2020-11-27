@@ -3,7 +3,7 @@ package cz.vutbr.fit.pdb.projekt.events.subscribers.group;
 import cz.vutbr.fit.pdb.projekt.events.events.ConfirmedEventAdapter;
 import cz.vutbr.fit.pdb.projekt.events.events.OracleCreatedEvent;
 import cz.vutbr.fit.pdb.projekt.events.subscribers.AbstractSubscriber;
-import cz.vutbr.fit.pdb.projekt.features.persistent.PersistentGroup;
+import cz.vutbr.fit.pdb.projekt.features.helperInterfaces.persistent.PersistentGroup;
 import cz.vutbr.fit.pdb.projekt.features.sqlfeatures.group.GroupTable;
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;

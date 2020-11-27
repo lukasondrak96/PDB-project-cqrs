@@ -1,9 +1,8 @@
 package cz.vutbr.fit.pdb.projekt.events.events.post;
 
-import cz.vutbr.fit.pdb.projekt.commands.services.PostCommandService;
+import cz.vutbr.fit.pdb.projekt.api.commands.services.PostCommandService;
 import cz.vutbr.fit.pdb.projekt.events.events.EventInterface;
-import cz.vutbr.fit.pdb.projekt.features.persistent.PersistentPost;
-import cz.vutbr.fit.pdb.projekt.features.persistent.PersistentUser;
+import cz.vutbr.fit.pdb.projekt.features.helperInterfaces.persistent.PersistentPost;
 
 public class PostDeletedEvent implements EventInterface<PersistentPost> {
 

@@ -1,10 +1,10 @@
 package cz.vutbr.fit.pdb.projekt.features.nosqlfeatures.user;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import cz.vutbr.fit.pdb.projekt.features.helperInterfaces.object.UserInterface;
+import cz.vutbr.fit.pdb.projekt.features.helperInterfaces.persistent.PersistentUser;
 import cz.vutbr.fit.pdb.projekt.features.nosqlfeatures.user.inherited.ConversationInherited;
 import cz.vutbr.fit.pdb.projekt.features.nosqlfeatures.user.inherited.GroupInherited;
-import cz.vutbr.fit.pdb.projekt.features.persistent.PersistentUser;
-import cz.vutbr.fit.pdb.projekt.features.persistent.UserInterface;
 import cz.vutbr.fit.pdb.projekt.features.sqlfeatures.user.UserSex;
 import cz.vutbr.fit.pdb.projekt.features.sqlfeatures.user.UserState;
 import lombok.Data;

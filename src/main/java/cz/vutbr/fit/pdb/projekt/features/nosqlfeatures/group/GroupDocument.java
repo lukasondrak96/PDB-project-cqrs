@@ -1,12 +1,12 @@
 package cz.vutbr.fit.pdb.projekt.features.nosqlfeatures.group;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import cz.vutbr.fit.pdb.projekt.features.helperInterfaces.object.GroupInterface;
+import cz.vutbr.fit.pdb.projekt.features.helperInterfaces.persistent.PersistentGroup;
+import cz.vutbr.fit.pdb.projekt.features.helperInterfaces.reference.UserReference;
 import cz.vutbr.fit.pdb.projekt.features.nosqlfeatures.group.inherited.AuthorInherited;
 import cz.vutbr.fit.pdb.projekt.features.nosqlfeatures.group.inherited.MemberInherited;
 import cz.vutbr.fit.pdb.projekt.features.nosqlfeatures.group.inherited.PostInherited;
-import cz.vutbr.fit.pdb.projekt.features.persistent.GroupInterface;
-import cz.vutbr.fit.pdb.projekt.features.persistent.PersistentGroup;
-import cz.vutbr.fit.pdb.projekt.features.persistent.UserReference;
 import cz.vutbr.fit.pdb.projekt.features.sqlfeatures.group.GroupState;
 import cz.vutbr.fit.pdb.projekt.features.sqlfeatures.user.UserTable;
 import lombok.Data;

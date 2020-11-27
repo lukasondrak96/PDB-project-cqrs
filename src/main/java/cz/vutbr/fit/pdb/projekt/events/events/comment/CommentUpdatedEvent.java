@@ -1,8 +1,8 @@
 package cz.vutbr.fit.pdb.projekt.events.events.comment;
 
-import cz.vutbr.fit.pdb.projekt.commands.services.CommentCommandService;
+import cz.vutbr.fit.pdb.projekt.api.commands.services.CommentCommandService;
 import cz.vutbr.fit.pdb.projekt.events.events.EventInterface;
-import cz.vutbr.fit.pdb.projekt.features.persistent.PersistentComment;
+import cz.vutbr.fit.pdb.projekt.features.helperInterfaces.persistent.PersistentComment;
 
 public class CommentUpdatedEvent implements EventInterface<PersistentComment> {
 
