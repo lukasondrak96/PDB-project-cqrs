@@ -7,7 +7,7 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public interface GroupDocumentRepository extends MongoRepository<GroupDocument, String> {
+public interface GroupDocumentRepository extends MongoRepository<GroupDocument, Integer> {
     @Query(value="{ 'creator.id' : ?0 }")
     List<GroupDocument> findByCreatorId(int id);
 }
