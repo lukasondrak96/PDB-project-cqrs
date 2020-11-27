@@ -1,7 +1,7 @@
 package cz.vutbr.fit.pdb.projekt.commands.services;
 
 import cz.vutbr.fit.pdb.projekt.commands.dto.user.NewUserDto;
-import cz.vutbr.fit.pdb.projekt.events.events.user.OracleCreatedEvent;
+import cz.vutbr.fit.pdb.projekt.events.events.OracleCreatedEvent;
 import cz.vutbr.fit.pdb.projekt.events.subscribers.user.MongoUserEventSubscriber;
 import cz.vutbr.fit.pdb.projekt.events.subscribers.user.OracleUserEventSubscriber;
 import cz.vutbr.fit.pdb.projekt.features.nosqlfeatures.user.UserDocument;
@@ -148,7 +148,7 @@ public class UserCommandService implements CommandService<PersistentUser> {
         UserInterface persistentUserInterface = (UserInterface) user;
         UserInterface userInterface = (UserInterface) objectInterface;
         if(user instanceof UserTable || user instanceof UserDocument) {
-            persistentUserInterface.setIdUser(userInterface.getIdUser());
+            persistentUserInterface.setId(userInterface.getId());
             persistentUserInterface.setName(userInterface.getName());
             persistentUserInterface.setSurname(userInterface.getSurname());
             persistentUserInterface.setEmail(userInterface.getEmail());

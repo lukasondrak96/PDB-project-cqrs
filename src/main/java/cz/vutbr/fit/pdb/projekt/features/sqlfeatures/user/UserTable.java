@@ -36,7 +36,7 @@ public class UserTable implements UserInterface, PersistentUser {
     @Id
     @SequenceGenerator(name = "UserIdGenerator", sequenceName = "USER_SEQUENCE", allocationSize = 1)
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "UserIdGenerator")
-    private int idUser;
+    private int id;
 
     private String email;
 
@@ -53,7 +53,7 @@ public class UserTable implements UserInterface, PersistentUser {
     @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinTable(
             name = "user_group_link",
-            joinColumns = {@JoinColumn(name = "idUser")},
+            joinColumns = {@JoinColumn(name = "id")},
             inverseJoinColumns = {@JoinColumn(name = "idGroup")}
     )
     private List<GroupTable> groups = new ArrayList<>();

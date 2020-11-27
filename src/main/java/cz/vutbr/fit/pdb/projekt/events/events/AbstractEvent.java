@@ -12,7 +12,11 @@ import lombok.Setter;
 @Setter
 public abstract class AbstractEvent<T extends PersistentObject> implements EventInterface<T> {
     private ObjectInterface objectInterface;
-    private CommandService<T> commandService;
+    protected CommandService<T> commandService;
+
+    public AbstractEvent(ObjectInterface objectInterface) {
+        this.objectInterface = objectInterface;
+    }
 
     @Override
     public String toString() {

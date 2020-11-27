@@ -36,12 +36,12 @@ public class MessageTable {
     private Date readAt;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "idUserSender", referencedColumnName = "idUser")
+    @JoinColumn(name = "idUserSender", referencedColumnName = "id")
     @OnDelete(action = OnDeleteAction.CASCADE)
     private UserTable userTableReferenceSender;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "idUserReceiver", referencedColumnName = "idUser")
+    @JoinColumn(name = "idUserReceiver", referencedColumnName = "id")
     @OnDelete(action = OnDeleteAction.CASCADE)
     private UserTable userTableReferenceReceiver;
 }

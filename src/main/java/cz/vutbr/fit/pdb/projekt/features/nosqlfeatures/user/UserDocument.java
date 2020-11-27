@@ -21,9 +21,12 @@ import java.util.List;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class UserDocument implements UserInterface, PersistentUser {
 
-    public UserDocument(int idUser, String email, String name, String surname, Date birthDate, UserSex sex, List<GroupInherited> groupsMember,
+    @Id
+    private int id;
+
+    public UserDocument(int id, String email, String name, String surname, Date birthDate, UserSex sex, List<GroupInherited> groupsMember,
                         List<GroupInherited> groupsAdmin, List<ConversationInherited> conversationsWithUser) {
-        this.idUser = idUser;
+        this.id = id;
         this.email = email;
         this.name = name;
         this.surname = surname;
@@ -35,9 +38,9 @@ public class UserDocument implements UserInterface, PersistentUser {
         this.conversationsWithUser = conversationsWithUser;
     }
 
-    public UserDocument(int idUser, String email, String name, String surname, Date birthDate, UserSex sex, UserState state,
+    public UserDocument(int id, String email, String name, String surname, Date birthDate, UserSex sex, UserState state,
                         List<GroupInherited> groupsMember, List<GroupInherited> groupsAdmin, List<ConversationInherited> conversationsWithUser) {
-        this.idUser = idUser;
+        this.id = id;
         this.email = email;
         this.name = name;
         this.surname = surname;
@@ -48,9 +51,6 @@ public class UserDocument implements UserInterface, PersistentUser {
         this.groupsAdmin = groupsAdmin;
         this.conversationsWithUser = conversationsWithUser;
     }
-
-    @Id
-    private int idUser;
     private List<ConversationInherited> conversationsWithUser;
     private String email;
     private String name;

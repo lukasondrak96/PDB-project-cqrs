@@ -1,7 +1,6 @@
-package cz.vutbr.fit.pdb.projekt.events.events.user;
+package cz.vutbr.fit.pdb.projekt.events.events;
 
 import cz.vutbr.fit.pdb.projekt.commands.services.CommandService;
-import cz.vutbr.fit.pdb.projekt.events.events.AbstractEvent;
 import cz.vutbr.fit.pdb.projekt.features.persistent.ObjectInterface;
 import cz.vutbr.fit.pdb.projekt.features.persistent.PersistentObject;
 
