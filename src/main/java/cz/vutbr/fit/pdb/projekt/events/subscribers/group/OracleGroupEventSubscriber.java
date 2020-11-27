@@ -1,7 +1,7 @@
 package cz.vutbr.fit.pdb.projekt.events.subscribers.group;
 
 import cz.vutbr.fit.pdb.projekt.events.events.ConfirmedEventAdapter;
-import cz.vutbr.fit.pdb.projekt.events.events.user.OracleCreatedEvent;
+import cz.vutbr.fit.pdb.projekt.events.events.OracleCreatedEvent;
 import cz.vutbr.fit.pdb.projekt.events.subscribers.AbstractSubscriber;
 import cz.vutbr.fit.pdb.projekt.features.persistent.PersistentGroup;
 import cz.vutbr.fit.pdb.projekt.features.sqlfeatures.group.GroupTable;
@@ -26,7 +26,7 @@ public class OracleGroupEventSubscriber extends AbstractSubscriber {
         LOGGER.info(RECEIVED_AND_APPLYING_EVENT, groupCreatedEvent.getClass().getSimpleName(), groupCreatedEvent);
         GroupTable groupTable = (GroupTable) groupCreatedEvent.apply(REUSABLE_ORACLE_OBJECT);
         if(groupTable != null) {
-            final ConfirmedEventAdapter<PersistentGroup> confirmedGroupCreatedEvent = new ConfirmedEventAdapter<>(groupTable, groupCreatedEvent.getCommandService());
+            final ConfirmedEventAdapter<PersistentGroup> confirmedGroupCreatedEvent = new ConfirmedEventAdapter<>(groupTable, new OracleCreatedEvent<>(groupTable, groupCreatedEvent.getCommandService()));
             LOGGER.info(POSTING_EVENT, confirmedGroupCreatedEvent.getClass().getSimpleName(), confirmedGroupCreatedEvent);
             post(confirmedGroupCreatedEvent);
         }

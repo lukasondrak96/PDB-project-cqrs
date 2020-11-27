@@ -22,6 +22,6 @@ public class NewGroupDto {
     private GroupState state;
 
     @NotNull(message = "Id autora musí být zadané")
-    private Integer idUser;
+    private Integer authorId;
 
 }

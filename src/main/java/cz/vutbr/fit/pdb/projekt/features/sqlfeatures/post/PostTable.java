@@ -37,7 +37,7 @@ public class PostTable {
     private Date createdAt;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "idGroup", referencedColumnName = "idGroup")
+    @JoinColumn(name = "idGroup", referencedColumnName = "id")
     @OnDelete(action = OnDeleteAction.CASCADE)
     private GroupTable groupTableReference;
 

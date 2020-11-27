@@ -1,11 +1,12 @@
 package cz.vutbr.fit.pdb.projekt.commands.services;
 
 import cz.vutbr.fit.pdb.projekt.commands.dto.group.NewGroupDto;
-import cz.vutbr.fit.pdb.projekt.events.events.user.OracleCreatedEvent;
+import cz.vutbr.fit.pdb.projekt.events.events.OracleCreatedEvent;
 import cz.vutbr.fit.pdb.projekt.events.subscribers.group.MongoGroupEventSubscriber;
 import cz.vutbr.fit.pdb.projekt.events.subscribers.group.OracleGroupEventSubscriber;
 import cz.vutbr.fit.pdb.projekt.features.nosqlfeatures.group.GroupDocument;
 import cz.vutbr.fit.pdb.projekt.features.nosqlfeatures.group.GroupDocumentRepository;
+import cz.vutbr.fit.pdb.projekt.features.persistent.GroupInterface;
 import cz.vutbr.fit.pdb.projekt.features.persistent.ObjectInterface;
 import cz.vutbr.fit.pdb.projekt.features.persistent.PersistentGroup;
 import cz.vutbr.fit.pdb.projekt.features.sqlfeatures.group.GroupRepository;
@@ -41,7 +42,7 @@ public class GroupCommandService implements CommandService<PersistentGroup> {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Nelze vytvořit archivovanou skupinu");
         }
 
-        Optional<UserTable> userOptional = userRepository.findById(newGroupDto.getIdUser());
+        Optional<UserTable> userOptional = userRepository.findById(newGroupDto.getAuthorId());
         if (userOptional.isEmpty()) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Uživatel s tímto id neexistuje");
         }
@@ -101,12 +102,23 @@ public class GroupCommandService implements CommandService<PersistentGroup> {
     }
 
     @Override
-    public PersistentGroup assignFromTo(ObjectInterface objectInterface, PersistentGroup persistentObject) {
-        return null;
+    public PersistentGroup assignFromTo(ObjectInterface objectInterface, PersistentGroup group) {
+        GroupInterface persistentGroupInterface = (GroupInterface) group;
+        GroupInterface groupInterface = (GroupInterface) objectInterface;
+        if(group instanceof GroupTable || group instanceof GroupDocument) {
+            persistentGroupInterface.setId(groupInterface.getId());
+            persistentGroupInterface.setName(groupInterface.getName());
+            persistentGroupInterface.setState(groupInterface.getState());
+            persistentGroupInterface.setDescription(groupInterface.getDescription());
+        }
+        return (PersistentGroup) persistentGroupInterface;
     }
 
     @Override
-    public PersistentGroup save(PersistentGroup persistentObject) {
-        return null;
+    public PersistentGroup save(PersistentGroup group) {
+        if (group instanceof GroupTable)
+            return groupRepository.save((GroupTable) group);
+        else
+            return groupDocumentRepository.save((GroupDocument) group);
     }
 }
