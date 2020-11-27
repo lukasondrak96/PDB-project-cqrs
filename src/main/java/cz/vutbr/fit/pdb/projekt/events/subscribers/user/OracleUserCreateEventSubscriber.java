@@ -10,14 +10,14 @@ import org.greenrobot.eventbus.Subscribe;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class OracleUserEventSubscriber extends AbstractSubscriber {
+public class OracleUserCreateEventSubscriber extends AbstractSubscriber {
 
     public static final String RECEIVED_AND_APPLYING_EVENT = "Received and applying {} event {}";
     public static final String POSTING_EVENT = "Posting {} event {}";
-    private static final Logger LOGGER = LoggerFactory.getLogger(OracleUserEventSubscriber.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(OracleUserCreateEventSubscriber.class);
     private static final UserTable REUSABLE_ORACLE_OBJECT = new UserTable();
 
-    public OracleUserEventSubscriber(EventBus... eventBuses) {
+    public OracleUserCreateEventSubscriber(EventBus... eventBuses) {
         super(eventBuses);
     }
 
@@ -31,10 +31,5 @@ public class OracleUserEventSubscriber extends AbstractSubscriber {
             post(confirmedUserCreatedEvent);
         }
     }
-
-//    @Subscribe
-//    public void onUserUpdatedEvent(UserUpdatedEvent userUpdatedEvent) {
-//        userUpdatedEvent.apply(persistentObject);
-//    }
 
 }

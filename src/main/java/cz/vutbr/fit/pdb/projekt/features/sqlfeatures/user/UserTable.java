@@ -25,7 +25,8 @@ public class UserTable implements UserInterface, PersistentUser, UserReference {
         this.state = UserState.ACTIVATED;
     }
 
-    public UserTable(String email, String name, String surname, Date birthDate, UserSex sex, UserState state) {
+    public UserTable(Integer id, String email, String name, String surname, Date birthDate, UserSex sex, UserState state) {
+        this.id = id;
         this.email = email;
         this.name = name;
         this.surname = surname;

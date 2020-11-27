@@ -1,9 +1,12 @@
 package cz.vutbr.fit.pdb.projekt.api.commands.services;
 
 import cz.vutbr.fit.pdb.projekt.api.commands.dtos.user.NewUserDto;
+import cz.vutbr.fit.pdb.projekt.api.commands.dtos.user.UpdateUserDto;
+import cz.vutbr.fit.pdb.projekt.events.events.ConfirmedEventAdapter;
 import cz.vutbr.fit.pdb.projekt.events.events.OracleCreatedEvent;
 import cz.vutbr.fit.pdb.projekt.events.subscribers.user.MongoUserEventSubscriber;
-import cz.vutbr.fit.pdb.projekt.events.subscribers.user.OracleUserEventSubscriber;
+import cz.vutbr.fit.pdb.projekt.events.subscribers.user.OracleUserChangeEventSubscriber;
+import cz.vutbr.fit.pdb.projekt.events.subscribers.user.OracleUserCreateEventSubscriber;
 import cz.vutbr.fit.pdb.projekt.features.helperInterfaces.ObjectInterface;
 import cz.vutbr.fit.pdb.projekt.features.helperInterfaces.objects.UserInterface;
 import cz.vutbr.fit.pdb.projekt.features.helperInterfaces.persistent.PersistentUser;
@@ -16,6 +19,9 @@ import org.greenrobot.eventbus.EventBus;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Optional;
 
 @Service
 @AllArgsConstructor
@@ -32,7 +38,7 @@ public class UserCommandService implements CommandService<PersistentUser> {
 
         final UserTable userTable = new UserTable(newUserDto.getEmail(), newUserDto.getName(), newUserDto.getSurname(), newUserDto.getBirthDate(), newUserDto.getSex());
 
-        OracleUserEventSubscriber oracleSubscriber = new OracleUserEventSubscriber(EVENT_BUS);
+        OracleUserCreateEventSubscriber oracleSubscriber = new OracleUserCreateEventSubscriber(EVENT_BUS);
         MongoUserEventSubscriber mongoSubscriber = new MongoUserEventSubscriber(EVENT_BUS);
 
         EVENT_BUS.post(new OracleCreatedEvent<>(userTable, this));
@@ -42,34 +48,35 @@ public class UserCommandService implements CommandService<PersistentUser> {
         return ResponseEntity.ok().body("Účet byl vytvořen");
     }
 
-//    @Transactional
-//    public ResponseEntity<?> updateUser(Integer userId, UpdateUserDto updateUserDto) {
-//        Optional<UserTable> userTableOptional = userRepository.findById(userId);
-//        if(userTableOptional.isEmpty())
-//            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Tento uživatel neexistuje");
-//
-//        Optional<UserDocument> userDocumentOptional = userDocumentRepository.findById(userId);
-//        if (userDocumentOptional.isEmpty())
-//            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("User s tímto emailem neexistuje v mongu (v oraclu existuje -> nekompatibilní stav databází)");
-//
-//        UserTable oldUserTable = userTableOptional.get();
-//        UserDocument oldUserDocument = userDocumentOptional.get();
-//
-//        if (userTableEqualsUpdateUserDto(oldUserTable, updateUserDto)) {
-//            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Nebyl nalezen záznam pro editaci");
-//        }
-//
-//        final UserTable userTable = new UserTable(updateUserDto.getEmail(), updateUserDto.getName(),
-//                updateUserDto.getSurname(), updateUserDto.getBirthDate(), updateUserDto.getSex(), updateUserDto.getState());
-//        userTable.setIdUser(oldUserTable.getIdUser());
-//
-//        final UserDocument userDocument = new UserDocument(oldUserDocument.getId(), updateUserDto.getEmail(), updateUserDto.getName(),
-//                updateUserDto.getSurname(), updateUserDto.getBirthDate(), updateUserDto.getSex(), updateUserDto.getState(),
-//                oldUserDocument.getGroupsMember(), oldUserDocument.getGroupsAdmin(), oldUserDocument.getConversationsWithUser());
-//
-//        subscribeAndPostEvent(userTable, userDocument, new UserUpdatedEvent(this));
-//        return ResponseEntity.ok().body("Data byla aktualizována");
-//    }
+    @Transactional
+    public ResponseEntity<?> updateUser(Integer userId, UpdateUserDto updateUserDto) {
+        Optional<UserTable> userTableOptional = userRepository.findById(userId);
+        if(userTableOptional.isEmpty())
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Tento uživatel neexistuje");
+
+        UserTable oldUserTable = userTableOptional.get();
+
+        if (userTableEqualsUpdateUserDto(oldUserTable, updateUserDto)) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Nebyl nalezen záznam pro editaci");
+        }
+
+        final UserTable userTable = new UserTable(userId, updateUserDto.getEmail(), updateUserDto.getName(),
+                updateUserDto.getSurname(), updateUserDto.getBirthDate(), updateUserDto.getSex(), updateUserDto.getState());
+
+
+        OracleUserChangeEventSubscriber sqlSubscriber = new OracleUserChangeEventSubscriber(EVENT_BUS);
+        MongoUserEventSubscriber noSqlSubscriber = new MongoUserEventSubscriber(EVENT_BUS);
+
+        OracleCreatedEvent<PersistentUser> createdEvent = new OracleCreatedEvent<>(userTable, this);
+        ConfirmedEventAdapter<PersistentUser> adapterOfCreatedEvent = new ConfirmedEventAdapter<>(createdEvent);
+
+        EVENT_BUS.post(adapterOfCreatedEvent);
+
+        EVENT_BUS.unregister(sqlSubscriber);
+        EVENT_BUS.unregister(noSqlSubscriber);
+
+        return ResponseEntity.ok().body("Data byla aktualizována");
+    }
 //
 //    @Transactional
 //    public ResponseEntity<?> activateUser(String userId) {
@@ -122,24 +129,15 @@ public class UserCommandService implements CommandService<PersistentUser> {
 //
 //
 //    /* private methods */
-//    private void subscribeAndPostEvent(UserTable userTable, UserDocument userDocument, EventInterface<?> event) {
-//        OracleUserEventSubscriber<UserTable> sqlSubscriber = new OracleUserEventSubscriber<>(userTable, EVENT_BUS);
-////        OracleUserEventSubscriber<UserDocument> noSqlSubscriber = new OracleUserEventSubscriber<>(userDocument, EVENT_BUS);
-//
-//        EVENT_BUS.post(event);
-//
-//        EVENT_BUS.unregister(sqlSubscriber);
-////        EVENT_BUS.unregister(noSqlSubscriber);
-//    }
-//
-//    private boolean userTableEqualsUpdateUserDto(UserTable table, UpdateUserDto dto) {
-//        return dto.getEmail().equals(table.getEmail()) &&
-//                dto.getName().equals(table.getName()) &&
-//                dto.getSurname().equals(table.getSurname()) &&
-//                dto.getBirthDate().equals(table.getBirthDate()) &&
-//                dto.getSex() == table.getSex() &&
-//                dto.getState() == table.getState();
-//    }
+
+    private boolean userTableEqualsUpdateUserDto(UserTable table, UpdateUserDto dto) {
+        return dto.getEmail().equals(table.getEmail()) &&
+                dto.getName().equals(table.getName()) &&
+                dto.getSurname().equals(table.getSurname()) &&
+                dto.getBirthDate().equals(table.getBirthDate()) &&
+                dto.getSex() == table.getSex() &&
+                dto.getState() == table.getState();
+    }
 
 
     @Override
