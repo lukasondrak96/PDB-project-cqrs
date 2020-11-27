@@ -1,11 +1,11 @@
 package cz.vutbr.fit.pdb.projekt.api.commands.services;
 
-import cz.vutbr.fit.pdb.projekt.api.commands.dto.group.NewGroupDto;
+import cz.vutbr.fit.pdb.projekt.api.commands.dtos.group.NewGroupDto;
 import cz.vutbr.fit.pdb.projekt.events.events.OracleCreatedEvent;
 import cz.vutbr.fit.pdb.projekt.events.subscribers.group.MongoGroupEventSubscriber;
 import cz.vutbr.fit.pdb.projekt.events.subscribers.group.OracleGroupEventSubscriber;
 import cz.vutbr.fit.pdb.projekt.features.helperInterfaces.ObjectInterface;
-import cz.vutbr.fit.pdb.projekt.features.helperInterfaces.object.GroupInterface;
+import cz.vutbr.fit.pdb.projekt.features.helperInterfaces.objects.GroupInterface;
 import cz.vutbr.fit.pdb.projekt.features.helperInterfaces.persistent.PersistentGroup;
 import cz.vutbr.fit.pdb.projekt.features.nosqlfeatures.group.GroupDocument;
 import cz.vutbr.fit.pdb.projekt.features.nosqlfeatures.group.GroupDocumentRepository;

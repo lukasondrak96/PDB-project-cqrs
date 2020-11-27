@@ -1,9 +1,9 @@
 package cz.vutbr.fit.pdb.projekt.features.nosqlfeatures.group;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import cz.vutbr.fit.pdb.projekt.features.helperInterfaces.object.GroupInterface;
+import cz.vutbr.fit.pdb.projekt.features.helperInterfaces.objects.GroupInterface;
 import cz.vutbr.fit.pdb.projekt.features.helperInterfaces.persistent.PersistentGroup;
-import cz.vutbr.fit.pdb.projekt.features.helperInterfaces.reference.UserReference;
+import cz.vutbr.fit.pdb.projekt.features.helperInterfaces.references.UserReference;
 import cz.vutbr.fit.pdb.projekt.features.nosqlfeatures.group.inherited.AuthorInherited;
 import cz.vutbr.fit.pdb.projekt.features.nosqlfeatures.group.inherited.MemberInherited;
 import cz.vutbr.fit.pdb.projekt.features.nosqlfeatures.group.inherited.PostInherited;

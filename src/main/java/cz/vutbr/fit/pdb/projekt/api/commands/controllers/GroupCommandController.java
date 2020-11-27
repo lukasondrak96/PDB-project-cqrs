@@ -1,6 +1,6 @@
 package cz.vutbr.fit.pdb.projekt.api.commands.controllers;
 
-import cz.vutbr.fit.pdb.projekt.api.commands.dto.group.NewGroupDto;
+import cz.vutbr.fit.pdb.projekt.api.commands.dtos.group.NewGroupDto;
 import cz.vutbr.fit.pdb.projekt.api.commands.services.GroupCommandService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;

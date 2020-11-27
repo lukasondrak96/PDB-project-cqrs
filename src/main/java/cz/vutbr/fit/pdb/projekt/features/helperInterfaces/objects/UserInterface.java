@@ -1,4 +1,4 @@
-package cz.vutbr.fit.pdb.projekt.features.helperInterfaces.object;
+package cz.vutbr.fit.pdb.projekt.features.helperInterfaces.objects;
 
 import cz.vutbr.fit.pdb.projekt.features.helperInterfaces.ObjectInterface;
 import cz.vutbr.fit.pdb.projekt.features.sqlfeatures.user.UserSex;

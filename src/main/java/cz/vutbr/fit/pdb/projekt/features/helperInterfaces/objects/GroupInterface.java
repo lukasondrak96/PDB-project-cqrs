@@ -1,7 +1,7 @@
-package cz.vutbr.fit.pdb.projekt.features.helperInterfaces.object;
+package cz.vutbr.fit.pdb.projekt.features.helperInterfaces.objects;
 
 import cz.vutbr.fit.pdb.projekt.features.helperInterfaces.ObjectInterface;
-import cz.vutbr.fit.pdb.projekt.features.helperInterfaces.reference.UserReference;
+import cz.vutbr.fit.pdb.projekt.features.helperInterfaces.references.UserReference;
 import cz.vutbr.fit.pdb.projekt.features.sqlfeatures.group.GroupState;
 
 public interface GroupInterface extends ObjectInterface {

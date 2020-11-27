@@ -1,11 +1,11 @@
 package cz.vutbr.fit.pdb.projekt.api.commands.services;
 
-import cz.vutbr.fit.pdb.projekt.api.commands.dto.user.NewUserDto;
+import cz.vutbr.fit.pdb.projekt.api.commands.dtos.user.NewUserDto;
 import cz.vutbr.fit.pdb.projekt.events.events.OracleCreatedEvent;
 import cz.vutbr.fit.pdb.projekt.events.subscribers.user.MongoUserEventSubscriber;
 import cz.vutbr.fit.pdb.projekt.events.subscribers.user.OracleUserEventSubscriber;
 import cz.vutbr.fit.pdb.projekt.features.helperInterfaces.ObjectInterface;
-import cz.vutbr.fit.pdb.projekt.features.helperInterfaces.object.UserInterface;
+import cz.vutbr.fit.pdb.projekt.features.helperInterfaces.objects.UserInterface;
 import cz.vutbr.fit.pdb.projekt.features.helperInterfaces.persistent.PersistentUser;
 import cz.vutbr.fit.pdb.projekt.features.nosqlfeatures.user.UserDocument;
 import cz.vutbr.fit.pdb.projekt.features.nosqlfeatures.user.UserDocumentRepository;

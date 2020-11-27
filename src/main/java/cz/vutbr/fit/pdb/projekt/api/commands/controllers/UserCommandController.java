@@ -1,7 +1,7 @@
 package cz.vutbr.fit.pdb.projekt.api.commands.controllers;
 
-import cz.vutbr.fit.pdb.projekt.api.commands.dto.user.NewUserDto;
-import cz.vutbr.fit.pdb.projekt.api.commands.dto.user.UpdateUserDto;
+import cz.vutbr.fit.pdb.projekt.api.commands.dtos.user.NewUserDto;
+import cz.vutbr.fit.pdb.projekt.api.commands.dtos.user.UpdateUserDto;
 import cz.vutbr.fit.pdb.projekt.api.commands.services.UserCommandService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;

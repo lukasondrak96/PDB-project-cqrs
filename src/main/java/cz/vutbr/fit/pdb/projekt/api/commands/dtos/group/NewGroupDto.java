@@ -1,4 +1,4 @@
-package cz.vutbr.fit.pdb.projekt.api.commands.dto.group;
+package cz.vutbr.fit.pdb.projekt.api.commands.dtos.group;
 
 import cz.vutbr.fit.pdb.projekt.features.sqlfeatures.group.GroupState;
 import lombok.AllArgsConstructor;

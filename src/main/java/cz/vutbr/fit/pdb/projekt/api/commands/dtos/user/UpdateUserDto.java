@@ -1,4 +1,4 @@
-package cz.vutbr.fit.pdb.projekt.api.commands.dto.user;
+package cz.vutbr.fit.pdb.projekt.api.commands.dtos.user;
 
 import cz.vutbr.fit.pdb.projekt.features.sqlfeatures.user.UserSex;
 import cz.vutbr.fit.pdb.projekt.features.sqlfeatures.user.UserState;
