@@ -1,7 +1,7 @@
 package cz.vutbr.fit.pdb.projekt.events.subscribers.user;
 
 import cz.vutbr.fit.pdb.projekt.events.events.ConfirmedEventAdapter;
-import cz.vutbr.fit.pdb.projekt.events.events.user.OracleCreatedEvent;
+import cz.vutbr.fit.pdb.projekt.events.events.OracleCreatedEvent;
 import cz.vutbr.fit.pdb.projekt.events.subscribers.AbstractSubscriber;
 import cz.vutbr.fit.pdb.projekt.features.persistent.PersistentUser;
 import cz.vutbr.fit.pdb.projekt.features.sqlfeatures.user.UserTable;
@@ -26,7 +26,7 @@ public class OracleUserEventSubscriber extends AbstractSubscriber {
         LOGGER.info(RECEIVED_AND_APPLYING_EVENT, userCreatedEvent.getClass().getSimpleName(), userCreatedEvent);
         UserTable userTable = (UserTable) userCreatedEvent.apply(REUSABLE_ORACLE_OBJECT);
         if(userTable != null) {
-            final ConfirmedEventAdapter<PersistentUser> confirmedUserCreatedEvent = new ConfirmedEventAdapter<>(userTable, userCreatedEvent.getCommandService());
+            final ConfirmedEventAdapter<PersistentUser> confirmedUserCreatedEvent = new ConfirmedEventAdapter<>(userTable, new OracleCreatedEvent<>(userTable, userCreatedEvent.getCommandService()));
             LOGGER.info(POSTING_EVENT, confirmedUserCreatedEvent.getClass().getSimpleName(), confirmedUserCreatedEvent);
             post(confirmedUserCreatedEvent);
         }

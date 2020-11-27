@@ -6,9 +6,9 @@ import cz.vutbr.fit.pdb.projekt.features.sqlfeatures.user.UserState;
 import java.util.Date;
 
 public interface UserInterface extends ObjectInterface {
-    int getIdUser();
+    int getId();
 
-    void setIdUser(int idUser);
+    void setId(int id);
 
     String getEmail();
 

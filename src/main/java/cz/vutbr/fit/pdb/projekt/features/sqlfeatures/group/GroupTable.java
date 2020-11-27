@@ -35,7 +35,7 @@ public class GroupTable implements GroupInterface, PersistentGroup {
     private GroupState state;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "idUser", referencedColumnName = "idUser")
+    @JoinColumn(name = "idUser", referencedColumnName = "id")
     @OnDelete(action = OnDeleteAction.CASCADE)
     private UserTable userTableReference;
 
