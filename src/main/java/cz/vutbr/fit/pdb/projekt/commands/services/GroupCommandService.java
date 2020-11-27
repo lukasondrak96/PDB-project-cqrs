@@ -110,6 +110,7 @@ public class GroupCommandService implements CommandService<PersistentGroup> {
             persistentGroupInterface.setName(groupInterface.getName());
             persistentGroupInterface.setState(groupInterface.getState());
             persistentGroupInterface.setDescription(groupInterface.getDescription());
+            persistentGroupInterface.setUserReference(groupInterface.getUserReference());
         }
         return (PersistentGroup) persistentGroupInterface;
     }

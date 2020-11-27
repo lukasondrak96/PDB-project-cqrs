@@ -26,7 +26,7 @@ public class OracleGroupEventSubscriber extends AbstractSubscriber {
         LOGGER.info(RECEIVED_AND_APPLYING_EVENT, groupCreatedEvent.getClass().getSimpleName(), groupCreatedEvent);
         GroupTable groupTable = (GroupTable) groupCreatedEvent.apply(REUSABLE_ORACLE_OBJECT);
         if(groupTable != null) {
-            final ConfirmedEventAdapter<PersistentGroup> confirmedGroupCreatedEvent = new ConfirmedEventAdapter<>(groupTable, new OracleCreatedEvent<>(groupTable, groupCreatedEvent.getCommandService()));
+            final ConfirmedEventAdapter<PersistentGroup> confirmedGroupCreatedEvent = new ConfirmedEventAdapter<>(new OracleCreatedEvent<>(groupTable, groupCreatedEvent.getCommandService()));
             LOGGER.info(POSTING_EVENT, confirmedGroupCreatedEvent.getClass().getSimpleName(), confirmedGroupCreatedEvent);
             post(confirmedGroupCreatedEvent);
         }

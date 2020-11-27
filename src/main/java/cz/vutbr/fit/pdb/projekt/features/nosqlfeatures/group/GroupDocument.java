@@ -6,7 +6,9 @@ import cz.vutbr.fit.pdb.projekt.features.nosqlfeatures.group.inherited.MemberInh
 import cz.vutbr.fit.pdb.projekt.features.nosqlfeatures.group.inherited.PostInherited;
 import cz.vutbr.fit.pdb.projekt.features.persistent.GroupInterface;
 import cz.vutbr.fit.pdb.projekt.features.persistent.PersistentGroup;
+import cz.vutbr.fit.pdb.projekt.features.persistent.UserReference;
 import cz.vutbr.fit.pdb.projekt.features.sqlfeatures.group.GroupState;
+import cz.vutbr.fit.pdb.projekt.features.sqlfeatures.user.UserTable;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -37,4 +39,15 @@ public class GroupDocument implements GroupInterface, PersistentGroup {
     private AuthorInherited author;
     private List<PostInherited> posts;
     private List<MemberInherited> members;
+
+    @Override
+    public UserReference getUserReference() {
+        return author;
+    }
+
+    @Override
+    public void setUserReference(UserReference userReference) {
+        UserTable userTable = (UserTable) userReference;
+        author = new AuthorInherited(userTable.getId(), userTable.getName(), userTable.getSurname());
+    }
 }

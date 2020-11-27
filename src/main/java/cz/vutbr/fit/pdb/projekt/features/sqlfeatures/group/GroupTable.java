@@ -2,6 +2,7 @@ package cz.vutbr.fit.pdb.projekt.features.sqlfeatures.group;
 
 import cz.vutbr.fit.pdb.projekt.features.persistent.GroupInterface;
 import cz.vutbr.fit.pdb.projekt.features.persistent.PersistentGroup;
+import cz.vutbr.fit.pdb.projekt.features.persistent.UserReference;
 import cz.vutbr.fit.pdb.projekt.features.sqlfeatures.user.UserTable;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -50,5 +51,15 @@ public class GroupTable implements GroupInterface, PersistentGroup {
     public void removeUser(UserTable user) {
         this.users.remove(user);
         user.getGroups().remove(this);
+    }
+
+    @Override
+    public UserReference getUserReference() {
+        return userTableReference;
+    }
+
+    @Override
+    public void setUserReference(UserReference userReference) {
+        userTableReference = (UserTable) userReference;
     }
 }

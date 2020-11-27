@@ -2,6 +2,7 @@ package cz.vutbr.fit.pdb.projekt.features.sqlfeatures.user;
 
 import cz.vutbr.fit.pdb.projekt.features.persistent.PersistentUser;
 import cz.vutbr.fit.pdb.projekt.features.persistent.UserInterface;
+import cz.vutbr.fit.pdb.projekt.features.persistent.UserReference;
 import cz.vutbr.fit.pdb.projekt.features.sqlfeatures.group.GroupTable;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -14,7 +15,7 @@ import java.util.List;
 @Entity
 @Data
 @NoArgsConstructor
-public class UserTable implements UserInterface, PersistentUser {
+public class UserTable implements UserInterface, PersistentUser, UserReference {
     public UserTable(String email, String name, String surname, Date birthDate, UserSex sex) {
         this.email = email;
         this.name = name;
@@ -66,4 +67,5 @@ public class UserTable implements UserInterface, PersistentUser {
         this.groups.remove(group);
         group.getUsers().remove(this);
     }
+
 }

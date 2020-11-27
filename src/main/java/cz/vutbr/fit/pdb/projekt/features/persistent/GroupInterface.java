@@ -18,4 +18,8 @@ public interface GroupInterface extends ObjectInterface {
     GroupState getState();
 
     void setState(GroupState state);
+
+    UserReference getUserReference();
+
+    void setUserReference(UserReference userReference);
 }
