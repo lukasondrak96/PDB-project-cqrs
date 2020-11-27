@@ -1,10 +1,10 @@
 package cz.vutbr.fit.pdb.projekt.features.sqlfeatures.user;
 
 import cz.vutbr.fit.pdb.projekt.features.persistent.PersistentUser;
+import cz.vutbr.fit.pdb.projekt.features.persistent.UserInterface;
 import cz.vutbr.fit.pdb.projekt.features.sqlfeatures.group.GroupTable;
-import lombok.Getter;
+import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -12,10 +12,9 @@ import java.util.Date;
 import java.util.List;
 
 @Entity
-@Getter
-@Setter
+@Data
 @NoArgsConstructor
-public class UserTable implements PersistentUser {
+public class UserTable implements UserInterface, PersistentUser {
     public UserTable(String email, String name, String surname, Date birthDate, UserSex sex) {
         this.email = email;
         this.name = name;

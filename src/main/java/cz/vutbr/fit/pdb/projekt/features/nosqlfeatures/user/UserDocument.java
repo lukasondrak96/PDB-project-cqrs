@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import cz.vutbr.fit.pdb.projekt.features.nosqlfeatures.user.inherited.ConversationInherited;
 import cz.vutbr.fit.pdb.projekt.features.nosqlfeatures.user.inherited.GroupInherited;
 import cz.vutbr.fit.pdb.projekt.features.persistent.PersistentUser;
+import cz.vutbr.fit.pdb.projekt.features.persistent.UserInterface;
 import cz.vutbr.fit.pdb.projekt.features.sqlfeatures.user.UserSex;
 import cz.vutbr.fit.pdb.projekt.features.sqlfeatures.user.UserState;
 import lombok.Data;
@@ -18,15 +19,11 @@ import java.util.List;
 @Data
 @NoArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class UserDocument implements PersistentUser {
+public class UserDocument implements UserInterface, PersistentUser {
 
-    @Id
-    private int id;
-    private List<ConversationInherited> conversationsWithUser;
-
-    public UserDocument(int id, String email, String name, String surname, Date birthDate, UserSex sex, List<GroupInherited> groupsMember,
+    public UserDocument(int idUser, String email, String name, String surname, Date birthDate, UserSex sex, List<GroupInherited> groupsMember,
                         List<GroupInherited> groupsAdmin, List<ConversationInherited> conversationsWithUser) {
-        this.id = id;
+        this.idUser = idUser;
         this.email = email;
         this.name = name;
         this.surname = surname;
@@ -37,17 +34,10 @@ public class UserDocument implements PersistentUser {
         this.groupsAdmin = groupsAdmin;
         this.conversationsWithUser = conversationsWithUser;
     }
-    private String email;
-    private String name;
-    private String surname;
-    private Date birthDate;
-    private UserSex sex;
-    private UserState state;
-    private List<GroupInherited> groupsMember;
-    private List<GroupInherited> groupsAdmin;
-    public UserDocument(int id, String email, String name, String surname, Date birthDate, UserSex sex, UserState state,
+
+    public UserDocument(int idUser, String email, String name, String surname, Date birthDate, UserSex sex, UserState state,
                         List<GroupInherited> groupsMember, List<GroupInherited> groupsAdmin, List<ConversationInherited> conversationsWithUser) {
-        this.id = id;
+        this.idUser = idUser;
         this.email = email;
         this.name = name;
         this.surname = surname;
@@ -58,4 +48,17 @@ public class UserDocument implements PersistentUser {
         this.groupsAdmin = groupsAdmin;
         this.conversationsWithUser = conversationsWithUser;
     }
+
+    @Id
+    private int idUser;
+    private List<ConversationInherited> conversationsWithUser;
+    private String email;
+    private String name;
+    private String surname;
+    private Date birthDate;
+    private UserSex sex;
+    private UserState state;
+    private List<GroupInherited> groupsMember;
+    private List<GroupInherited> groupsAdmin;
+
 }

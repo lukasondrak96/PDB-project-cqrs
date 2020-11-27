@@ -34,6 +34,7 @@ public class UserCommandController {
 
     @PutMapping("{id}/edit")
     public ResponseEntity<?> editUserAccount(@PathVariable(value = "id") Integer userId, @Valid @RequestBody UpdateUserDto updateUserDto) {
-        return userCommandService.updateUser(userId, updateUserDto);
+//        return userCommandService.updateUser(userId, updateUserDto);
+        return null;
     }
 }
