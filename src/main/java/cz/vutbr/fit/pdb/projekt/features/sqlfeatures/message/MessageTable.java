@@ -35,13 +35,23 @@ public class MessageTable {
 
     private Date readAt;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "idUserSender", referencedColumnName = "id")
     @OnDelete(action = OnDeleteAction.CASCADE)
     private UserTable userReferenceSender;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "idUserReceiver", referencedColumnName = "id")
     @OnDelete(action = OnDeleteAction.CASCADE)
     private UserTable userReferenceReceiver;
+
+    @Override
+    public String toString() {
+        return "MessageTable{" +
+                "id=" + idMessage +
+                ", text='" + text +
+                ", createdAt=" + createdAt.toString() +
+                '\'' +
+                '}';
+    }
 }

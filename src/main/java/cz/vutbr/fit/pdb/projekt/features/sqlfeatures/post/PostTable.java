@@ -39,12 +39,12 @@ public class PostTable implements PostInterface, PersistentPost {
 
     private Date createdAt;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "idGroup", referencedColumnName = "id")
     @OnDelete(action = OnDeleteAction.CASCADE)
     private GroupTable groupReference;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "idUser", referencedColumnName = "id")
     @OnDelete(action = OnDeleteAction.CASCADE)
     private UserTable userReference;
@@ -57,5 +57,16 @@ public class PostTable implements PostInterface, PersistentPost {
     @Override
     public void setGroupReference(GroupTable groupReference) {
         this.groupReference = groupReference;
+    }
+
+    @Override
+    public String toString() {
+        return "PostTable{" +
+                "id=" + id +
+                ", title='" + title +
+                ", text='" + text +
+                ", createdAt=" + createdAt.toString() +
+                '\'' +
+                '}';
     }
 }

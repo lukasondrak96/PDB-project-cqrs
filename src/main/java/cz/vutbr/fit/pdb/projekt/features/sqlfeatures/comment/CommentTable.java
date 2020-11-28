@@ -33,14 +33,23 @@ public class CommentTable {
 
     private Date createdAt;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "idPost", referencedColumnName = "id")
     @OnDelete(action = OnDeleteAction.CASCADE)
     private PostTable postReference;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "idUser", referencedColumnName = "id")
     @OnDelete(action = OnDeleteAction.CASCADE)
     private UserTable userReference;
 
+    @Override
+    public String toString() {
+        return "CommentTable{" +
+                "id=" + idComment +
+                ", text='" + text +
+                ", createdAt=" + createdAt.toString() +
+                '\'' +
+                '}';
+    }
 }

@@ -52,7 +52,7 @@ public class UserTable implements UserInterface, PersistentUser, UserReference {
 
     private UserState state;
 
-    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @JoinTable(
             name = "user_group_link",
             joinColumns = {@JoinColumn(name = "id")},
@@ -69,4 +69,17 @@ public class UserTable implements UserInterface, PersistentUser, UserReference {
         group.getUsers().remove(this);
     }
 
+    @Override
+    public String toString() {
+        return "UserTable{" +
+                "id=" + id +
+                ", email='" + email +
+                ", name=" + name +
+                ", surname=" + surname +
+                ", birthDate=" + birthDate.toString() +
+                ", sex=" + sex.toString() +
+                ", state=" + state.toString() +
+                '\'' +
+                '}';
+    }
 }

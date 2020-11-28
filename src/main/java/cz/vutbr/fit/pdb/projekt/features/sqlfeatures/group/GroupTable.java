@@ -35,12 +35,12 @@ public class GroupTable implements GroupInterface, PersistentGroup {
 
     private GroupState state;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "creatorId", referencedColumnName = "id")
     @OnDelete(action = OnDeleteAction.CASCADE)
     private UserTable userReference;
 
-    @ManyToMany(mappedBy = "groups", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @ManyToMany(mappedBy = "groups", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private List<UserTable> users = new ArrayList<>();
 
     public void addUser(UserTable user) {
@@ -56,5 +56,15 @@ public class GroupTable implements GroupInterface, PersistentGroup {
     @Override
     public void setUserReference(UserReference userReference) {
         this.userReference = (UserTable) userReference;
+    }
+
+    @Override
+    public String toString() {
+        return "GroupTable{" +
+                "id=" + id +
+                ", name='" + name +
+                ", description=" + description +
+                '\'' +
+                '}';
     }
 }

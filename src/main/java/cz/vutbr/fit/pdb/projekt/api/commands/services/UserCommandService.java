@@ -72,7 +72,7 @@ public class UserCommandService implements UserWithStateChangingService<Persiste
         }
 
         final UserTable userTable = new UserTable(userId, updateUserDto.getEmail(), updateUserDto.getName(),
-                updateUserDto.getSurname(), updateUserDto.getBirthDate(), updateUserDto.getSex(), updateUserDto.getState());
+                updateUserDto.getSurname(), updateUserDto.getBirthDate(), updateUserDto.getSex(), oldUserTable.getState());
 
         UserUpdatedEvent<PersistentUser> updatedEvent = new UserUpdatedEvent<>(userTable, this);
         subscribeChangeEventToOracleAndMongo(updatedEvent);
@@ -196,8 +196,7 @@ public class UserCommandService implements UserWithStateChangingService<Persiste
                 dto.getName().equals(table.getName()) &&
                 dto.getSurname().equals(table.getSurname()) &&
                 dto.getBirthDate().equals(table.getBirthDate()) &&
-                dto.getSex() == table.getSex() &&
-                dto.getState() == table.getState();
+                dto.getSex() == table.getSex();
     }
 
     private boolean groupCreatorChangedName(UserDocument userDocument, CreatorEmbedded groupCreator) {
