@@ -1,13 +1,16 @@
 package cz.vutbr.fit.pdb.projekt.api.commands.services;
 
+import cz.vutbr.fit.pdb.projekt.api.commands.dtos.comment.NewCommentDto;
 import cz.vutbr.fit.pdb.projekt.api.commands.dtos.group.NewGroupDto;
 import cz.vutbr.fit.pdb.projekt.api.commands.dtos.post.NewPostDto;
 import cz.vutbr.fit.pdb.projekt.api.commands.dtos.user.NewUserDto;
 import cz.vutbr.fit.pdb.projekt.api.commands.dtos.user.UpdateUserDto;
 import cz.vutbr.fit.pdb.projekt.features.nosqlfeatures.group.GroupDocument;
 import cz.vutbr.fit.pdb.projekt.features.nosqlfeatures.group.GroupDocumentRepository;
+import cz.vutbr.fit.pdb.projekt.features.nosqlfeatures.group.embedded.PostEmbedded;
 import cz.vutbr.fit.pdb.projekt.features.nosqlfeatures.user.UserDocument;
 import cz.vutbr.fit.pdb.projekt.features.nosqlfeatures.user.UserDocumentRepository;
+import cz.vutbr.fit.pdb.projekt.features.sqlfeatures.comment.CommentRepository;
 import cz.vutbr.fit.pdb.projekt.features.sqlfeatures.group.GroupRepository;
 import cz.vutbr.fit.pdb.projekt.features.sqlfeatures.group.GroupState;
 import cz.vutbr.fit.pdb.projekt.features.sqlfeatures.post.PostRepository;
@@ -40,6 +43,12 @@ class UserCommandServiceTest {
     private final Date TEST_BIRTH_DATE_UPDATE = new Date(500L);
     private final UserSex TEST_SEX_UPDATE = UserSex.MALE;
 
+    private final UserState STATE_ACTIVATED = UserState.ACTIVATED;
+    private final UserState STATE_DEACTIVATED = UserState.DEACTIVATED;
+    private final GroupState TEST_GROUP_STATE = GroupState.PRIVATE;
+    private final String TEST_TITLE = "testtitle";
+    private final String TEST_TEXT = "testtext";
+
     @Autowired
     UserCommandService userCommandService;
 
@@ -58,15 +67,17 @@ class UserCommandServiceTest {
     @Autowired
     GroupDocumentRepository groupDocumentRepository;
 
-    private final UserState STATE_ACTIVATED = UserState.ACTIVATED;
-    private final UserState STATE_DEACTIVATED = UserState.DEACTIVATED;
-    private final GroupState TEST_GROUP_STATE = GroupState.PRIVATE;
-    private final String TEST_TITLE = "testtitle";
-    private final String TEST_TEXT = "testtext";
     @Autowired
     PostCommandService postCommandService;
+
     @Autowired
     PostRepository postRepository;
+
+    @Autowired
+    CommentCommandService commentCommandService;
+
+    @Autowired
+    CommentRepository commentRepository;
 
     @BeforeEach
     void setUp() {
@@ -74,6 +85,8 @@ class UserCommandServiceTest {
         userDocumentRepository.deleteAll();
         groupDocumentRepository.deleteAll();
         groupRepository.deleteAll();
+        postRepository.deleteAll();
+        commentRepository.deleteAll();
     }
 
     @AfterEach
@@ -82,6 +95,8 @@ class UserCommandServiceTest {
         userDocumentRepository.deleteAll();
         groupDocumentRepository.deleteAll();
         groupRepository.deleteAll();
+        postRepository.deleteAll();
+        commentRepository.deleteAll();
     }
 
     @Test
@@ -146,7 +161,7 @@ class UserCommandServiceTest {
     }
 
     @Test
-    void test_updateUser_updatesNameAndSurnameInGroupAndPosts() {
+    void test_updateUser_updatesNameAndSurnameInGroups() {
         NewUserDto newUserDto = new NewUserDto(
                 TEST_EMAIL, TEST_NAME, TEST_SURNAME, TEST_BIRTH_DATE, TEST_SEX
         );
@@ -157,9 +172,6 @@ class UserCommandServiceTest {
         userCommandService.createUser(newUserDto);
         int createdUserId = userRepository.findAll().get(0).getId();
         groupCommandService.createGroup(new NewGroupDto(TEST_NAME, null, TEST_GROUP_STATE, createdUserId));
-        int createdGroupId = groupRepository.findAll().get(0).getId();
-        postCommandService.createPost(new NewPostDto(TEST_TITLE, TEST_TEXT, createdUserId, createdGroupId));
-
 
         userCommandService.updateUser(createdUserId, updateUserDto);
 
@@ -181,6 +193,30 @@ class UserCommandServiceTest {
                                 (group.getCreator().getSurname().equals(userTable.getSurname()))
                 );
 
+        assertTrue(allGroupCreatorsChangedInSql);
+        assertTrue(allGroupCreatorsChangedInNoSql);
+    }
+
+    @Test
+    void test_updateUser_updatesNameAndSurnameInPosts() {
+        NewUserDto newUserDto = new NewUserDto(
+                TEST_EMAIL, TEST_NAME, TEST_SURNAME, TEST_BIRTH_DATE, TEST_SEX
+        );
+        UpdateUserDto updateUserDto = new UpdateUserDto(
+                TEST_EMAIL + TEST_ADDITION_TO_CHANGE_STRING, TEST_NAME + TEST_ADDITION_TO_CHANGE_STRING,
+                TEST_SURNAME + TEST_ADDITION_TO_CHANGE_STRING, TEST_BIRTH_DATE, TEST_SEX
+        );
+        userCommandService.createUser(newUserDto);
+        int createdUserId = userRepository.findAll().get(0).getId();
+        groupCommandService.createGroup(new NewGroupDto(TEST_NAME, null, TEST_GROUP_STATE, createdUserId));
+        int createdGroupId = groupRepository.findAll().get(0).getId();
+        postCommandService.createPost(new NewPostDto(TEST_TITLE, TEST_TEXT, createdUserId, createdGroupId));
+
+
+        userCommandService.updateUser(createdUserId, updateUserDto);
+
+
+        UserTable userTable = userRepository.findById(createdUserId).get();
         boolean allPostsCreatorsChangedInSql = postRepository.findAll()
                 .stream()
                 .filter(post -> post.getUserReference().getId() == userTable.getId())
@@ -200,14 +236,66 @@ class UserCommandServiceTest {
                                     (post.getCreator().getSurname().equals(userTable.getSurname()))
 
                     );
+            if(!allPostsCreatorsChangedInNoSql)
+                break;
         }
 
-
-        assertTrue(allGroupCreatorsChangedInSql);
-        assertTrue(allGroupCreatorsChangedInNoSql);
         assertTrue(allPostsCreatorsChangedInSql);
         assertTrue(allPostsCreatorsChangedInNoSql);
     }
+
+    @Test
+    void test_updateUser_updatesNameAndSurnameInComments() {
+        NewUserDto newUserDto = new NewUserDto(
+                TEST_EMAIL, TEST_NAME, TEST_SURNAME, TEST_BIRTH_DATE, TEST_SEX
+        );
+        UpdateUserDto updateUserDto = new UpdateUserDto(
+                TEST_EMAIL + TEST_ADDITION_TO_CHANGE_STRING, TEST_NAME + TEST_ADDITION_TO_CHANGE_STRING,
+                TEST_SURNAME + TEST_ADDITION_TO_CHANGE_STRING, TEST_BIRTH_DATE, TEST_SEX
+        );
+        userCommandService.createUser(newUserDto);
+        int createdUserId = userRepository.findAll().get(0).getId();
+        groupCommandService.createGroup(new NewGroupDto(TEST_NAME, null, TEST_GROUP_STATE, createdUserId));
+        int createdGroupId = groupRepository.findAll().get(0).getId();
+        postCommandService.createPost(new NewPostDto(TEST_TITLE, TEST_TEXT, createdUserId, createdGroupId));
+        int createdPostId = postRepository.findAll().get(0).getId();
+        commentCommandService.createComment(new NewCommentDto(TEST_TEXT, createdUserId, createdPostId));
+
+
+        userCommandService.updateUser(createdUserId, updateUserDto);
+
+
+        UserTable userTable = userRepository.findById(createdUserId).get();
+
+        boolean allCommentsCreatorsChangedInSql = commentRepository.findAll()
+                .stream()
+                .filter(comment -> comment.getUserReference().getId() == userTable.getId())
+                .allMatch(comment ->
+                        (comment.getUserReference().getName().equals(userTable.getName())) &&
+                                (comment.getUserReference().getSurname().equals(userTable.getSurname()))
+                );
+
+        List<GroupDocument> allGroups = groupDocumentRepository.findAll();
+        boolean allCommentsCreatorsChangedInNoSql = true;
+        for (GroupDocument groupDocument : allGroups) {
+            for(PostEmbedded postEmbedded : groupDocument.getPosts()) {
+                allCommentsCreatorsChangedInNoSql = postEmbedded.getComments()
+                        .stream()
+                        .filter(comment -> comment.getId() == userTable.getId())
+                        .allMatch(comment ->
+                                (comment.getCreator().getName().equals(userTable.getName())) &&
+                                        (comment.getCreator().getSurname().equals(userTable.getSurname()))
+
+                        );
+                if(!allCommentsCreatorsChangedInNoSql)
+                    break;
+            }
+        }
+
+        assertTrue(allCommentsCreatorsChangedInSql);
+        assertTrue(allCommentsCreatorsChangedInNoSql);
+    }
+
 
     @Test
     void test_deactivate_and_activateUser() {
@@ -216,24 +304,22 @@ class UserCommandServiceTest {
         );
         userCommandService.createUser(newUserDto);
         int createdUserId = userRepository.findAll().get(0).getId();
-        ;
 
-
+        //deactivate
         userCommandService.deactivateUser(createdUserId);
 
 
         UserTable deactivatedUserTable = userRepository.findById(createdUserId).get();
         UserDocument deactivatedUserDocument = userDocumentRepository.findById(createdUserId).get();
-
         assertEquals(STATE_DEACTIVATED, deactivatedUserTable.getState());
         assertEquals(STATE_DEACTIVATED, deactivatedUserDocument.getState());
 
-
+        //activate
         userCommandService.activateUser(createdUserId);
+
 
         UserTable activatedUserTable = userRepository.findById(createdUserId).get();
         UserDocument activatedUserDocument = userDocumentRepository.findById(createdUserId).get();
-
         assertEquals(STATE_ACTIVATED, activatedUserTable.getState());
         assertEquals(STATE_ACTIVATED, activatedUserDocument.getState());
     }

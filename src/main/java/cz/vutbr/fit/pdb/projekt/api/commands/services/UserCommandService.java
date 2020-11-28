@@ -128,7 +128,7 @@ public class UserCommandService implements UserWithStateChangingService<Persiste
             UserDocument userDocument = (UserDocument) user;
             updateGroupCreatorsNameAndSurname(userDocument);
             updatePostCreatorsNameAndSurname(userDocument);
-//            updateCommentsCreatorsNameAndSurname(userDocument); //todo uncomment when Comments creation ready
+            updateCommentsCreatorsNameAndSurname(userDocument);
 
             return userDocumentRepository.save(userDocument);
         }
@@ -227,8 +227,8 @@ public class UserCommandService implements UserWithStateChangingService<Persiste
         mongoTemplate.updateMulti(
                 new Query(where("posts.comments.creator.id").is(userDocument.getId())),
                 new Update()
-                        .set("posts.$.comments.$.creator.name", userDocument.getName())
-                        .set("posts.$.comments.$.creator.surname", userDocument.getSurname()),
+                        .set("posts.$[outer].comments.$[inner].creator.name", userDocument.getName())
+                        .set("posts.$[outer].comments.$[inner].creator.surname", userDocument.getSurname()),
                 GroupDocument.class
         );
     }
