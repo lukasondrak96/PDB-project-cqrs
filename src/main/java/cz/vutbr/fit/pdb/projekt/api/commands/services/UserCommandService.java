@@ -127,7 +127,7 @@ public class UserCommandService implements UserWithStateChangingService<Persiste
         } else {
             UserDocument userDocument = (UserDocument) user;
             updateGroupCreatorsNameAndSurname(userDocument);
-//            updatePostCreatorsNameAndSurname(userDocument); //todo uncomment when Post creation ready
+            updatePostCreatorsNameAndSurname(userDocument);
 //            updateCommentsCreatorsNameAndSurname(userDocument); //todo uncomment when Comments creation ready
 
             return userDocumentRepository.save(userDocument);

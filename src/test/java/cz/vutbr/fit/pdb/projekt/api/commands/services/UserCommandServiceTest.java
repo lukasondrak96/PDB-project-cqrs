@@ -1,13 +1,16 @@
 package cz.vutbr.fit.pdb.projekt.api.commands.services;
 
 import cz.vutbr.fit.pdb.projekt.api.commands.dtos.group.NewGroupDto;
+import cz.vutbr.fit.pdb.projekt.api.commands.dtos.post.NewPostDto;
 import cz.vutbr.fit.pdb.projekt.api.commands.dtos.user.NewUserDto;
 import cz.vutbr.fit.pdb.projekt.api.commands.dtos.user.UpdateUserDto;
+import cz.vutbr.fit.pdb.projekt.features.nosqlfeatures.group.GroupDocument;
 import cz.vutbr.fit.pdb.projekt.features.nosqlfeatures.group.GroupDocumentRepository;
 import cz.vutbr.fit.pdb.projekt.features.nosqlfeatures.user.UserDocument;
 import cz.vutbr.fit.pdb.projekt.features.nosqlfeatures.user.UserDocumentRepository;
 import cz.vutbr.fit.pdb.projekt.features.sqlfeatures.group.GroupRepository;
 import cz.vutbr.fit.pdb.projekt.features.sqlfeatures.group.GroupState;
+import cz.vutbr.fit.pdb.projekt.features.sqlfeatures.post.PostRepository;
 import cz.vutbr.fit.pdb.projekt.features.sqlfeatures.user.UserRepository;
 import cz.vutbr.fit.pdb.projekt.features.sqlfeatures.user.UserSex;
 import cz.vutbr.fit.pdb.projekt.features.sqlfeatures.user.UserState;
@@ -19,6 +22,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import java.util.Date;
+import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -35,21 +39,34 @@ class UserCommandServiceTest {
     private final String TEST_ADDITION_TO_CHANGE_STRING = "Addition";
     private final Date TEST_BIRTH_DATE_UPDATE = new Date(500L);
     private final UserSex TEST_SEX_UPDATE = UserSex.MALE;
+
     @Autowired
     UserCommandService userCommandService;
+
     @Autowired
     UserRepository userRepository;
+
     @Autowired
     UserDocumentRepository userDocumentRepository;
+
     @Autowired
     GroupCommandService groupCommandService;
+
     @Autowired
     GroupRepository groupRepository;
+
     @Autowired
     GroupDocumentRepository groupDocumentRepository;
-    private UserState STATE_ACTIVATED = UserState.ACTIVATED;
-    private UserState STATE_DEACTIVATED = UserState.DEACTIVATED;
-    private GroupState TEST_GROUP_STATE = GroupState.PRIVATE;
+
+    private final UserState STATE_ACTIVATED = UserState.ACTIVATED;
+    private final UserState STATE_DEACTIVATED = UserState.DEACTIVATED;
+    private final GroupState TEST_GROUP_STATE = GroupState.PRIVATE;
+    private final String TEST_TITLE = "testtitle";
+    private final String TEST_TEXT = "testtext";
+    @Autowired
+    PostCommandService postCommandService;
+    @Autowired
+    PostRepository postRepository;
 
     @BeforeEach
     void setUp() {
@@ -129,7 +146,7 @@ class UserCommandServiceTest {
     }
 
     @Test
-    void test_updateUser_updatesNameAndSurnameInGroup() {
+    void test_updateUser_updatesNameAndSurnameInGroupAndPosts() {
         NewUserDto newUserDto = new NewUserDto(
                 TEST_EMAIL, TEST_NAME, TEST_SURNAME, TEST_BIRTH_DATE, TEST_SEX
         );
@@ -140,13 +157,15 @@ class UserCommandServiceTest {
         userCommandService.createUser(newUserDto);
         int createdUserId = userRepository.findAll().get(0).getId();
         groupCommandService.createGroup(new NewGroupDto(TEST_NAME, null, TEST_GROUP_STATE, createdUserId));
+        int createdGroupId = groupRepository.findAll().get(0).getId();
+        postCommandService.createPost(new NewPostDto(TEST_TITLE, TEST_TEXT, createdUserId, createdGroupId));
 
 
         userCommandService.updateUser(createdUserId, updateUserDto);
 
 
         UserTable userTable = userRepository.findById(createdUserId).get();
-        boolean allChangedInSql = groupRepository.findAll()
+        boolean allGroupCreatorsChangedInSql = groupRepository.findAll()
                 .stream()
                 .filter(group -> group.getUserReference().getId() == userTable.getId())
                 .allMatch(group ->
@@ -154,7 +173,7 @@ class UserCommandServiceTest {
                                 (group.getUserReference().getSurname().equals(userTable.getSurname()))
                 );
 
-        boolean allChangedInNoSql = groupDocumentRepository.findAll()
+        boolean allGroupCreatorsChangedInNoSql = groupDocumentRepository.findAll()
                 .stream()
                 .filter(group -> group.getCreator().getId() == userTable.getId())
                 .allMatch(group ->
@@ -162,8 +181,32 @@ class UserCommandServiceTest {
                                 (group.getCreator().getSurname().equals(userTable.getSurname()))
                 );
 
-        assertTrue(allChangedInSql);
-        assertTrue(allChangedInNoSql);
+        boolean allPostsCreatorsChangedInSql = postRepository.findAll()
+                .stream()
+                .filter(post -> post.getUserReference().getId() == userTable.getId())
+                .allMatch(post ->
+                        (post.getUserReference().getName().equals(userTable.getName())) &&
+                                (post.getUserReference().getSurname().equals(userTable.getSurname()))
+                );
+
+        List<GroupDocument> allGroups = groupDocumentRepository.findAll();
+        boolean allPostsCreatorsChangedInNoSql = true;
+        for (GroupDocument groupDocument : allGroups) {
+            allPostsCreatorsChangedInNoSql = groupDocument.getPosts()
+                    .stream()
+                    .filter(post -> post.getId() == userTable.getId())
+                    .allMatch(post ->
+                            (post.getCreator().getName().equals(userTable.getName())) &&
+                                    (post.getCreator().getSurname().equals(userTable.getSurname()))
+
+                    );
+        }
+
+
+        assertTrue(allGroupCreatorsChangedInSql);
+        assertTrue(allGroupCreatorsChangedInNoSql);
+        assertTrue(allPostsCreatorsChangedInSql);
+        assertTrue(allPostsCreatorsChangedInNoSql);
     }
 
     @Test
@@ -172,7 +215,8 @@ class UserCommandServiceTest {
                 TEST_EMAIL, TEST_NAME, TEST_SURNAME, TEST_BIRTH_DATE, TEST_SEX
         );
         userCommandService.createUser(newUserDto);
-        int createdUserId = userRepository.findAll().get(0).getId();;
+        int createdUserId = userRepository.findAll().get(0).getId();
+        ;
 
 
         userCommandService.deactivateUser(createdUserId);
