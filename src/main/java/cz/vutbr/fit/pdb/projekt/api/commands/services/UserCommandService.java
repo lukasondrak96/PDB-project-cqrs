@@ -24,13 +24,17 @@ import cz.vutbr.fit.pdb.projekt.features.sqlfeatures.user.UserState;
 import cz.vutbr.fit.pdb.projekt.features.sqlfeatures.user.UserTable;
 import lombok.AllArgsConstructor;
 import org.greenrobot.eventbus.EventBus;
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
 import java.util.Optional;
+
+import static org.springframework.data.mongodb.core.query.Criteria.where;
 
 @Service
 @AllArgsConstructor
@@ -39,6 +43,7 @@ public class UserCommandService implements UserService<PersistentUser> {
     private final UserRepository userRepository;
     private final UserDocumentRepository userDocumentRepository;
     private final GroupDocumentRepository groupDocumentRepository;
+    private MongoTemplate mongoTemplate;
 
     private static final EventBus EVENT_BUS = EventBus.getDefault();
 
@@ -133,13 +138,10 @@ public class UserCommandService implements UserService<PersistentUser> {
             return userRepository.save((UserTable) user);
         } else {
             UserDocument userDocument = (UserDocument) user;
-            List<GroupDocument> groupsOfChangedCreator  = groupDocumentRepository.findByCreatorId(userDocument.getId());
-            groupsOfChangedCreator.stream().forEach(group -> {
-                if(groupCreatorChangedName(userDocument, group.getCreator())) {
-                    group.setCreator(new CreatorInherited(userDocument.getId(), userDocument.getName(), userDocument.getSurname()));
-                    groupDocumentRepository.save(group);
-                }
-            });
+            updateGroupCreatorsNameAndSurname(userDocument);
+//            updatePostCreatorsNameAndSurname(userDocument); //todo uncomment when Post creation ready
+//            updateCommentsCreatorsNameAndSurname(userDocument); //todo uncomment when Comments creation ready
+
             return userDocumentRepository.save(userDocument);
         }
     }
@@ -207,5 +209,34 @@ public class UserCommandService implements UserService<PersistentUser> {
         return !groupCreator.getName().equals(userDocument.getName()) || !groupCreator.getSurname().equals(userDocument.getSurname());
     }
 
+    private void updateGroupCreatorsNameAndSurname(UserDocument userDocument) {
+        mongoTemplate.updateMulti(
+                new Query(where("creator.id").is(userDocument.getId())),
+                new Update()
+                        .set("creator.name", userDocument.getName())
+                        .set("creator.surname", userDocument.getSurname()),
+                GroupDocument.class
+        );
+    }
+
+    private void updatePostCreatorsNameAndSurname(UserDocument userDocument) {
+        mongoTemplate.updateMulti(
+                new Query(where("posts.creator.id").is(userDocument.getId())),
+                new Update()
+                        .set("posts.$.creator.name", userDocument.getName())
+                        .set("posts.$.creator.surname", userDocument.getSurname()),
+                GroupDocument.class
+        );
+    }
+
+    private void updateCommentsCreatorsNameAndSurname(UserDocument userDocument) {
+        mongoTemplate.updateMulti(
+                new Query(where("posts.comments.creator.id").is(userDocument.getId())),
+                new Update()
+                        .set("posts.$.comments.$.creator.name", userDocument.getName())
+                        .set("posts.$.comments.$.creator.surname", userDocument.getSurname()),
+                GroupDocument.class
+        );
+    }
 
 }
