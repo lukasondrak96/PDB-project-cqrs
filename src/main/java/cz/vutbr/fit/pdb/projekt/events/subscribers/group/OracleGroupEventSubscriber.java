@@ -32,9 +32,4 @@ public class OracleGroupEventSubscriber extends AbstractSubscriber {
         }
     }
 
-//    @Subscribe
-//    public void onGroupUpdatedEvent(GroupUpdatedEvent groupUpdatedEvent) {
-//        groupUpdatedEvent.apply(persistentObject);
-//    }
-
 }

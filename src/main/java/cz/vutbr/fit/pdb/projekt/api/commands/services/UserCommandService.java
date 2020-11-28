@@ -9,8 +9,7 @@ import cz.vutbr.fit.pdb.projekt.events.events.user.UserActivatedEvent;
 import cz.vutbr.fit.pdb.projekt.events.events.user.UserDeactivatedEvent;
 import cz.vutbr.fit.pdb.projekt.events.events.user.UserUpdatedEvent;
 import cz.vutbr.fit.pdb.projekt.events.subscribers.user.MongoUserEventSubscriber;
-import cz.vutbr.fit.pdb.projekt.events.subscribers.user.OracleUserChangeEventSubscriber;
-import cz.vutbr.fit.pdb.projekt.events.subscribers.user.OracleUserCreateEventSubscriber;
+import cz.vutbr.fit.pdb.projekt.events.subscribers.user.OracleUserEventSubscriber;
 import cz.vutbr.fit.pdb.projekt.features.helperInterfaces.ObjectInterface;
 import cz.vutbr.fit.pdb.projekt.features.helperInterfaces.objects.UserInterface;
 import cz.vutbr.fit.pdb.projekt.features.helperInterfaces.persistent.PersistentUser;
@@ -54,7 +53,7 @@ public class UserCommandService implements UserService<PersistentUser> {
 
         final UserTable userTable = new UserTable(newUserDto.getEmail(), newUserDto.getName(), newUserDto.getSurname(), newUserDto.getBirthDate(), newUserDto.getSex());
 
-        OracleUserCreateEventSubscriber oracleSubscriber = new OracleUserCreateEventSubscriber(EVENT_BUS);
+        OracleUserEventSubscriber oracleSubscriber = new OracleUserEventSubscriber(EVENT_BUS);
         MongoUserEventSubscriber mongoSubscriber = new MongoUserEventSubscriber(EVENT_BUS);
 
         EVENT_BUS.post(new OracleCreatedEvent<>(userTable, this));
@@ -104,7 +103,7 @@ public class UserCommandService implements UserService<PersistentUser> {
     }
 
     private void subscribeChangeEventToOracleAndMongo(AbstractEvent<PersistentUser> event) {
-        OracleUserChangeEventSubscriber sqlSubscriber = new OracleUserChangeEventSubscriber(EVENT_BUS);
+        OracleUserEventSubscriber sqlSubscriber = new OracleUserEventSubscriber(EVENT_BUS);
         MongoUserEventSubscriber noSqlSubscriber = new MongoUserEventSubscriber(EVENT_BUS);
         EVENT_BUS.post(event);
 
