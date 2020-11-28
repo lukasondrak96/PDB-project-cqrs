@@ -2,15 +2,14 @@ package cz.vutbr.fit.pdb.projekt.api.commands.services;
 
 import cz.vutbr.fit.pdb.projekt.api.commands.dtos.user.NewUserDto;
 import cz.vutbr.fit.pdb.projekt.api.commands.dtos.user.UpdateUserDto;
-import cz.vutbr.fit.pdb.projekt.api.commands.services.helpingservices.UserService;
+import cz.vutbr.fit.pdb.projekt.api.commands.services.helpingservices.UserWithStateChangingService;
 import cz.vutbr.fit.pdb.projekt.events.events.AbstractEvent;
 import cz.vutbr.fit.pdb.projekt.events.events.OracleCreatedEvent;
 import cz.vutbr.fit.pdb.projekt.events.events.user.UserActivatedEvent;
 import cz.vutbr.fit.pdb.projekt.events.events.user.UserDeactivatedEvent;
 import cz.vutbr.fit.pdb.projekt.events.events.user.UserUpdatedEvent;
 import cz.vutbr.fit.pdb.projekt.events.subscribers.user.MongoUserEventSubscriber;
-import cz.vutbr.fit.pdb.projekt.events.subscribers.user.OracleUserChangeEventSubscriber;
-import cz.vutbr.fit.pdb.projekt.events.subscribers.user.OracleUserCreateEventSubscriber;
+import cz.vutbr.fit.pdb.projekt.events.subscribers.user.OracleUserEventSubscriber;
 import cz.vutbr.fit.pdb.projekt.features.helperInterfaces.ObjectInterface;
 import cz.vutbr.fit.pdb.projekt.features.helperInterfaces.objects.UserInterface;
 import cz.vutbr.fit.pdb.projekt.features.helperInterfaces.persistent.PersistentUser;
@@ -38,7 +37,7 @@ import static org.springframework.data.mongodb.core.query.Criteria.where;
 
 @Service
 @AllArgsConstructor
-public class UserCommandService implements UserService<PersistentUser> {
+public class UserCommandService implements UserWithStateChangingService<PersistentUser> {
 
     private final UserRepository userRepository;
     private final UserDocumentRepository userDocumentRepository;
@@ -54,12 +53,8 @@ public class UserCommandService implements UserService<PersistentUser> {
 
         final UserTable userTable = new UserTable(newUserDto.getEmail(), newUserDto.getName(), newUserDto.getSurname(), newUserDto.getBirthDate(), newUserDto.getSex());
 
-        OracleUserCreateEventSubscriber oracleSubscriber = new OracleUserCreateEventSubscriber(EVENT_BUS);
-        MongoUserEventSubscriber mongoSubscriber = new MongoUserEventSubscriber(EVENT_BUS);
-
-        EVENT_BUS.post(new OracleCreatedEvent<>(userTable, this));
-        EVENT_BUS.unregister(oracleSubscriber);
-        EVENT_BUS.unregister(mongoSubscriber);
+        OracleCreatedEvent<PersistentUser> createdEvent = new OracleCreatedEvent<>(userTable, this);
+        subscribeChangeEventToOracleAndMongo(createdEvent);
 
         return ResponseEntity.ok().body("Účet byl vytvořen");
     }
@@ -100,16 +95,8 @@ public class UserCommandService implements UserService<PersistentUser> {
 
         UserActivatedEvent<PersistentUser> userActivatedEvent = new UserActivatedEvent<>(userTable, this);
         subscribeChangeEventToOracleAndMongo(userActivatedEvent);
+
         return ResponseEntity.ok().body("Uživatel byl aktivován");
-    }
-
-    private void subscribeChangeEventToOracleAndMongo(AbstractEvent<PersistentUser> event) {
-        OracleUserChangeEventSubscriber sqlSubscriber = new OracleUserChangeEventSubscriber(EVENT_BUS);
-        MongoUserEventSubscriber noSqlSubscriber = new MongoUserEventSubscriber(EVENT_BUS);
-        EVENT_BUS.post(event);
-
-        EVENT_BUS.unregister(sqlSubscriber);
-        EVENT_BUS.unregister(noSqlSubscriber);
     }
 
     @Transactional
@@ -127,6 +114,7 @@ public class UserCommandService implements UserService<PersistentUser> {
 
         UserDeactivatedEvent<PersistentUser> userDeactivatedEvent = new UserDeactivatedEvent<>(userTable, this);
         subscribeChangeEventToOracleAndMongo(userDeactivatedEvent);
+
         return ResponseEntity.ok().body("Uživatel byl deaktivován");
     }
 
@@ -192,9 +180,16 @@ public class UserCommandService implements UserService<PersistentUser> {
         return (PersistentUser) persistentUserInterface;
     }
 
-
-
     /* private methods */
+
+    private void subscribeChangeEventToOracleAndMongo(AbstractEvent<PersistentUser> event) {
+        OracleUserEventSubscriber sqlSubscriber = new OracleUserEventSubscriber(EVENT_BUS);
+        MongoUserEventSubscriber noSqlSubscriber = new MongoUserEventSubscriber(EVENT_BUS);
+        EVENT_BUS.post(event);
+
+        EVENT_BUS.unregister(sqlSubscriber);
+        EVENT_BUS.unregister(noSqlSubscriber);
+    }
 
     private boolean userTableEqualsUpdateUserDto(UserTable table, UpdateUserDto dto) {
         return dto.getEmail().equals(table.getEmail()) &&

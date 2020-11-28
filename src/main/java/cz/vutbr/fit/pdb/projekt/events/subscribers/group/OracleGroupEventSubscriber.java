@@ -2,6 +2,7 @@ package cz.vutbr.fit.pdb.projekt.events.subscribers.group;
 
 import cz.vutbr.fit.pdb.projekt.events.events.ConfirmedEventAdapter;
 import cz.vutbr.fit.pdb.projekt.events.events.OracleCreatedEvent;
+import cz.vutbr.fit.pdb.projekt.events.events.group.GroupStateChangedEvent;
 import cz.vutbr.fit.pdb.projekt.events.subscribers.AbstractSubscriber;
 import cz.vutbr.fit.pdb.projekt.features.helperInterfaces.persistent.PersistentGroup;
 import cz.vutbr.fit.pdb.projekt.features.sqlfeatures.group.GroupTable;
@@ -32,9 +33,11 @@ public class OracleGroupEventSubscriber extends AbstractSubscriber {
         }
     }
 
-//    @Subscribe
-//    public void onGroupUpdatedEvent(GroupUpdatedEvent groupUpdatedEvent) {
-//        groupUpdatedEvent.apply(persistentObject);
-//    }
+    @Subscribe
+    public void onGroupStateChangedEvent(GroupStateChangedEvent<PersistentGroup> groupStateChangedEvent) {
+        LOGGER.info(RECEIVED_AND_APPLYING_EVENT, groupStateChangedEvent.getClass().getSimpleName(), groupStateChangedEvent);
+        groupStateChangedEvent.apply(REUSABLE_ORACLE_OBJECT);
+    }
+
 
 }
