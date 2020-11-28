@@ -27,7 +27,7 @@ public class MessageTable {
     @Id
     @SequenceGenerator(name = "MessageIdGenerator", sequenceName = "MESSAGE_SEQUENCE", allocationSize = 1)
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "MessageIdGenerator")
-    private int idMessage;
+    private int id;
 
     private String text;
 
@@ -48,7 +48,7 @@ public class MessageTable {
     @Override
     public String toString() {
         return "MessageTable{" +
-                "id=" + idMessage +
+                "id=" + id +
                 ", text='" + text +
                 ", createdAt=" + createdAt.toString() +
                 '\'' +

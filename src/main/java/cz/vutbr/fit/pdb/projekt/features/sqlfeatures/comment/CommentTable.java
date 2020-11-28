@@ -1,5 +1,8 @@
 package cz.vutbr.fit.pdb.projekt.features.sqlfeatures.comment;
 
+import cz.vutbr.fit.pdb.projekt.features.helperInterfaces.objects.CommentInterface;
+import cz.vutbr.fit.pdb.projekt.features.helperInterfaces.persistent.PersistentComment;
+import cz.vutbr.fit.pdb.projekt.features.helperInterfaces.references.UserReference;
 import cz.vutbr.fit.pdb.projekt.features.sqlfeatures.post.PostTable;
 import cz.vutbr.fit.pdb.projekt.features.sqlfeatures.user.UserTable;
 import lombok.Getter;
@@ -15,7 +18,7 @@ import java.util.Date;
 @Getter
 @Setter
 @NoArgsConstructor
-public class CommentTable {
+public class CommentTable implements CommentInterface, PersistentComment {
 
     public CommentTable(String text, Date createdAt, PostTable postReference, UserTable userReference) {
         this.text = text;
@@ -27,7 +30,7 @@ public class CommentTable {
     @Id
     @SequenceGenerator(name = "CommentIdGenerator", sequenceName = "COMMENT_SEQUENCE", allocationSize = 1)
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "CommentIdGenerator")
-    private int idComment;
+    private int id;
 
     private String text;
 
@@ -44,12 +47,12 @@ public class CommentTable {
     private UserTable userReference;
 
     @Override
-    public String toString() {
-        return "CommentTable{" +
-                "id=" + idComment +
-                ", text='" + text +
-                ", createdAt=" + createdAt.toString() +
-                '\'' +
-                '}';
+    public void setUserReference(UserReference userReference) {
+        this.userReference = (UserTable) userReference;
+    }
+
+    @Override
+    public void setPostReference(PostTable postReference) {
+        this.postReference = postReference;
     }
 }

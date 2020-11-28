@@ -14,7 +14,7 @@ public class CommentUpdatedEvent implements EventInterface<PersistentComment> {
 
     @Override
     public PersistentComment apply(PersistentComment persistentComment) {
-        return service.updateComment(persistentComment);
+        return null;
     }
 
 }
