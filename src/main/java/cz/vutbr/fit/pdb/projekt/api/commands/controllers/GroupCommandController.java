@@ -1,5 +1,6 @@
 package cz.vutbr.fit.pdb.projekt.api.commands.controllers;
 
+import cz.vutbr.fit.pdb.projekt.api.commands.dtos.group.ChangeGroupStateDto;
 import cz.vutbr.fit.pdb.projekt.api.commands.dtos.group.NewGroupDto;
 import cz.vutbr.fit.pdb.projekt.api.commands.services.GroupCommandService;
 import lombok.AllArgsConstructor;
@@ -31,8 +32,8 @@ public class GroupCommandController {
     }
 
     @PutMapping("{id}/change-state")
-    public ResponseEntity<?> changeGroupState(@PathVariable(value = "id") int groupId) {
-        return null;
+    public ResponseEntity<?> changeGroupState(@PathVariable(value = "id") int groupId, @Valid @RequestBody ChangeGroupStateDto changeGroupStateDto) {
+        return groupCommandService.changeGroupState(groupId, changeGroupStateDto.getState());
     }
 
     @GetMapping("{id}/add-user/{userId}")

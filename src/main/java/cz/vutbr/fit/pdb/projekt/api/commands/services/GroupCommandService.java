@@ -1,8 +1,10 @@
 package cz.vutbr.fit.pdb.projekt.api.commands.services;
 
 import cz.vutbr.fit.pdb.projekt.api.commands.dtos.group.NewGroupDto;
-import cz.vutbr.fit.pdb.projekt.api.commands.services.helpingservices.CommandService;
+import cz.vutbr.fit.pdb.projekt.api.commands.services.helpingservices.GroupWithStateChangingService;
+import cz.vutbr.fit.pdb.projekt.events.events.AbstractEvent;
 import cz.vutbr.fit.pdb.projekt.events.events.OracleCreatedEvent;
+import cz.vutbr.fit.pdb.projekt.events.events.group.GroupStateChangedEvent;
 import cz.vutbr.fit.pdb.projekt.events.subscribers.group.MongoGroupEventSubscriber;
 import cz.vutbr.fit.pdb.projekt.events.subscribers.group.OracleGroupEventSubscriber;
 import cz.vutbr.fit.pdb.projekt.features.helperInterfaces.ObjectInterface;
@@ -25,7 +27,7 @@ import java.util.Optional;
 
 @Service
 @AllArgsConstructor
-public class GroupCommandService implements CommandService<PersistentGroup> {
+public class GroupCommandService implements GroupWithStateChangingService<PersistentGroup> {
 
     private final GroupRepository groupRepository;
     private final UserRepository userRepository;
@@ -50,14 +52,8 @@ public class GroupCommandService implements CommandService<PersistentGroup> {
         UserTable creator = userOptional.get();
 
         final GroupTable groupTable = new GroupTable(newGroupDto.getName(), newGroupDto.getDescription(), newGroupDto.getState(), creator);
-
-        OracleGroupEventSubscriber oracleSubscriber = new OracleGroupEventSubscriber(EVENT_BUS);
-        MongoGroupEventSubscriber mongoSubscriber = new MongoGroupEventSubscriber(EVENT_BUS);
-
-        EVENT_BUS.post(new OracleCreatedEvent<>(groupTable, this));
-        EVENT_BUS.unregister(oracleSubscriber);
-        EVENT_BUS.unregister(mongoSubscriber);
-
+        OracleCreatedEvent<PersistentGroup> oracleCreatedEvent = new OracleCreatedEvent<>(groupTable, this);
+        subscribeChangeEventToOracleAndMongo(oracleCreatedEvent);
         return ResponseEntity.ok().body("Skupina byla vytvořena");
     }
 
@@ -85,6 +81,22 @@ public class GroupCommandService implements CommandService<PersistentGroup> {
 //        EVENT_BUS.post(deletedEvent);
 
         return ResponseEntity.ok().body("Skupina byla smazána");
+    }
+
+
+    public ResponseEntity<?> changeGroupState(int groupId, GroupState groupState) {
+        Optional<GroupTable> groupTableOptional = groupRepository.findById(groupId);
+        if (groupTableOptional.isEmpty())
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Skupina s tímto id neexistuje");
+
+        GroupTable groupTable = groupTableOptional.get();
+        if(groupTable.getState() == groupState)
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Skupina již má stav " + groupState.name());
+
+        GroupStateChangedEvent<PersistentGroup> groupGroupStateChangedEvent = new GroupStateChangedEvent<>(groupTable, groupState, this);
+        subscribeChangeEventToOracleAndMongo(groupGroupStateChangedEvent);
+
+        return ResponseEntity.ok().body("Stav skupiny byl změněn");
     }
 
 /* methods called from events */
@@ -128,4 +140,30 @@ public class GroupCommandService implements CommandService<PersistentGroup> {
         else
             return groupDocumentRepository.save((GroupDocument) group);
     }
+
+
+    @Override
+    public PersistentGroup finishStateChanging(PersistentGroup group, GroupState state) {
+        if (group instanceof GroupTable) {
+            GroupTable groupTable = (GroupTable) group;
+            groupTable.setState(state);
+            return groupRepository.save(groupTable);
+        } else {
+            GroupDocument groupDocument = (GroupDocument) group;
+            groupDocument.setState(state);
+            return groupDocumentRepository.save(groupDocument);
+        }
+    }
+
+    /* private methods */
+
+    private void subscribeChangeEventToOracleAndMongo(AbstractEvent<PersistentGroup> event) {
+        OracleGroupEventSubscriber sqlSubscriber = new OracleGroupEventSubscriber(EVENT_BUS);
+        MongoGroupEventSubscriber noSqlSubscriber = new MongoGroupEventSubscriber(EVENT_BUS);
+        EVENT_BUS.post(event);
+
+        EVENT_BUS.unregister(sqlSubscriber);
+        EVENT_BUS.unregister(noSqlSubscriber);
+    }
+
 }
