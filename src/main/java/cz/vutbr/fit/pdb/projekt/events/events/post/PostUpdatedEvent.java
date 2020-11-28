@@ -14,7 +14,7 @@ public class PostUpdatedEvent implements EventInterface<PersistentPost> {
 
     @Override
     public PersistentPost apply(PersistentPost persistentPost) {
-        return service.updatePost(persistentPost);
+        return null;
     }
 
 }

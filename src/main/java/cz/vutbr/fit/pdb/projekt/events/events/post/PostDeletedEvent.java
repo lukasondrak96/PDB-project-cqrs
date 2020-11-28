@@ -14,7 +14,7 @@ public class PostDeletedEvent implements EventInterface<PersistentPost> {
 
     @Override
     public PersistentPost apply(PersistentPost persistentPost) {
-        return service.deletePost(persistentPost);
+        return null;
     }
 
 }

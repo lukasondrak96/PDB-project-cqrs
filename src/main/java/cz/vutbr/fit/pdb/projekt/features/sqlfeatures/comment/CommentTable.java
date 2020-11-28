@@ -34,7 +34,7 @@ public class CommentTable {
     private Date createdAt;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "idPost", referencedColumnName = "idPost")
+    @JoinColumn(name = "idPost", referencedColumnName = "id")
     @OnDelete(action = OnDeleteAction.CASCADE)
     private PostTable postTableReference;
 

@@ -1,5 +1,7 @@
 package cz.vutbr.fit.pdb.projekt.features.sqlfeatures.post;
 
+import cz.vutbr.fit.pdb.projekt.features.helperInterfaces.objects.PostInterface;
+import cz.vutbr.fit.pdb.projekt.features.helperInterfaces.persistent.PersistentPost;
 import cz.vutbr.fit.pdb.projekt.features.sqlfeatures.group.GroupTable;
 import cz.vutbr.fit.pdb.projekt.features.sqlfeatures.user.UserTable;
 import lombok.Getter;
@@ -15,7 +17,7 @@ import java.util.Date;
 @Getter
 @Setter
 @NoArgsConstructor
-public class PostTable {
+public class PostTable implements PostInterface, PersistentPost {
 
     public PostTable(String title, String text, Date createdAt, GroupTable groupTableReference, UserTable userTableReference) {
         this.title = title;
@@ -28,7 +30,7 @@ public class PostTable {
     @Id
     @SequenceGenerator(name = "PostIdGenerator", sequenceName = "POST_SEQUENCE", allocationSize = 1)
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "PostIdGenerator")
-    private int idPost;
+    private int id;
 
     private String title;
 
