@@ -10,7 +10,7 @@ import cz.vutbr.fit.pdb.projekt.features.helperInterfaces.ObjectInterface;
 import cz.vutbr.fit.pdb.projekt.features.helperInterfaces.objects.PostInterface;
 import cz.vutbr.fit.pdb.projekt.features.helperInterfaces.persistent.PersistentPost;
 import cz.vutbr.fit.pdb.projekt.features.nosqlfeatures.group.GroupDocument;
-import cz.vutbr.fit.pdb.projekt.features.nosqlfeatures.group.inherited.PostInherited;
+import cz.vutbr.fit.pdb.projekt.features.nosqlfeatures.group.embedded.PostEmbedded;
 import cz.vutbr.fit.pdb.projekt.features.sqlfeatures.group.GroupRepository;
 import cz.vutbr.fit.pdb.projekt.features.sqlfeatures.group.GroupTable;
 import cz.vutbr.fit.pdb.projekt.features.sqlfeatures.post.PostRepository;
@@ -67,7 +67,7 @@ public class PostCommandService implements CommandService<PersistentPost> {
     public PersistentPost assignFromTo(ObjectInterface objectInterface, PersistentPost post) {
         PostInterface persistentPostInterface = (PostInterface) post;
         PostInterface postInterface = (PostInterface) objectInterface;
-        if(post instanceof PostTable || post instanceof PostInherited) {
+        if(post instanceof PostTable || post instanceof PostEmbedded) {
             persistentPostInterface.setId(postInterface.getId());
             persistentPostInterface.setTitle(postInterface.getTitle());
             persistentPostInterface.setText(postInterface.getText());
@@ -83,7 +83,7 @@ public class PostCommandService implements CommandService<PersistentPost> {
         if (post instanceof PostTable) {
             return postRepository.save((PostTable) post);
         } else {
-            addPostToGroup((PostInherited) post);
+            addPostToGroup((PostEmbedded) post);
             return post;
         }
     }
@@ -105,7 +105,7 @@ public class PostCommandService implements CommandService<PersistentPost> {
         EVENT_BUS.unregister(noSqlSubscriber);
     }
 
-    private void addPostToGroup(PostInherited post) {
+    private void addPostToGroup(PostEmbedded post) {
         mongoTemplate.updateMulti(
                 new Query(where("id").is(post.getGroupReference().getId())),
                 new Update()

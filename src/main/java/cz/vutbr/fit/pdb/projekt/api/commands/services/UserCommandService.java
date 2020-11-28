@@ -15,7 +15,7 @@ import cz.vutbr.fit.pdb.projekt.features.helperInterfaces.objects.UserInterface;
 import cz.vutbr.fit.pdb.projekt.features.helperInterfaces.persistent.PersistentUser;
 import cz.vutbr.fit.pdb.projekt.features.nosqlfeatures.group.GroupDocument;
 import cz.vutbr.fit.pdb.projekt.features.nosqlfeatures.group.GroupDocumentRepository;
-import cz.vutbr.fit.pdb.projekt.features.nosqlfeatures.group.inherited.CreatorInherited;
+import cz.vutbr.fit.pdb.projekt.features.nosqlfeatures.group.embedded.CreatorEmbedded;
 import cz.vutbr.fit.pdb.projekt.features.nosqlfeatures.user.UserDocument;
 import cz.vutbr.fit.pdb.projekt.features.nosqlfeatures.user.UserDocumentRepository;
 import cz.vutbr.fit.pdb.projekt.features.sqlfeatures.user.UserRepository;
@@ -200,7 +200,7 @@ public class UserCommandService implements UserWithStateChangingService<Persiste
                 dto.getState() == table.getState();
     }
 
-    private boolean groupCreatorChangedName(UserDocument userDocument, CreatorInherited groupCreator) {
+    private boolean groupCreatorChangedName(UserDocument userDocument, CreatorEmbedded groupCreator) {
         return !groupCreator.getName().equals(userDocument.getName()) || !groupCreator.getSurname().equals(userDocument.getSurname());
     }
 

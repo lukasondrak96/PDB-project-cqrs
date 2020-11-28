@@ -4,9 +4,9 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import cz.vutbr.fit.pdb.projekt.features.helperInterfaces.objects.GroupInterface;
 import cz.vutbr.fit.pdb.projekt.features.helperInterfaces.persistent.PersistentGroup;
 import cz.vutbr.fit.pdb.projekt.features.helperInterfaces.references.UserReference;
-import cz.vutbr.fit.pdb.projekt.features.nosqlfeatures.group.inherited.CreatorInherited;
-import cz.vutbr.fit.pdb.projekt.features.nosqlfeatures.group.inherited.MemberInherited;
-import cz.vutbr.fit.pdb.projekt.features.nosqlfeatures.group.inherited.PostInherited;
+import cz.vutbr.fit.pdb.projekt.features.nosqlfeatures.group.embedded.CreatorEmbedded;
+import cz.vutbr.fit.pdb.projekt.features.nosqlfeatures.group.embedded.MemberEmbedded;
+import cz.vutbr.fit.pdb.projekt.features.nosqlfeatures.group.embedded.PostEmbedded;
 import cz.vutbr.fit.pdb.projekt.features.sqlfeatures.group.GroupState;
 import cz.vutbr.fit.pdb.projekt.features.sqlfeatures.user.UserTable;
 import lombok.Data;
@@ -22,9 +22,9 @@ import java.util.List;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class GroupDocument implements GroupInterface, PersistentGroup {
 
-    private CreatorInherited creator;
+    private CreatorEmbedded creator;
 
-    public GroupDocument(String name, String description, GroupState state, CreatorInherited creator, List<PostInherited> posts, List<MemberInherited> members) {
+    public GroupDocument(String name, String description, GroupState state, CreatorEmbedded creator, List<PostEmbedded> posts, List<MemberEmbedded> members) {
         this.name = name;
         this.description = description;
         this.state = state;
@@ -38,8 +38,8 @@ public class GroupDocument implements GroupInterface, PersistentGroup {
     private String name;
     private String description;
     private GroupState state;
-    private List<PostInherited> posts;
-    private List<MemberInherited> members;
+    private List<PostEmbedded> posts;
+    private List<MemberEmbedded> members;
 
     @Override
     public UserReference getUserReference() {
@@ -49,6 +49,6 @@ public class GroupDocument implements GroupInterface, PersistentGroup {
     @Override
     public void setUserReference(UserReference userReference) {
         UserTable userTable = (UserTable) userReference;
-        creator = new CreatorInherited(userTable.getId(), userTable.getName(), userTable.getSurname());
+        creator = new CreatorEmbedded(userTable.getId(), userTable.getName(), userTable.getSurname());
     }
 }

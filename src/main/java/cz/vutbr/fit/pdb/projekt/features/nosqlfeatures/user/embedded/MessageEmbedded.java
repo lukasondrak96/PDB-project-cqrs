@@ -1,4 +1,4 @@
-package cz.vutbr.fit.pdb.projekt.features.nosqlfeatures.user.inherited;
+package cz.vutbr.fit.pdb.projekt.features.nosqlfeatures.user.embedded;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -9,7 +9,7 @@ import java.util.Date;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class MessageInherited {
+public class MessageEmbedded {
     private boolean sent;
     private String text;
     private Date createdAt;

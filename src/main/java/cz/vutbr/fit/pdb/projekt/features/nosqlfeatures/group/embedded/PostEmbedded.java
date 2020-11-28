@@ -1,4 +1,4 @@
-package cz.vutbr.fit.pdb.projekt.features.nosqlfeatures.group.inherited;
+package cz.vutbr.fit.pdb.projekt.features.nosqlfeatures.group.embedded;
 
 import cz.vutbr.fit.pdb.projekt.features.helperInterfaces.objects.PostInterface;
 import cz.vutbr.fit.pdb.projekt.features.helperInterfaces.persistent.PersistentPost;
@@ -16,13 +16,13 @@ import java.util.List;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class PostInherited implements PostInterface, PersistentPost {
+public class PostEmbedded implements PostInterface, PersistentPost {
     private int id;
     private String title;
     private String text;
     private Date createdAt;
-    private CreatorInherited creator;
-    private List<CommentInherited> comments;
+    private CreatorEmbedded creator;
+    private List<CommentEmbedded> comments;
 
     @Transient
     private GroupTable groupReference;
@@ -35,6 +35,6 @@ public class PostInherited implements PostInterface, PersistentPost {
     @Override
     public void setUserReference(UserReference userReference) {
         UserTable userTable = (UserTable) userReference;
-        creator = new CreatorInherited(userTable.getId(), userTable.getName(), userTable.getSurname());
+        creator = new CreatorEmbedded(userTable.getId(), userTable.getName(), userTable.getSurname());
     }
 }
