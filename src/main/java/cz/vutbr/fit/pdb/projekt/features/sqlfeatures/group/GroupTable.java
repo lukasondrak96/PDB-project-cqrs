@@ -17,11 +17,11 @@ import java.util.List;
 @Data
 @NoArgsConstructor
 public class GroupTable implements GroupInterface, PersistentGroup {
-    public GroupTable(String name, String description, GroupState state, UserTable userTableReference) {
+    public GroupTable(String name, String description, GroupState state, UserTable userReference) {
         this.name = name;
         this.description = description;
         this.state = state;
-        this.userTableReference = userTableReference;
+        this.userReference = userReference;
     }
 
     @Id
@@ -38,7 +38,7 @@ public class GroupTable implements GroupInterface, PersistentGroup {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "creatorId", referencedColumnName = "id")
     @OnDelete(action = OnDeleteAction.CASCADE)
-    private UserTable userTableReference;
+    private UserTable userReference;
 
     @ManyToMany(mappedBy = "groups", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<UserTable> users = new ArrayList<>();
@@ -54,12 +54,7 @@ public class GroupTable implements GroupInterface, PersistentGroup {
     }
 
     @Override
-    public UserReference getUserReference() {
-        return userTableReference;
-    }
-
-    @Override
     public void setUserReference(UserReference userReference) {
-        userTableReference = (UserTable) userReference;
+        this.userReference = (UserTable) userReference;
     }
 }

@@ -42,7 +42,7 @@ public class UserCommandService implements UserWithStateChangingService<Persiste
     private final UserRepository userRepository;
     private final UserDocumentRepository userDocumentRepository;
     private final GroupDocumentRepository groupDocumentRepository;
-    private MongoTemplate mongoTemplate;
+    private final MongoTemplate mongoTemplate;
 
     private static final EventBus EVENT_BUS = EventBus.getDefault();
 

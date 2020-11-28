@@ -24,11 +24,6 @@ public class GroupDocument implements GroupInterface, PersistentGroup {
 
     private CreatorInherited creator;
 
-    @Id
-    private int id;
-    private String name;
-    private String description;
-    private GroupState state;
     public GroupDocument(String name, String description, GroupState state, CreatorInherited creator, List<PostInherited> posts, List<MemberInherited> members) {
         this.name = name;
         this.description = description;
@@ -37,6 +32,12 @@ public class GroupDocument implements GroupInterface, PersistentGroup {
         this.posts = posts;
         this.members = members;
     }
+
+    @Id
+    private int id;
+    private String name;
+    private String description;
+    private GroupState state;
     private List<PostInherited> posts;
     private List<MemberInherited> members;
 

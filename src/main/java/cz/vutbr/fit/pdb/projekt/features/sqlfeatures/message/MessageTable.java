@@ -16,12 +16,12 @@ import java.util.Date;
 @NoArgsConstructor
 public class MessageTable {
 
-    public MessageTable(String text, Date createdAt, Date readAt, UserTable userTableReferenceSender, UserTable userTableReferenceReceiver) {
+    public MessageTable(String text, Date createdAt, Date readAt, UserTable userReferenceSender, UserTable userReferenceReceiver) {
         this.text = text;
         this.createdAt = createdAt;
         this.readAt = readAt;
-        this.userTableReferenceSender = userTableReferenceSender;
-        this.userTableReferenceReceiver = userTableReferenceReceiver;
+        this.userReferenceSender = userReferenceSender;
+        this.userReferenceReceiver = userReferenceReceiver;
     }
 
     @Id
@@ -38,10 +38,10 @@ public class MessageTable {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "idUserSender", referencedColumnName = "id")
     @OnDelete(action = OnDeleteAction.CASCADE)
-    private UserTable userTableReferenceSender;
+    private UserTable userReferenceSender;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "idUserReceiver", referencedColumnName = "id")
     @OnDelete(action = OnDeleteAction.CASCADE)
-    private UserTable userTableReferenceReceiver;
+    private UserTable userReferenceReceiver;
 }

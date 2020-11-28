@@ -17,11 +17,11 @@ import java.util.Date;
 @NoArgsConstructor
 public class CommentTable {
 
-    public CommentTable(String text, Date createdAt, PostTable postTableReference, UserTable userTableReference) {
+    public CommentTable(String text, Date createdAt, PostTable postReference, UserTable userReference) {
         this.text = text;
         this.createdAt = createdAt;
-        this.postTableReference = postTableReference;
-        this.userTableReference = userTableReference;
+        this.postReference = postReference;
+        this.userReference = userReference;
     }
 
     @Id
@@ -36,11 +36,11 @@ public class CommentTable {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "idPost", referencedColumnName = "id")
     @OnDelete(action = OnDeleteAction.CASCADE)
-    private PostTable postTableReference;
+    private PostTable postReference;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "idUser", referencedColumnName = "id")
     @OnDelete(action = OnDeleteAction.CASCADE)
-    private UserTable userTableReference;
+    private UserTable userReference;
 
 }

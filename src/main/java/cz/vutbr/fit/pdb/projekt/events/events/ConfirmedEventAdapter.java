@@ -4,7 +4,7 @@ import cz.vutbr.fit.pdb.projekt.features.helperInterfaces.PersistentObject;
 
 public class ConfirmedEventAdapter<T extends PersistentObject> extends AbstractEvent<T> implements EventInterface<T> {
 
-    private AbstractEvent<T> event;
+    private final AbstractEvent<T> event;
 
     public ConfirmedEventAdapter(AbstractEvent<T> event) {
         super(null);

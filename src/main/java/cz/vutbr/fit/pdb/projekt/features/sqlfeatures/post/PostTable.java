@@ -2,6 +2,7 @@ package cz.vutbr.fit.pdb.projekt.features.sqlfeatures.post;
 
 import cz.vutbr.fit.pdb.projekt.features.helperInterfaces.objects.PostInterface;
 import cz.vutbr.fit.pdb.projekt.features.helperInterfaces.persistent.PersistentPost;
+import cz.vutbr.fit.pdb.projekt.features.helperInterfaces.references.UserReference;
 import cz.vutbr.fit.pdb.projekt.features.sqlfeatures.group.GroupTable;
 import cz.vutbr.fit.pdb.projekt.features.sqlfeatures.user.UserTable;
 import lombok.Getter;
@@ -19,12 +20,12 @@ import java.util.Date;
 @NoArgsConstructor
 public class PostTable implements PostInterface, PersistentPost {
 
-    public PostTable(String title, String text, Date createdAt, GroupTable groupTableReference, UserTable userTableReference) {
+    public PostTable(String title, String text, Date createdAt, GroupTable groupReference, UserTable userReference) {
         this.title = title;
         this.text = text;
         this.createdAt = createdAt;
-        this.groupTableReference = groupTableReference;
-        this.userTableReference = userTableReference;
+        this.groupReference = groupReference;
+        this.userReference = userReference;
     }
 
     @Id
@@ -41,11 +42,20 @@ public class PostTable implements PostInterface, PersistentPost {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "idGroup", referencedColumnName = "id")
     @OnDelete(action = OnDeleteAction.CASCADE)
-    private GroupTable groupTableReference;
+    private GroupTable groupReference;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "idUser", referencedColumnName = "id")
     @OnDelete(action = OnDeleteAction.CASCADE)
-    private UserTable userTableReference;
+    private UserTable userReference;
 
+    @Override
+    public void setUserReference(UserReference userReference) {
+        this.userReference = (UserTable) userReference;
+    }
+
+    @Override
+    public void setGroupReference(GroupTable groupReference) {
+        this.groupReference = groupReference;
+    }
 }

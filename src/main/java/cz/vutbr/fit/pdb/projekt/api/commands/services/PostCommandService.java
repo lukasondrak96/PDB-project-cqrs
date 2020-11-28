@@ -2,11 +2,15 @@ package cz.vutbr.fit.pdb.projekt.api.commands.services;
 
 import cz.vutbr.fit.pdb.projekt.api.commands.dtos.post.NewPostDto;
 import cz.vutbr.fit.pdb.projekt.api.commands.services.helpingservices.CommandService;
+import cz.vutbr.fit.pdb.projekt.events.events.AbstractEvent;
 import cz.vutbr.fit.pdb.projekt.events.events.OracleCreatedEvent;
+import cz.vutbr.fit.pdb.projekt.events.subscribers.post.MongoPostEventSubscriber;
 import cz.vutbr.fit.pdb.projekt.events.subscribers.post.OraclePostEventSubscriber;
 import cz.vutbr.fit.pdb.projekt.features.helperInterfaces.ObjectInterface;
 import cz.vutbr.fit.pdb.projekt.features.helperInterfaces.objects.PostInterface;
 import cz.vutbr.fit.pdb.projekt.features.helperInterfaces.persistent.PersistentPost;
+import cz.vutbr.fit.pdb.projekt.features.nosqlfeatures.group.GroupDocument;
+import cz.vutbr.fit.pdb.projekt.features.nosqlfeatures.group.inherited.PostInherited;
 import cz.vutbr.fit.pdb.projekt.features.sqlfeatures.group.GroupRepository;
 import cz.vutbr.fit.pdb.projekt.features.sqlfeatures.group.GroupTable;
 import cz.vutbr.fit.pdb.projekt.features.sqlfeatures.post.PostRepository;
@@ -15,12 +19,17 @@ import cz.vutbr.fit.pdb.projekt.features.sqlfeatures.user.UserRepository;
 import cz.vutbr.fit.pdb.projekt.features.sqlfeatures.user.UserTable;
 import lombok.AllArgsConstructor;
 import org.greenrobot.eventbus.EventBus;
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
 import java.util.Optional;
+
+import static org.springframework.data.mongodb.core.query.Criteria.where;
 
 
 @Service
@@ -30,6 +39,7 @@ public class PostCommandService implements CommandService<PersistentPost> {
     private final PostRepository postRepository;
     private final UserRepository userRepository;
     private final GroupRepository groupRepository;
+    private final MongoTemplate mongoTemplate;
 
     private static final EventBus EVENT_BUS = EventBus.getDefault();
 
@@ -47,14 +57,8 @@ public class PostCommandService implements CommandService<PersistentPost> {
         GroupTable group = groupOptional.get();
 
         final PostTable postTable = new PostTable(newPostDto.getTitle(), newPostDto.getText(), new Date(), group, creator);
-
-        OraclePostEventSubscriber oracleSubscriber = new OraclePostEventSubscriber(EVENT_BUS);
-//        MongoPostEventSubscriber mongoSubscriber = new MongoPostEventSubscriber(EVENT_BUS);
-
-        EVENT_BUS.post(new OracleCreatedEvent<>(postTable, this));
-        EVENT_BUS.unregister(oracleSubscriber);
-//        EVENT_BUS.unregister(mongoSubscriber);
-
+        OracleCreatedEvent<PersistentPost> oracleCreatedEvent = new OracleCreatedEvent<>(postTable, this);
+        subscribeChangeEventToOracleAndMongo(oracleCreatedEvent);
         return ResponseEntity.ok().body("Příspěvek byl vytvořen");
     }
 
@@ -63,27 +67,50 @@ public class PostCommandService implements CommandService<PersistentPost> {
     public PersistentPost assignFromTo(ObjectInterface objectInterface, PersistentPost post) {
         PostInterface persistentPostInterface = (PostInterface) post;
         PostInterface postInterface = (PostInterface) objectInterface;
-        if(post instanceof PostTable) {
+        if(post instanceof PostTable || post instanceof PostInherited) {
             persistentPostInterface.setId(postInterface.getId());
             persistentPostInterface.setTitle(postInterface.getTitle());
             persistentPostInterface.setText(postInterface.getText());
             persistentPostInterface.setCreatedAt(postInterface.getCreatedAt());
-            persistentPostInterface.setGroupTableReference(postInterface.getGroupTableReference());
-            persistentPostInterface.setUserTableReference(postInterface.getUserTableReference());
+            persistentPostInterface.setGroupReference(postInterface.getGroupReference());
+            persistentPostInterface.setUserReference(postInterface.getUserReference());
         }
         return (PersistentPost) persistentPostInterface;
     }
 
     @Override
     public PersistentPost finishSaving(PersistentPost post) {
-//        if (post instanceof PostTable)
+        if (post instanceof PostTable) {
             return postRepository.save((PostTable) post);
-//        else
-//            return groupDocumentRepository.save((GroupDocument) group);
+        } else {
+            addPostToGroup((PostInherited) post);
+            return post;
+        }
     }
 
     @Override
     public PersistentPost finishUpdating(PersistentPost persistentObject) {
         return null;
+    }
+
+
+    /* private methods */
+
+    private void subscribeChangeEventToOracleAndMongo(AbstractEvent<PersistentPost> event) {
+        OraclePostEventSubscriber sqlSubscriber = new OraclePostEventSubscriber(EVENT_BUS);
+        MongoPostEventSubscriber noSqlSubscriber = new MongoPostEventSubscriber(EVENT_BUS);
+
+        EVENT_BUS.post(event);
+        EVENT_BUS.unregister(sqlSubscriber);
+        EVENT_BUS.unregister(noSqlSubscriber);
+    }
+
+    private void addPostToGroup(PostInherited post) {
+        mongoTemplate.updateMulti(
+                new Query(where("id").is(post.getGroupReference().getId())),
+                new Update()
+                        .push("posts", post),
+                GroupDocument.class
+        );
     }
 }

@@ -1,8 +1,8 @@
 package cz.vutbr.fit.pdb.projekt.features.helperInterfaces.objects;
 
 import cz.vutbr.fit.pdb.projekt.features.helperInterfaces.ObjectInterface;
+import cz.vutbr.fit.pdb.projekt.features.helperInterfaces.references.UserReference;
 import cz.vutbr.fit.pdb.projekt.features.sqlfeatures.group.GroupTable;
-import cz.vutbr.fit.pdb.projekt.features.sqlfeatures.user.UserTable;
 
 import java.util.Date;
 
@@ -23,11 +23,11 @@ public interface PostInterface extends ObjectInterface {
 
     void setCreatedAt(Date createdAt);
 
-    GroupTable getGroupTableReference();
+    UserReference getUserReference();
 
-    void setGroupTableReference(GroupTable groupTableReference);
+    void setUserReference(UserReference userReference);
 
-    UserTable getUserTableReference();
+    GroupTable getGroupReference();
 
-    void setUserTableReference(UserTable userTableReference);
+    void setGroupReference(GroupTable userReference);
 }
