@@ -89,7 +89,7 @@ public class GroupCommandService implements GroupWithStateChangingService<Persis
         return ResponseEntity.ok().body("Data byla aktualizována");
     }
 
-    public ResponseEntity<?> deleteGroup(String groupId) {
+    public ResponseEntity<?> deleteGroup(int groupId) {
 //        Optional<GroupDocument> groupDocumentOptional = groupDocumentRepository.findById(groupId);
 //        if (groupDocumentOptional.isEmpty())
 //            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Skupina s tímto id neexistuje");
