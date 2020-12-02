@@ -2,6 +2,7 @@ package cz.vutbr.fit.pdb.projekt.api.commands.controllers;
 
 import cz.vutbr.fit.pdb.projekt.api.commands.dtos.group.ChangeGroupStateDto;
 import cz.vutbr.fit.pdb.projekt.api.commands.dtos.group.NewGroupDto;
+import cz.vutbr.fit.pdb.projekt.api.commands.dtos.group.UpdateGroupDto;
 import cz.vutbr.fit.pdb.projekt.api.commands.services.GroupCommandService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -22,8 +23,8 @@ public class GroupCommandController {
     }
 
     @PutMapping("{id}/edit")
-    public ResponseEntity<?> editGroup(@PathVariable(value = "id") int groupId) {
-        return null;
+    public ResponseEntity<?> editGroup(@PathVariable(value = "id") int groupId, @Valid @RequestBody UpdateGroupDto updateGroupDto) {
+        return groupCommandService.updateGroup(groupId, updateGroupDto);
     }
 
     @DeleteMapping("{id}/delete")

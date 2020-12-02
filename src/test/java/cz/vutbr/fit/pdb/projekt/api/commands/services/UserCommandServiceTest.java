@@ -6,22 +6,13 @@ import cz.vutbr.fit.pdb.projekt.api.commands.dtos.post.NewPostDto;
 import cz.vutbr.fit.pdb.projekt.api.commands.dtos.user.NewUserDto;
 import cz.vutbr.fit.pdb.projekt.api.commands.dtos.user.UpdateUserDto;
 import cz.vutbr.fit.pdb.projekt.features.nosqlfeatures.group.GroupDocument;
-import cz.vutbr.fit.pdb.projekt.features.nosqlfeatures.group.GroupDocumentRepository;
 import cz.vutbr.fit.pdb.projekt.features.nosqlfeatures.group.embedded.PostEmbedded;
 import cz.vutbr.fit.pdb.projekt.features.nosqlfeatures.user.UserDocument;
-import cz.vutbr.fit.pdb.projekt.features.nosqlfeatures.user.UserDocumentRepository;
-import cz.vutbr.fit.pdb.projekt.features.sqlfeatures.comment.CommentRepository;
-import cz.vutbr.fit.pdb.projekt.features.sqlfeatures.group.GroupRepository;
 import cz.vutbr.fit.pdb.projekt.features.sqlfeatures.group.GroupState;
-import cz.vutbr.fit.pdb.projekt.features.sqlfeatures.post.PostRepository;
-import cz.vutbr.fit.pdb.projekt.features.sqlfeatures.user.UserRepository;
 import cz.vutbr.fit.pdb.projekt.features.sqlfeatures.user.UserSex;
 import cz.vutbr.fit.pdb.projekt.features.sqlfeatures.user.UserState;
 import cz.vutbr.fit.pdb.projekt.features.sqlfeatures.user.UserTable;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import java.util.Date;
@@ -32,7 +23,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @SpringBootTest
-class UserCommandServiceTest {
+class UserCommandServiceTest extends AbstractServiceTest {
 
     private final String TEST_NAME = "testName";
     private final String TEST_SURNAME = "testSurname";
@@ -48,56 +39,6 @@ class UserCommandServiceTest {
     private final GroupState TEST_GROUP_STATE = GroupState.PRIVATE;
     private final String TEST_TITLE = "testtitle";
     private final String TEST_TEXT = "testtext";
-
-    @Autowired
-    UserCommandService userCommandService;
-
-    @Autowired
-    UserRepository userRepository;
-
-    @Autowired
-    UserDocumentRepository userDocumentRepository;
-
-    @Autowired
-    GroupCommandService groupCommandService;
-
-    @Autowired
-    GroupRepository groupRepository;
-
-    @Autowired
-    GroupDocumentRepository groupDocumentRepository;
-
-    @Autowired
-    PostCommandService postCommandService;
-
-    @Autowired
-    PostRepository postRepository;
-
-    @Autowired
-    CommentCommandService commentCommandService;
-
-    @Autowired
-    CommentRepository commentRepository;
-
-    @BeforeEach
-    void setUp() {
-        userRepository.deleteAll();
-        userDocumentRepository.deleteAll();
-        groupDocumentRepository.deleteAll();
-        groupRepository.deleteAll();
-        postRepository.deleteAll();
-        commentRepository.deleteAll();
-    }
-
-    @AfterEach
-    void tearDown() {
-        userRepository.deleteAll();
-        userDocumentRepository.deleteAll();
-        groupDocumentRepository.deleteAll();
-        groupRepository.deleteAll();
-        postRepository.deleteAll();
-        commentRepository.deleteAll();
-    }
 
     @Test
     void test_createUser() {
@@ -135,10 +76,10 @@ class UserCommandServiceTest {
                 TEST_EMAIL + TEST_ADDITION_TO_CHANGE_STRING, TEST_NAME + TEST_ADDITION_TO_CHANGE_STRING,
                 TEST_SURNAME + TEST_ADDITION_TO_CHANGE_STRING, TEST_BIRTH_DATE_UPDATE, TEST_SEX_UPDATE
         );
-
-
         userCommandService.createUser(newUserDto);
         int createdUserId = userRepository.findAll().get(0).getId();
+
+
         userCommandService.updateUser(createdUserId, updateUserDto);
 
 
@@ -154,10 +95,9 @@ class UserCommandServiceTest {
         assertEquals(TEST_SEX_UPDATE, createdUserSqlOptional.get().getSex());
         assertEquals(STATE_ACTIVATED, createdUserSqlOptional.get().getState());
 
-        assertEquals(createdUserNoSqlOptional.get(), new UserDocument(createdUserId, TEST_EMAIL + TEST_ADDITION_TO_CHANGE_STRING,
+        assertEquals(new UserDocument(createdUserId, TEST_EMAIL + TEST_ADDITION_TO_CHANGE_STRING,
                 TEST_NAME + TEST_ADDITION_TO_CHANGE_STRING, TEST_SURNAME + TEST_ADDITION_TO_CHANGE_STRING, TEST_BIRTH_DATE_UPDATE,
-                TEST_SEX_UPDATE, STATE_ACTIVATED, null, null, null));
-
+                TEST_SEX_UPDATE, STATE_ACTIVATED, null, null, null), createdUserNoSqlOptional.get());
     }
 
     @Test

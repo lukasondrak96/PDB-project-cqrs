@@ -33,6 +33,16 @@ public class GroupDocument implements GroupInterface, PersistentGroup {
         this.members = members;
     }
 
+    public GroupDocument(int id, String name, String description, GroupState state, CreatorEmbedded creator, List<PostEmbedded> posts, List<MemberEmbedded> members) {
+        this.id = id;
+        this.name = name;
+        this.description = description;
+        this.state = state;
+        this.creator = creator;
+        this.posts = posts;
+        this.members = members;
+    }
+
     @Id
     private int id;
     private String name;

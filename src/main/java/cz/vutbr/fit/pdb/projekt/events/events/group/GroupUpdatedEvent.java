@@ -1,20 +1,21 @@
 package cz.vutbr.fit.pdb.projekt.events.events.group;
 
-import cz.vutbr.fit.pdb.projekt.api.commands.services.GroupCommandService;
-import cz.vutbr.fit.pdb.projekt.events.events.EventInterface;
-import cz.vutbr.fit.pdb.projekt.features.helperInterfaces.persistent.PersistentGroup;
+import cz.vutbr.fit.pdb.projekt.api.commands.services.helpingservices.CommandService;
+import cz.vutbr.fit.pdb.projekt.events.events.AbstractEvent;
+import cz.vutbr.fit.pdb.projekt.features.helperInterfaces.ObjectInterface;
+import cz.vutbr.fit.pdb.projekt.features.helperInterfaces.PersistentObject;
 
-public class GroupUpdatedEvent implements EventInterface<PersistentGroup> {
+public class GroupUpdatedEvent<T extends PersistentObject> extends AbstractEvent<T> {
 
-    private final GroupCommandService service;
-
-    public GroupUpdatedEvent(GroupCommandService service) {
-        this.service = service;
+    public GroupUpdatedEvent(ObjectInterface objectInterface, CommandService<T> commandService) {
+        super(objectInterface, commandService);
     }
 
     @Override
-    public PersistentGroup apply(PersistentGroup persistentGroup) {
-        return service.updateGroup(persistentGroup);
+    public T apply(T persistentObject) {
+        CommandService<T> commandService = getCommandService();
+        persistentObject = commandService.assignFromTo(getObjectInterface(), persistentObject);
+        return commandService.finishUpdating(persistentObject);
     }
 
 }

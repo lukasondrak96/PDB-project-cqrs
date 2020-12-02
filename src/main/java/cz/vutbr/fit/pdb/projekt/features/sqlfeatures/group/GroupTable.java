@@ -24,6 +24,14 @@ public class GroupTable implements GroupInterface, PersistentGroup {
         this.userReference = userReference;
     }
 
+    public GroupTable(int id, String name, String description, GroupState state, UserTable userReference) {
+        this.id = id;
+        this.name = name;
+        this.description = description;
+        this.state = state;
+        this.userReference = userReference;
+    }
+
     @Id
     @SequenceGenerator(name = "GroupIdGenerator", sequenceName = "GROUP_SEQUENCE", allocationSize = 1)
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "GroupIdGenerator")

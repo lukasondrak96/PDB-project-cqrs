@@ -10,6 +10,7 @@ import java.util.Date;
 @AllArgsConstructor
 @NoArgsConstructor
 public class MessageEmbedded {
+    private int id;
     private boolean sent;
     private String text;
     private Date createdAt;

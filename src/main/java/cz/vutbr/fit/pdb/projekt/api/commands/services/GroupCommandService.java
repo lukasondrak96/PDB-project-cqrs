@@ -1,10 +1,12 @@
 package cz.vutbr.fit.pdb.projekt.api.commands.services;
 
 import cz.vutbr.fit.pdb.projekt.api.commands.dtos.group.NewGroupDto;
+import cz.vutbr.fit.pdb.projekt.api.commands.dtos.group.UpdateGroupDto;
 import cz.vutbr.fit.pdb.projekt.api.commands.services.helpingservices.GroupWithStateChangingService;
 import cz.vutbr.fit.pdb.projekt.events.events.AbstractEvent;
 import cz.vutbr.fit.pdb.projekt.events.events.OracleCreatedEvent;
 import cz.vutbr.fit.pdb.projekt.events.events.group.GroupStateChangedEvent;
+import cz.vutbr.fit.pdb.projekt.events.events.group.GroupUpdatedEvent;
 import cz.vutbr.fit.pdb.projekt.events.subscribers.group.MongoGroupEventSubscriber;
 import cz.vutbr.fit.pdb.projekt.events.subscribers.group.OracleGroupEventSubscriber;
 import cz.vutbr.fit.pdb.projekt.features.helperInterfaces.ObjectInterface;
@@ -12,6 +14,7 @@ import cz.vutbr.fit.pdb.projekt.features.helperInterfaces.objects.GroupInterface
 import cz.vutbr.fit.pdb.projekt.features.helperInterfaces.persistent.PersistentGroup;
 import cz.vutbr.fit.pdb.projekt.features.nosqlfeatures.group.GroupDocument;
 import cz.vutbr.fit.pdb.projekt.features.nosqlfeatures.group.GroupDocumentRepository;
+import cz.vutbr.fit.pdb.projekt.features.nosqlfeatures.user.UserDocument;
 import cz.vutbr.fit.pdb.projekt.features.sqlfeatures.group.GroupRepository;
 import cz.vutbr.fit.pdb.projekt.features.sqlfeatures.group.GroupState;
 import cz.vutbr.fit.pdb.projekt.features.sqlfeatures.group.GroupTable;
@@ -19,11 +22,16 @@ import cz.vutbr.fit.pdb.projekt.features.sqlfeatures.user.UserRepository;
 import cz.vutbr.fit.pdb.projekt.features.sqlfeatures.user.UserTable;
 import lombok.AllArgsConstructor;
 import org.greenrobot.eventbus.EventBus;
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
+
+import static org.springframework.data.mongodb.core.query.Criteria.where;
 
 @Service
 @AllArgsConstructor
@@ -35,6 +43,7 @@ public class GroupCommandService implements GroupWithStateChangingService<Persis
 
     private final GroupDocumentRepository groupDocumentRepository;
     private static final EventBus EVENT_BUS = EventBus.getDefault();
+    private final MongoTemplate mongoTemplate;
 
     public ResponseEntity<?> createGroup(NewGroupDto newGroupDto) {
         if (groupRepository.countByName(newGroupDto.getName()) != 0) {
@@ -57,9 +66,27 @@ public class GroupCommandService implements GroupWithStateChangingService<Persis
         return ResponseEntity.ok().body("Skupina byla vytvořena");
     }
 
-    public PersistentGroup updateGroup(PersistentGroup persistentGroup) {
-        //todo
-        return null;
+    public ResponseEntity<?> updateGroup(Integer groupId, UpdateGroupDto updateGroupDto) {
+        Optional<GroupTable> groupTableOptional = groupRepository.findById(groupId);
+        if(groupTableOptional.isEmpty())
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Tato skupina neexistuje");
+
+        GroupTable oldGroupTable = groupTableOptional.get();
+
+        if (groupTableEqualsUpdateGroupDto(oldGroupTable, updateGroupDto)) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Nebyl nalezen záznam pro editaci");
+        }
+
+        final GroupTable groupTable = new GroupTable(groupId, updateGroupDto.getName(),
+                updateGroupDto.getDescription(),
+                oldGroupTable.getState(),
+                oldGroupTable.getUserReference()
+        );
+
+        GroupUpdatedEvent<PersistentGroup> updatedEvent = new GroupUpdatedEvent<>(groupTable, this);
+        subscribeChangeEventToOracleAndMongo(updatedEvent);
+
+        return ResponseEntity.ok().body("Data byla aktualizována");
     }
 
     public ResponseEntity<?> deleteGroup(String groupId) {
@@ -100,13 +127,6 @@ public class GroupCommandService implements GroupWithStateChangingService<Persis
     }
 
 /* methods called from events */
-    public PersistentGroup finishGroupSaving(PersistentGroup group) {
-        if (group instanceof GroupTable)
-            return groupRepository.save((GroupTable) group);
-        else
-            return groupDocumentRepository.save((GroupDocument) group);
-    }
-
     public void finishGroupDeleting(PersistentGroup group) {
         if (group instanceof GroupTable)
             groupRepository.delete((GroupTable) group);
@@ -115,8 +135,33 @@ public class GroupCommandService implements GroupWithStateChangingService<Persis
     }
 
     @Override
-    public PersistentGroup finishUpdating(PersistentGroup persistentObject) {
-        return null;
+    public PersistentGroup finishUpdating(PersistentGroup group) {
+        if (group instanceof GroupTable) {
+            return groupRepository.save((GroupTable) group);
+        } else {
+            GroupDocument groupDocument = (GroupDocument) group;
+            updateNameOfGroupInUsersGroupsMember(groupDocument);
+            updateNameOfGroupInUsersGroupsAdmin(groupDocument);
+            return groupDocumentRepository.save(groupDocument);
+        }
+    }
+
+    private void updateNameOfGroupInUsersGroupsAdmin(GroupDocument groupDocument) {
+        mongoTemplate.updateMulti(
+                new Query(where("groups_member.id").is(groupDocument.getId())),
+                new Update()
+                        .set("groups_member.$.name", groupDocument.getName()),
+                UserDocument.class
+        );
+    }
+
+    private void updateNameOfGroupInUsersGroupsMember(GroupDocument groupDocument) {
+        mongoTemplate.updateMulti(
+                new Query(where("groups_admin.id").is(groupDocument.getId())),
+                new Update()
+                        .set("groups_admin.$.name", groupDocument.getName()),
+                UserDocument.class
+        );
     }
 
     @Override
@@ -156,6 +201,11 @@ public class GroupCommandService implements GroupWithStateChangingService<Persis
     }
 
     /* private methods */
+    private boolean groupTableEqualsUpdateGroupDto(GroupTable table, UpdateGroupDto dto) {
+        return dto.getName().equals(table.getName()) &&
+                dto.getDescription() == table.getDescription();
+    }
+
 
     private void subscribeChangeEventToOracleAndMongo(AbstractEvent<PersistentGroup> event) {
         OracleGroupEventSubscriber sqlSubscriber = new OracleGroupEventSubscriber(EVENT_BUS);

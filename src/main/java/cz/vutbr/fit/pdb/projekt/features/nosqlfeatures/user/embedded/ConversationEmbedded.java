@@ -10,6 +10,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ConversationEmbedded {
+    private int id;
     private String name;
     private String surname;
     private List<MessageEmbedded> messages;
