@@ -28,7 +28,7 @@ public class GroupCommandController {
     }
 
     @DeleteMapping("{id}/delete")
-    public ResponseEntity<?> deleteGroup(@PathVariable(value = "id") String groupId) {
+    public ResponseEntity<?> deleteGroup(@PathVariable(value = "id") int groupId) {
         return groupCommandService.deleteGroup(groupId);
     }
 

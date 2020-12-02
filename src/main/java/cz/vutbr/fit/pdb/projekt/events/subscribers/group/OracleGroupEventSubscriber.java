@@ -2,6 +2,7 @@ package cz.vutbr.fit.pdb.projekt.events.subscribers.group;
 
 import cz.vutbr.fit.pdb.projekt.events.events.ConfirmedEventAdapter;
 import cz.vutbr.fit.pdb.projekt.events.events.OracleCreatedEvent;
+import cz.vutbr.fit.pdb.projekt.events.events.group.GroupDeletedEvent;
 import cz.vutbr.fit.pdb.projekt.events.events.group.GroupStateChangedEvent;
 import cz.vutbr.fit.pdb.projekt.events.events.group.GroupUpdatedEvent;
 import cz.vutbr.fit.pdb.projekt.events.subscribers.AbstractSubscriber;
@@ -35,16 +36,20 @@ public class OracleGroupEventSubscriber extends AbstractSubscriber {
     }
 
     @Subscribe
-    public void onGroupStateChangedEvent(GroupStateChangedEvent<PersistentGroup> groupStateChangedEvent) {
-        LOGGER.info(RECEIVED_AND_APPLYING_EVENT, groupStateChangedEvent.getClass().getSimpleName(), groupStateChangedEvent);
-        groupStateChangedEvent.apply(REUSABLE_ORACLE_OBJECT);
-    }
-
-    @Subscribe
     public void onGroupUpdatedEvent(GroupUpdatedEvent<PersistentGroup> groupUpdatedEvent) {
         LOGGER.info(RECEIVED_AND_APPLYING_EVENT, groupUpdatedEvent.getClass().getSimpleName(), groupUpdatedEvent);
         groupUpdatedEvent.apply(REUSABLE_ORACLE_OBJECT);
     }
 
+    @Subscribe
+    public void onGroupDeletedEvent(GroupDeletedEvent<PersistentGroup> groupDeletedEvent) {
+        LOGGER.info(RECEIVED_AND_APPLYING_EVENT, groupDeletedEvent.getClass().getSimpleName(), groupDeletedEvent);
+        groupDeletedEvent.apply(REUSABLE_ORACLE_OBJECT);
+    }
 
+    @Subscribe
+    public void onGroupStateChangedEvent(GroupStateChangedEvent<PersistentGroup> groupStateChangedEvent) {
+        LOGGER.info(RECEIVED_AND_APPLYING_EVENT, groupStateChangedEvent.getClass().getSimpleName(), groupStateChangedEvent);
+        groupStateChangedEvent.apply(REUSABLE_ORACLE_OBJECT);
+    }
 }

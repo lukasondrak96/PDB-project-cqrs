@@ -14,7 +14,6 @@ import cz.vutbr.fit.pdb.projekt.features.helperInterfaces.ObjectInterface;
 import cz.vutbr.fit.pdb.projekt.features.helperInterfaces.objects.UserInterface;
 import cz.vutbr.fit.pdb.projekt.features.helperInterfaces.persistent.PersistentUser;
 import cz.vutbr.fit.pdb.projekt.features.nosqlfeatures.group.GroupDocument;
-import cz.vutbr.fit.pdb.projekt.features.nosqlfeatures.group.GroupDocumentRepository;
 import cz.vutbr.fit.pdb.projekt.features.nosqlfeatures.group.embedded.CreatorEmbedded;
 import cz.vutbr.fit.pdb.projekt.features.nosqlfeatures.user.UserDocument;
 import cz.vutbr.fit.pdb.projekt.features.nosqlfeatures.user.UserDocumentRepository;
@@ -41,7 +40,6 @@ public class UserCommandService implements UserWithStateChangingService<Persiste
 
     private final UserRepository userRepository;
     private final UserDocumentRepository userDocumentRepository;
-    private final GroupDocumentRepository groupDocumentRepository;
     private final MongoTemplate mongoTemplate;
 
     private static final EventBus EVENT_BUS = EventBus.getDefault();

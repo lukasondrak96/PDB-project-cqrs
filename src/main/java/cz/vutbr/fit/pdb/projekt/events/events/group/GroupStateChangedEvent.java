@@ -8,7 +8,7 @@ import cz.vutbr.fit.pdb.projekt.features.sqlfeatures.group.GroupState;
 
 public class GroupStateChangedEvent<T extends PersistentObject> extends AbstractEvent<T> {
 
-    private GroupState groupState;
+    private final GroupState groupState;
 
     public GroupStateChangedEvent(ObjectInterface objectInterface, GroupState groupState, GroupWithStateChangingService<T> commandService) {
         super(objectInterface, commandService);

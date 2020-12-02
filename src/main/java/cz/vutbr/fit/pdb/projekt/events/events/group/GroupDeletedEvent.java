@@ -1,21 +1,21 @@
 package cz.vutbr.fit.pdb.projekt.events.events.group;
 
-import cz.vutbr.fit.pdb.projekt.api.commands.services.GroupCommandService;
-import cz.vutbr.fit.pdb.projekt.events.events.EventInterface;
-import cz.vutbr.fit.pdb.projekt.features.helperInterfaces.persistent.PersistentGroup;
+import cz.vutbr.fit.pdb.projekt.api.commands.services.helpingservices.CommandDeleteService;
+import cz.vutbr.fit.pdb.projekt.api.commands.services.helpingservices.CommandService;
+import cz.vutbr.fit.pdb.projekt.events.events.AbstractEvent;
+import cz.vutbr.fit.pdb.projekt.features.helperInterfaces.ObjectInterface;
+import cz.vutbr.fit.pdb.projekt.features.helperInterfaces.PersistentObject;
 
-public class GroupDeletedEvent implements EventInterface<PersistentGroup> {
+public class GroupDeletedEvent<T extends PersistentObject> extends AbstractEvent<T> {
 
-    private final GroupCommandService service;
-
-    public GroupDeletedEvent(GroupCommandService service) {
-        this.service = service;
+    public GroupDeletedEvent(ObjectInterface objectInterface, CommandService<T> commandService) {
+        super(objectInterface, commandService);
     }
 
     @Override
-    public PersistentGroup apply(PersistentGroup persistentGroup) {
-        service.finishGroupDeleting(persistentGroup);
-        return null;
+    public T apply(T persistentObject) {
+        CommandDeleteService<T> commandService = (CommandDeleteService<T>) getCommandService();
+        return commandService.finishDeleting(persistentObject);
     }
 
 }
