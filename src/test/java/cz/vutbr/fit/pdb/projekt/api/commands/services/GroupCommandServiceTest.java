@@ -23,9 +23,7 @@ class GroupCommandServiceTest extends AbstractServiceTest {
     private final String TEST_NAME = "testName";
     private final String TEST_DESCRIPTION = "testDescription";
     private final GroupState TEST_STATE_PRIVATE = GroupState.PRIVATE;
-    private final Integer TEST_USER_REFERENCE_ID = 1;
     private final NewUserDto TEST_GROUP_CREATOR = new NewUserDto("test@test", "testName", "testSurname", new Date(300L), UserSex.FEMALE);
-    private final CreatorEmbedded TEST_CREATOR_EMBEDDED = new CreatorEmbedded(TEST_USER_REFERENCE_ID, "testName", "testSurname");
 
     private final String TEST_ADDITION_TO_CHANGE_STRING = "Addition";
 
@@ -60,14 +58,17 @@ class GroupCommandServiceTest extends AbstractServiceTest {
 
     @Test
     void test_updateGroup() {
+        userCommandService.createUser(TEST_GROUP_CREATOR);
+        int creatorId = userRepository.findAll().get(0).getId();
+        CreatorEmbedded testCreatorEmbedded = new CreatorEmbedded(creatorId, "testName", "testSurname");
+
         NewGroupDto newGroupDto = new NewGroupDto(
-                TEST_NAME, TEST_DESCRIPTION, TEST_STATE_PRIVATE, TEST_USER_REFERENCE_ID
+                TEST_NAME, TEST_DESCRIPTION, TEST_STATE_PRIVATE, creatorId
         );
+        groupCommandService.createGroup(newGroupDto);
         UpdateGroupDto updateGroupDto = new UpdateGroupDto(
                 TEST_NAME + TEST_ADDITION_TO_CHANGE_STRING, TEST_DESCRIPTION + TEST_ADDITION_TO_CHANGE_STRING
         );
-        userCommandService.createUser(TEST_GROUP_CREATOR);
-        groupCommandService.createGroup(newGroupDto);
         int createdGroupId = groupRepository.findAll().get(0).getId();
 
 
@@ -84,15 +85,16 @@ class GroupCommandServiceTest extends AbstractServiceTest {
         assertEquals(TEST_GROUP_CREATOR.getEmail(), updatedGroupSqlOptional.get().getUserReference().getEmail());
 
         assertEquals(new GroupDocument(createdGroupId, TEST_NAME + TEST_ADDITION_TO_CHANGE_STRING, TEST_DESCRIPTION + TEST_ADDITION_TO_CHANGE_STRING, TEST_STATE_PRIVATE,
-                TEST_CREATOR_EMBEDDED, null, null), updatedGroupNoSqlOptional.get());
+                testCreatorEmbedded, null, null), updatedGroupNoSqlOptional.get());
     }
 
     @Test
     void test_deleteGroup() {
-        NewGroupDto newGroupDto = new NewGroupDto(
-                TEST_NAME, TEST_DESCRIPTION, TEST_STATE_PRIVATE, TEST_USER_REFERENCE_ID
-        );
         userCommandService.createUser(TEST_GROUP_CREATOR);
+        int creatorId = userRepository.findAll().get(0).getId();
+        NewGroupDto newGroupDto = new NewGroupDto(
+                TEST_NAME, TEST_DESCRIPTION, TEST_STATE_PRIVATE, creatorId
+        );
         groupCommandService.createGroup(newGroupDto);
         int createdGroupId = groupRepository.findAll().get(0).getId();
 
