@@ -89,6 +89,21 @@ class GroupCommandServiceTest extends AbstractServiceTest {
 
     @Test
     void test_deleteGroup() {
+        NewGroupDto newGroupDto = new NewGroupDto(
+                TEST_NAME, TEST_DESCRIPTION, TEST_STATE_PRIVATE, TEST_USER_REFERENCE_ID
+        );
+        userCommandService.createUser(TEST_GROUP_CREATOR);
+        groupCommandService.createGroup(newGroupDto);
+        int createdGroupId = groupRepository.findAll().get(0).getId();
+
+
+        groupCommandService.deleteGroup(createdGroupId);
+
+
+        Optional<GroupTable> updatedGroupSqlOptional = groupRepository.findById(createdGroupId);
+        Optional<GroupDocument> updatedGroupNoSqlOptional = groupDocumentRepository.findById(createdGroupId);
+        assertTrue(updatedGroupSqlOptional.isEmpty());
+        assertTrue(updatedGroupNoSqlOptional.isEmpty());
     }
 
     @Test
