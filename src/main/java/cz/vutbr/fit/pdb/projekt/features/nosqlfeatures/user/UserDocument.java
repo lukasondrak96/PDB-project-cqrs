@@ -12,6 +12,7 @@ import lombok.NoArgsConstructor;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import javax.persistence.Id;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -52,14 +53,14 @@ public class UserDocument implements UserInterface, PersistentUser {
         this.conversationsWithUser = conversationsWithUser;
     }
 
-    private List<ConversationEmbedded> conversationsWithUser;
+    private List<ConversationEmbedded> conversationsWithUser = new ArrayList<>();
     private String email;
     private String name;
     private String surname;
     private Date birthDate;
     private UserSex sex;
     private UserState state;
-    private List<GroupEmbedded> groupsMember;
-    private List<GroupEmbedded> groupsAdmin;
+    private List<GroupEmbedded> groupsMember = new ArrayList<>();
+    private List<GroupEmbedded> groupsAdmin = new ArrayList<>();
 
 }

@@ -15,6 +15,7 @@ import cz.vutbr.fit.pdb.projekt.features.sqlfeatures.user.UserTable;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -64,7 +65,7 @@ class UserCommandServiceTest extends AbstractServiceTest {
         assertEquals(STATE_ACTIVATED, createdUserSqlOptional.get().getState());
 
         assertEquals(createdUserNoSqlOptional.get(), new UserDocument(createdUserId, TEST_EMAIL, TEST_NAME, TEST_SURNAME, TEST_BIRTH_DATE,
-                TEST_SEX, STATE_ACTIVATED, null, null, null));
+                TEST_SEX, STATE_ACTIVATED, new ArrayList<>(), new ArrayList<>(), new ArrayList<>()));
     }
 
     @Test
@@ -97,7 +98,7 @@ class UserCommandServiceTest extends AbstractServiceTest {
 
         assertEquals(new UserDocument(createdUserId, TEST_EMAIL + TEST_ADDITION_TO_CHANGE_STRING,
                 TEST_NAME + TEST_ADDITION_TO_CHANGE_STRING, TEST_SURNAME + TEST_ADDITION_TO_CHANGE_STRING, TEST_BIRTH_DATE_UPDATE,
-                TEST_SEX_UPDATE, STATE_ACTIVATED, null, null, null), createdUserNoSqlOptional.get());
+                TEST_SEX_UPDATE, STATE_ACTIVATED, new ArrayList<>(), new ArrayList<>(), new ArrayList<>()), createdUserNoSqlOptional.get());
     }
 
     @Test

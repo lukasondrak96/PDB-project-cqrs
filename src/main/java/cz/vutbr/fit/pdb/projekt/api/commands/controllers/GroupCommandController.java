@@ -39,19 +39,19 @@ public class GroupCommandController {
 
     @GetMapping("{id}/add-user/{userId}")
     public ResponseEntity<?> addUserToGroup(@PathVariable(value = "id") int groupId,
-                                            @PathVariable(value = "userId") String userId) {
+                                            @PathVariable(value = "userId") int userId) {
         return null;
     }
 
     @GetMapping("{id}/remove-user/{userId}")
     public ResponseEntity<?> removeUserToGroup(@PathVariable(value = "id") int groupId,
-                                               @PathVariable(value = "userId") String userId) {
+                                               @PathVariable(value = "userId") int userId) {
         return null;
     }
 
     @GetMapping("{id}/change-admin/{userId}")
     public ResponseEntity<?> changeGroupAdmin(@PathVariable(value = "id") int groupId,
-                                              @PathVariable(value = "userId") String userId) {
-        return null;
+                                              @PathVariable(value = "userId") int userId) {
+        return groupCommandService.changeGroupAdmin(groupId, userId);
     }
 }

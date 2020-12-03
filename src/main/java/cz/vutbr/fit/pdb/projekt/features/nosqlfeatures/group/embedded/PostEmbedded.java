@@ -10,6 +10,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Transient;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -23,7 +24,7 @@ public class PostEmbedded implements PostInterface, PersistentPost {
     private String text;
     private Date createdAt;
     private CreatorEmbedded creator;
-    private List<CommentEmbedded> comments;
+    private List<CommentEmbedded> comments = new ArrayList<>();
 
     @Transient
     private GroupTable groupReference;

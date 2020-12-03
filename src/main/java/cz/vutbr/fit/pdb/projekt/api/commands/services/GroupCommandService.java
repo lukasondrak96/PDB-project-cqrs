@@ -3,9 +3,10 @@ package cz.vutbr.fit.pdb.projekt.api.commands.services;
 import cz.vutbr.fit.pdb.projekt.api.commands.dtos.group.NewGroupDto;
 import cz.vutbr.fit.pdb.projekt.api.commands.dtos.group.UpdateGroupDto;
 import cz.vutbr.fit.pdb.projekt.api.commands.services.helpingservices.CommandDeleteService;
-import cz.vutbr.fit.pdb.projekt.api.commands.services.helpingservices.GroupWithStateChangingService;
+import cz.vutbr.fit.pdb.projekt.api.commands.services.helpingservices.GroupChangingService;
 import cz.vutbr.fit.pdb.projekt.events.events.AbstractEvent;
 import cz.vutbr.fit.pdb.projekt.events.events.OracleCreatedEvent;
+import cz.vutbr.fit.pdb.projekt.events.events.group.GroupAdminChangedEvent;
 import cz.vutbr.fit.pdb.projekt.events.events.group.GroupDeletedEvent;
 import cz.vutbr.fit.pdb.projekt.events.events.group.GroupStateChangedEvent;
 import cz.vutbr.fit.pdb.projekt.events.events.group.GroupUpdatedEvent;
@@ -16,7 +17,9 @@ import cz.vutbr.fit.pdb.projekt.features.helperInterfaces.objects.GroupInterface
 import cz.vutbr.fit.pdb.projekt.features.helperInterfaces.persistent.PersistentGroup;
 import cz.vutbr.fit.pdb.projekt.features.nosqlfeatures.group.GroupDocument;
 import cz.vutbr.fit.pdb.projekt.features.nosqlfeatures.group.GroupDocumentRepository;
+import cz.vutbr.fit.pdb.projekt.features.nosqlfeatures.group.embedded.CreatorEmbedded;
 import cz.vutbr.fit.pdb.projekt.features.nosqlfeatures.user.UserDocument;
+import cz.vutbr.fit.pdb.projekt.features.nosqlfeatures.user.embedded.GroupEmbedded;
 import cz.vutbr.fit.pdb.projekt.features.sqlfeatures.group.GroupRepository;
 import cz.vutbr.fit.pdb.projekt.features.sqlfeatures.group.GroupState;
 import cz.vutbr.fit.pdb.projekt.features.sqlfeatures.group.GroupTable;
@@ -38,7 +41,7 @@ import static org.springframework.data.mongodb.core.query.Criteria.where;
 
 @Service
 @AllArgsConstructor
-public class GroupCommandService implements GroupWithStateChangingService<PersistentGroup>, CommandDeleteService<PersistentGroup> {
+public class GroupCommandService implements GroupChangingService<PersistentGroup>, CommandDeleteService<PersistentGroup> {
 
     private final GroupRepository groupRepository;
     private final UserRepository userRepository;
@@ -113,8 +116,26 @@ public class GroupCommandService implements GroupWithStateChangingService<Persis
         if(groupTable.getState() == groupState)
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Skupina již má stav " + groupState.name());
 
-        GroupStateChangedEvent<PersistentGroup> groupGroupStateChangedEvent = new GroupStateChangedEvent<>(groupTable, groupState, this);
-        subscribeEventToOracleAndMongo(groupGroupStateChangedEvent);
+        GroupStateChangedEvent<PersistentGroup> groupStateChangedEvent = new GroupStateChangedEvent<>(groupTable, groupState, this);
+        subscribeEventToOracleAndMongo(groupStateChangedEvent);
+
+        return ResponseEntity.ok().body("Stav skupiny byl změněn");
+    }
+
+
+    public ResponseEntity<?> changeGroupAdmin(int groupId, int userId) {
+        Optional<GroupTable> groupTableOptional = groupRepository.findById(groupId);
+        if (groupTableOptional.isEmpty())
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Skupina s tímto id neexistuje");
+        GroupTable groupTable = groupTableOptional.get();
+
+        Optional<UserTable> userTableOptional = userRepository.findById(userId);
+        if(userTableOptional.isEmpty())
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Uživatel s tímto id neexistuje");
+        UserTable userTable = userTableOptional.get();
+
+        GroupAdminChangedEvent<PersistentGroup> groupAdminChangedEvent = new GroupAdminChangedEvent<>(groupTable, userTable, this);
+        subscribeEventToOracleAndMongo(groupAdminChangedEvent);
 
         return ResponseEntity.ok().body("Stav skupiny byl změněn");
     }
@@ -138,8 +159,12 @@ public class GroupCommandService implements GroupWithStateChangingService<Persis
     public PersistentGroup finishSaving(PersistentGroup group) {
         if (group instanceof GroupTable)
             return groupRepository.save((GroupTable) group);
-        else
-            return groupDocumentRepository.save((GroupDocument) group);
+        else {
+            GroupDocument groupDocument = (GroupDocument) group;
+            int idCreator = groupDocument.getCreator().getId();
+            updateCreatorsUserDocument(idCreator, groupDocument);
+            return groupDocumentRepository.save(groupDocument);
+        }
     }
 
     @Override
@@ -180,7 +205,21 @@ public class GroupCommandService implements GroupWithStateChangingService<Persis
         }
     }
 
-/* private methods */
+    @Override
+    public PersistentGroup finishAdminChanging(PersistentGroup group, UserTable userTable) {
+        if (group instanceof GroupTable) {
+            GroupTable groupTable = (GroupTable) group;
+            groupTable.setUserReference(userTable);
+            return groupRepository.save(groupTable);
+        } else {
+            GroupDocument groupDocument = (GroupDocument) group;
+            updateCreatorsUserDocument(userTable.getId(), groupDocument);
+            groupDocument.setCreator(new CreatorEmbedded(userTable.getId(), userTable.getName(), userTable.getSurname()));
+            return groupDocumentRepository.save(groupDocument);
+        }
+    }
+
+    /* private methods */
     private boolean groupTableEqualsUpdateGroupDto(GroupTable table, UpdateGroupDto dto) {
         return dto.getName().equals(table.getName()) &&
                 dto.getDescription().equals(table.getDescription());
@@ -193,6 +232,24 @@ public class GroupCommandService implements GroupWithStateChangingService<Persis
 
         EVENT_BUS.unregister(sqlSubscriber);
         EVENT_BUS.unregister(noSqlSubscriber);
+    }
+
+    private void updateCreatorsUserDocument(int newCreatorId, GroupDocument groupDocument) {
+        //remove group of group_admin of old creator (in case of create group this update does not needed)
+        mongoTemplate.updateMulti(
+                new Query(where("id").is(groupDocument.getCreator().getId())),
+                new Update()
+                        .pull("groupsAdmin", new GroupEmbedded(groupDocument.getId(), groupDocument.getName())),
+                UserDocument.class
+        );
+
+        //add group to group_admin for new creator
+        mongoTemplate.updateMulti(
+                new Query(where("id").is(newCreatorId)),
+                new Update()
+                        .push("groupsAdmin", new GroupEmbedded(groupDocument.getId(), groupDocument.getName())),
+                UserDocument.class
+        );
     }
 
     private void updateNameOfGroupInUsersGroupsAdmin(GroupDocument groupDocument) {

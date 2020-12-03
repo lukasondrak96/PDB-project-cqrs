@@ -14,6 +14,7 @@ import lombok.NoArgsConstructor;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import javax.persistence.Id;
+import java.util.ArrayList;
 import java.util.List;
 
 @Document
@@ -48,8 +49,8 @@ public class GroupDocument implements GroupInterface, PersistentGroup {
     private String name;
     private String description;
     private GroupState state;
-    private List<PostEmbedded> posts;
-    private List<MemberEmbedded> members;
+    private List<PostEmbedded> posts = new ArrayList<>();
+    private List<MemberEmbedded> members = new ArrayList<>();
 
     @Override
     public UserReference getUserReference() {
