@@ -1,9 +1,10 @@
 package cz.vutbr.fit.pdb.projekt.api.commands.services;
 
 import cz.vutbr.fit.pdb.projekt.api.commands.dtos.comment.NewCommentDto;
-import cz.vutbr.fit.pdb.projekt.api.commands.services.helpingservices.CommandService;
+import cz.vutbr.fit.pdb.projekt.api.commands.services.helpingservices.CommandDeleteService;
 import cz.vutbr.fit.pdb.projekt.events.events.AbstractEvent;
 import cz.vutbr.fit.pdb.projekt.events.events.OracleCreatedEvent;
+import cz.vutbr.fit.pdb.projekt.events.events.comment.CommentDeletedEvent;
 import cz.vutbr.fit.pdb.projekt.events.subscribers.comment.MongoCommentEventSubscriber;
 import cz.vutbr.fit.pdb.projekt.events.subscribers.comment.OracleCommentEventSubscriber;
 import cz.vutbr.fit.pdb.projekt.features.helperInterfaces.ObjectInterface;
@@ -31,10 +32,9 @@ import java.util.Optional;
 
 import static org.springframework.data.mongodb.core.query.Criteria.where;
 
-
 @Service
 @AllArgsConstructor
-public class CommentCommandService implements CommandService<PersistentComment> {
+public class CommentCommandService implements CommandDeleteService<PersistentComment> {
 
     private final CommentRepository commentRepository;
     private final PostRepository postRepository;
@@ -58,8 +58,21 @@ public class CommentCommandService implements CommandService<PersistentComment> 
 
         final CommentTable commentTable = new CommentTable(newCommentDto.getText(), new Date(), post, creator);
         OracleCreatedEvent<PersistentComment> oracleCreatedEvent = new OracleCreatedEvent<>(commentTable, this);
-        subscribeChangeEventToOracleAndMongo(oracleCreatedEvent);
+        subscribeEventToOracleAndMongo(oracleCreatedEvent);
         return ResponseEntity.ok().body("Komentář byl vytvořen");
+    }
+
+    public ResponseEntity<?> deleteComment(int commentId) {
+        Optional<CommentTable> commentTableOptional = commentRepository.findById(commentId);
+        if (commentTableOptional.isEmpty())
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Komentář s tímto id neexistuje");
+
+        CommentTable commentTable = commentTableOptional.get();
+
+        CommentDeletedEvent<PersistentComment> deletedEvent = new CommentDeletedEvent<>(commentTable, this);
+        subscribeEventToOracleAndMongo(deletedEvent);
+
+        return ResponseEntity.ok().body("Komentář byl smazán");
     }
 
     @Override
@@ -76,6 +89,7 @@ public class CommentCommandService implements CommandService<PersistentComment> 
         return (PersistentComment) persistentCommandInterface;
     }
 
+/* methods called from events */
     @Override
     public PersistentComment finishSaving(PersistentComment comment) {
         if (comment instanceof CommentTable) {
@@ -91,10 +105,17 @@ public class CommentCommandService implements CommandService<PersistentComment> 
         return null;
     }
 
+    @Override
+    public PersistentComment finishDeleting(PersistentComment comment) {
+        if (comment instanceof CommentTable)
+            commentRepository.delete((CommentTable) comment);
+        else
+            removeCommentFromPost((CommentEmbedded) comment);
+        return null;
+    }
 
-    /* private methods */
-
-    private void subscribeChangeEventToOracleAndMongo(AbstractEvent<PersistentComment> event) {
+/* private methods */
+    private void subscribeEventToOracleAndMongo(AbstractEvent<PersistentComment> event) {
         OracleCommentEventSubscriber sqlSubscriber = new OracleCommentEventSubscriber(EVENT_BUS);
         MongoCommentEventSubscriber noSqlSubscriber = new MongoCommentEventSubscriber(EVENT_BUS);
 
@@ -108,6 +129,15 @@ public class CommentCommandService implements CommandService<PersistentComment> 
                 new Query(where("posts.id").is(comment.getPostReference().getId())),
                 new Update()
                         .push("posts.$.comments", comment),
+                GroupDocument.class
+        );
+    }
+
+    private void removeCommentFromPost(CommentEmbedded comment) {
+        mongoTemplate.updateMulti(
+                new Query(where("posts.id").is(comment.getPostReference().getId())),
+                new Update()
+                        .pull("posts.$.comments", comment),
                 GroupDocument.class
         );
     }

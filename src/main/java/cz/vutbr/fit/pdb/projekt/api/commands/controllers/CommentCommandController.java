@@ -26,6 +26,6 @@ public class CommentCommandController {
 
     @DeleteMapping("{id}/delete")
     public ResponseEntity<?> deleteComment(@PathVariable(value = "id") int commentId) {
-        return null;
+        return commentCommandService.deleteComment(commentId);
     }
 }

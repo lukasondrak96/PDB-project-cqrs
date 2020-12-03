@@ -1,20 +1,21 @@
 package cz.vutbr.fit.pdb.projekt.events.events.comment;
 
-import cz.vutbr.fit.pdb.projekt.api.commands.services.CommentCommandService;
-import cz.vutbr.fit.pdb.projekt.events.events.EventInterface;
-import cz.vutbr.fit.pdb.projekt.features.helperInterfaces.persistent.PersistentComment;
+import cz.vutbr.fit.pdb.projekt.api.commands.services.helpingservices.CommandDeleteService;
+import cz.vutbr.fit.pdb.projekt.api.commands.services.helpingservices.CommandService;
+import cz.vutbr.fit.pdb.projekt.events.events.AbstractEvent;
+import cz.vutbr.fit.pdb.projekt.features.helperInterfaces.ObjectInterface;
+import cz.vutbr.fit.pdb.projekt.features.helperInterfaces.PersistentObject;
 
-public class CommentDeletedEvent implements EventInterface<PersistentComment> {
+public class CommentDeletedEvent<T extends PersistentObject> extends AbstractEvent<T> {
 
-    private final CommentCommandService service;
-
-    public CommentDeletedEvent(CommentCommandService service) {
-        this.service = service;
+    public CommentDeletedEvent(ObjectInterface objectInterface, CommandService<T> commandService) {
+        super(objectInterface, commandService);
     }
 
     @Override
-    public PersistentComment apply(PersistentComment persistentComment) {
-        return null;
+    public T apply(T persistentObject) {
+        CommandDeleteService<T> commandService = (CommandDeleteService<T>) getCommandService();
+        return commandService.finishDeleting(persistentObject);
     }
 
 }

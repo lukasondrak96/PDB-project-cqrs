@@ -2,6 +2,7 @@ package cz.vutbr.fit.pdb.projekt.events.subscribers.comment;
 
 import cz.vutbr.fit.pdb.projekt.events.events.ConfirmedEventAdapter;
 import cz.vutbr.fit.pdb.projekt.events.events.OracleCreatedEvent;
+import cz.vutbr.fit.pdb.projekt.events.events.comment.CommentDeletedEvent;
 import cz.vutbr.fit.pdb.projekt.events.subscribers.AbstractSubscriber;
 import cz.vutbr.fit.pdb.projekt.events.subscribers.group.OracleGroupEventSubscriber;
 import cz.vutbr.fit.pdb.projekt.features.helperInterfaces.persistent.PersistentComment;
@@ -31,5 +32,11 @@ public class OracleCommentEventSubscriber extends AbstractSubscriber {
             LOGGER.info(POSTING_EVENT, confirmedCommentCreatedEvent.getClass().getSimpleName(), confirmedCommentCreatedEvent);
             post(confirmedCommentCreatedEvent);
         }
+    }
+
+    @Subscribe
+    public void onCommentDeletedEvent(CommentDeletedEvent<PersistentComment> commentDeletedEvent) {
+        LOGGER.info(RECEIVED_AND_APPLYING_EVENT, commentDeletedEvent.getClass().getSimpleName(), commentDeletedEvent);
+        commentDeletedEvent.apply(REUSABLE_ORACLE_OBJECT);
     }
 }
