@@ -1,8 +1,8 @@
 package cz.vutbr.fit.pdb.projekt.events.subscribers.group;
 
 import cz.vutbr.fit.pdb.projekt.events.events.ConfirmedEventAdapter;
-import cz.vutbr.fit.pdb.projekt.events.events.group.GroupAdminChangedEvent;
 import cz.vutbr.fit.pdb.projekt.events.events.group.GroupDeletedEvent;
+import cz.vutbr.fit.pdb.projekt.events.events.group.GroupMemberAddedEvent;
 import cz.vutbr.fit.pdb.projekt.events.events.group.GroupStateChangedEvent;
 import cz.vutbr.fit.pdb.projekt.events.events.group.GroupUpdatedEvent;
 import cz.vutbr.fit.pdb.projekt.events.subscribers.AbstractSubscriber;
@@ -48,8 +48,8 @@ public class MongoGroupEventSubscriber extends AbstractSubscriber {
     }
 
     @Subscribe
-    public void onGroupAdminChangedEvent(GroupAdminChangedEvent<PersistentGroup> groupAdminChangedEvent) {
-        LOGGER.info(RECEIVED_AND_APPLYING_EVENT, groupAdminChangedEvent.getClass().getSimpleName(), groupAdminChangedEvent);
-        groupAdminChangedEvent.apply(REUSABLE_MONGO_OBJECT);
+    public void onGroupMemberAddedEvent(GroupMemberAddedEvent<PersistentGroup> groupMemberAddedEvent) {
+        LOGGER.info(RECEIVED_AND_APPLYING_EVENT, groupMemberAddedEvent.getClass().getSimpleName(), groupMemberAddedEvent);
+        groupMemberAddedEvent.apply(REUSABLE_MONGO_OBJECT);
     }
 }

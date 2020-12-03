@@ -6,10 +6,7 @@ import cz.vutbr.fit.pdb.projekt.api.commands.services.helpingservices.CommandDel
 import cz.vutbr.fit.pdb.projekt.api.commands.services.helpingservices.GroupChangingService;
 import cz.vutbr.fit.pdb.projekt.events.events.AbstractEvent;
 import cz.vutbr.fit.pdb.projekt.events.events.OracleCreatedEvent;
-import cz.vutbr.fit.pdb.projekt.events.events.group.GroupAdminChangedEvent;
-import cz.vutbr.fit.pdb.projekt.events.events.group.GroupDeletedEvent;
-import cz.vutbr.fit.pdb.projekt.events.events.group.GroupStateChangedEvent;
-import cz.vutbr.fit.pdb.projekt.events.events.group.GroupUpdatedEvent;
+import cz.vutbr.fit.pdb.projekt.events.events.group.*;
 import cz.vutbr.fit.pdb.projekt.events.subscribers.group.MongoGroupEventSubscriber;
 import cz.vutbr.fit.pdb.projekt.events.subscribers.group.OracleGroupEventSubscriber;
 import cz.vutbr.fit.pdb.projekt.features.helperInterfaces.ObjectInterface;
@@ -18,6 +15,7 @@ import cz.vutbr.fit.pdb.projekt.features.helperInterfaces.persistent.PersistentG
 import cz.vutbr.fit.pdb.projekt.features.nosqlfeatures.group.GroupDocument;
 import cz.vutbr.fit.pdb.projekt.features.nosqlfeatures.group.GroupDocumentRepository;
 import cz.vutbr.fit.pdb.projekt.features.nosqlfeatures.group.embedded.CreatorEmbedded;
+import cz.vutbr.fit.pdb.projekt.features.nosqlfeatures.group.embedded.MemberEmbedded;
 import cz.vutbr.fit.pdb.projekt.features.nosqlfeatures.user.UserDocument;
 import cz.vutbr.fit.pdb.projekt.features.nosqlfeatures.user.embedded.GroupEmbedded;
 import cz.vutbr.fit.pdb.projekt.features.sqlfeatures.group.GroupRepository;
@@ -137,6 +135,24 @@ public class GroupCommandService implements GroupChangingService<PersistentGroup
         GroupAdminChangedEvent<PersistentGroup> groupAdminChangedEvent = new GroupAdminChangedEvent<>(groupTable, userTable, this);
         subscribeEventToOracleAndMongo(groupAdminChangedEvent);
 
+        return ResponseEntity.ok().body("Admin skupiny byl změněn");
+    }
+
+
+    public ResponseEntity<?> addGroupMember(int groupId, int userId) {
+        Optional<GroupTable> groupTableOptional = groupRepository.findById(groupId);
+        if (groupTableOptional.isEmpty())
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Skupina s tímto id neexistuje");
+        GroupTable groupTable = groupTableOptional.get();
+
+        Optional<UserTable> userTableOptional = userRepository.findById(userId);
+        if(userTableOptional.isEmpty())
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Uživatel s tímto id neexistuje");
+        UserTable userTable = userTableOptional.get();
+
+        GroupMemberAddedEvent<PersistentGroup> groupMemberAddedEvent = new GroupMemberAddedEvent<>(groupTable, userTable, this);
+        subscribeEventToOracleAndMongo(groupMemberAddedEvent);
+
         return ResponseEntity.ok().body("Stav skupiny byl změněn");
     }
 
@@ -219,6 +235,20 @@ public class GroupCommandService implements GroupChangingService<PersistentGroup
         }
     }
 
+    @Override
+    public PersistentGroup finishMemberAdding(PersistentGroup group, UserTable userTable) {
+        if (group instanceof GroupTable) {
+            GroupTable groupTable = (GroupTable) group;
+            groupTable.addUser(userTable);
+            return groupRepository.save(groupTable);
+        } else {
+            GroupDocument groupDocument = (GroupDocument) group;
+            updateGroupMembersInUserDocument(userTable.getId(), groupDocument);
+            groupDocument.getMembers().add(new MemberEmbedded(userTable.getId(), userTable.getName(), userTable.getSurname()));
+            return groupDocumentRepository.save(groupDocument);
+        }
+    }
+
     /* private methods */
     private boolean groupTableEqualsUpdateGroupDto(GroupTable table, UpdateGroupDto dto) {
         return dto.getName().equals(table.getName()) &&
@@ -232,6 +262,16 @@ public class GroupCommandService implements GroupChangingService<PersistentGroup
 
         EVENT_BUS.unregister(sqlSubscriber);
         EVENT_BUS.unregister(noSqlSubscriber);
+    }
+
+
+    private void updateGroupMembersInUserDocument(int newMemberId, GroupDocument groupDocument) {
+        mongoTemplate.updateMulti(
+                new Query(where("id").is(newMemberId)),
+                new Update()
+                        .push("groupsMember", new GroupEmbedded(groupDocument.getId(), groupDocument.getName())),
+                UserDocument.class
+        );
     }
 
     private void updateCreatorsUserDocument(int newCreatorId, GroupDocument groupDocument) {

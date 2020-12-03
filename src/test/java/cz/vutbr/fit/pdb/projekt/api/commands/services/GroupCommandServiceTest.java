@@ -31,6 +31,7 @@ class GroupCommandServiceTest extends AbstractServiceTest {
 
     private final String TEST_ADDITION_TO_CHANGE_STRING = "Addition";
     private final NewUserDto TEST_GROUP_NEW_CREATOR = new NewUserDto("new@creator", "newCreator", "newCreatorSurname", new Date(300L), UserSex.FEMALE);
+    private final NewUserDto TEST_GROUP_NEW_MEMBER = new NewUserDto("new@member", "newMember", "newMemberSurname", new Date(300L), UserSex.FEMALE);
 
 
     @Test
@@ -198,18 +199,54 @@ class GroupCommandServiceTest extends AbstractServiceTest {
         Optional<GroupDocument> updatedGroupNoSqlOptional = groupDocumentRepository.findById(createdGroupId);
         assertTrue(updatedGroupSqlOptional.isPresent());
         assertTrue(updatedGroupNoSqlOptional.isPresent());
-        assertEquals(newAdmin.getId(), updatedGroupSqlOptional.get().getUserReference().getId());
-        assertEquals(newAdmin.getId(), updatedGroupNoSqlOptional.get().getCreator().getId());
-        assertEquals(newAdmin.getName(), updatedGroupSqlOptional.get().getUserReference().getName());
-        assertEquals(newAdmin.getName(), updatedGroupNoSqlOptional.get().getCreator().getName());
-        assertEquals(newAdmin.getSurname(), updatedGroupSqlOptional.get().getUserReference().getSurname());
-        assertEquals(newAdmin.getSurname(), updatedGroupNoSqlOptional.get().getCreator().getSurname());
+        GroupTable updatedGroupTable = updatedGroupSqlOptional.get();
+        GroupDocument updatedGroupDocument = updatedGroupNoSqlOptional.get();
+        assertEquals(newAdmin.getId(), updatedGroupTable.getUserReference().getId());
+        assertEquals(newAdmin.getId(), updatedGroupDocument.getCreator().getId());
+        assertEquals(newAdmin.getName(), updatedGroupTable.getUserReference().getName());
+        assertEquals(newAdmin.getName(), updatedGroupDocument.getCreator().getName());
+        assertEquals(newAdmin.getSurname(), updatedGroupTable.getUserReference().getSurname());
+        assertEquals(newAdmin.getSurname(), updatedGroupDocument.getCreator().getSurname());
 
         UserDocument newAdminDocument = userDocumentRepository.findById(newAdmin.getId()).get();
         assertEquals(1, newAdminDocument.getGroupsAdmin().size());
 
         UserDocument oldCreatorDocument = userDocumentRepository.findById(groupCreator.getId()).get();
         assertTrue(oldCreatorDocument.getGroupsAdmin().isEmpty());
+
+    }
+
+    @Test
+    void test_addMemberToGroup() {
+        userCommandService.createUser(TEST_GROUP_CREATOR);
+        UserTable groupCreator = userRepository.findAll().get(0);
+        NewGroupDto newGroupDto = new NewGroupDto(
+                TEST_NAME, TEST_DESCRIPTION, TEST_STATE_PUBLIC, groupCreator.getId()
+        );
+        groupCommandService.createGroup(newGroupDto);
+        int createdGroupId = groupRepository.findAll().get(0).getId();
+        userCommandService.createUser(TEST_GROUP_NEW_MEMBER);
+        UserTable newMember = userRepository.findAll().get(1);
+
+
+        groupCommandService.addGroupMember(createdGroupId, newMember.getId());
+
+
+        Optional<GroupTable> updatedGroupSqlOptional = groupRepository.findById(createdGroupId);
+        Optional<GroupDocument> updatedGroupNoSqlOptional = groupDocumentRepository.findById(createdGroupId);
+        assertTrue(updatedGroupSqlOptional.isPresent());
+        assertTrue(updatedGroupNoSqlOptional.isPresent());
+        GroupTable updatedGroupTable = updatedGroupSqlOptional.get();
+        GroupDocument updatedGroupDocument = updatedGroupNoSqlOptional.get();
+        assertEquals(newMember.getId(), updatedGroupTable.getUsers().get(0).getId());
+        assertEquals(newMember.getId(), updatedGroupDocument.getMembers().get(0).getId());
+        assertEquals(newMember.getName(), updatedGroupTable.getUsers().get(0).getName());
+        assertEquals(newMember.getName(), updatedGroupDocument.getMembers().get(0).getName());
+        assertEquals(newMember.getSurname(), updatedGroupTable.getUsers().get(0).getSurname());
+        assertEquals(newMember.getSurname(), updatedGroupDocument.getMembers().get(0).getSurname());
+
+        UserDocument newMemberDocument = userDocumentRepository.findById(newMember.getId()).get();
+        assertEquals(1, newMemberDocument.getGroupsMember().size());
 
     }
 }

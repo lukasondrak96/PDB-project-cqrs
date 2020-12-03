@@ -40,7 +40,7 @@ public class GroupCommandController {
     @GetMapping("{id}/add-user/{userId}")
     public ResponseEntity<?> addUserToGroup(@PathVariable(value = "id") int groupId,
                                             @PathVariable(value = "userId") int userId) {
-        return null;
+        return groupCommandService.addGroupMember(groupId, userId);
     }
 
     @GetMapping("{id}/remove-user/{userId}")

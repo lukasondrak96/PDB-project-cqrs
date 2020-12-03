@@ -9,4 +9,6 @@ public interface GroupChangingService<T extends PersistentObject> extends Comman
     T finishStateChanging(T group, GroupState state);
 
     T finishAdminChanging(T group, UserTable userTable);
+
+    T finishMemberAdding(T persistentObject, UserTable userTable);
 }
