@@ -16,6 +16,7 @@ import java.util.Date;
 @AllArgsConstructor
 @NoArgsConstructor
 public class CommentEmbedded implements CommentInterface, PersistentComment {
+
     private int id;
     private String text;
     private Date createdAt;

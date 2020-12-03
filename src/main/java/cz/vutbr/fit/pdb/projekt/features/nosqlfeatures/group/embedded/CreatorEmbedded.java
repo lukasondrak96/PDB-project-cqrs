@@ -9,7 +9,9 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class CreatorEmbedded implements UserReference {
+
     private int id;
     private String name;
     private String surname;
+
 }

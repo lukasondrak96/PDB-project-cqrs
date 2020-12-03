@@ -186,7 +186,6 @@ public class GroupCommandService implements GroupWithStateChangingService<Persis
                 dto.getDescription().equals(table.getDescription());
     }
 
-
     private void subscribeEventToOracleAndMongo(AbstractEvent<PersistentGroup> event) {
         OracleGroupEventSubscriber sqlSubscriber = new OracleGroupEventSubscriber(EVENT_BUS);
         MongoGroupEventSubscriber noSqlSubscriber = new MongoGroupEventSubscriber(EVENT_BUS);

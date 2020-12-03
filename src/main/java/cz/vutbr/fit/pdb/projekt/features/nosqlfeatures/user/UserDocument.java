@@ -51,6 +51,7 @@ public class UserDocument implements UserInterface, PersistentUser {
         this.groupsAdmin = groupsAdmin;
         this.conversationsWithUser = conversationsWithUser;
     }
+
     private List<ConversationEmbedded> conversationsWithUser;
     private String email;
     private String name;

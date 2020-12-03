@@ -9,9 +9,11 @@ import java.util.Date;
 
 @Repository
 public interface UserRepository extends JpaRepository<UserTable, Integer> {
+
     int countByEmail(String email);
 
     @Modifying
     @Query("update UserTable u set u.email = :email, u.name = :name, u.surname = :surname, u.birthDate = :birthDate, u.sex = :sex, u.state = :state where u.id= :id")
     int updateUser(int id, String email, String name, String surname, Date birthDate, UserSex sex, UserState state);
+
 }

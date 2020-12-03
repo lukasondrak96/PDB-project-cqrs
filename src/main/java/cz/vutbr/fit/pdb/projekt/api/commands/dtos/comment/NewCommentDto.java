@@ -20,4 +20,5 @@ public class NewCommentDto {
 
     @NotNull(message = "Id příspěvku, ke kterému je komentář vkládán, je povinné")
     private Integer postId;
+
 }

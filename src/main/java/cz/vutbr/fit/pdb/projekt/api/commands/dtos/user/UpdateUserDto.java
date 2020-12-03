@@ -21,4 +21,5 @@ public class UpdateUserDto extends NewUserDto {
                          @NotNull(message = "Pohlaví musí být zadané") UserSex sex) {
         super(email, name, surname, birthDate, sex);
     }
+
 }

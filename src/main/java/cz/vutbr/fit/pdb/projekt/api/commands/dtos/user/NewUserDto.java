@@ -30,4 +30,5 @@ public class NewUserDto {
 
     @NotNull(message = "Pohlaví musí být zadané")
     private UserSex sex;
+
 }

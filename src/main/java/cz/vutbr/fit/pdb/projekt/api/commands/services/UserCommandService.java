@@ -117,7 +117,6 @@ public class UserCommandService implements UserWithStateChangingService<Persiste
     }
 
 /* methods called from events */
-
     @Override
     public PersistentUser finishUpdating(PersistentUser user) {
         if (user instanceof UserTable) {
@@ -178,8 +177,7 @@ public class UserCommandService implements UserWithStateChangingService<Persiste
         return (PersistentUser) persistentUserInterface;
     }
 
-    /* private methods */
-
+/* private methods */
     private void subscribeChangeEventToOracleAndMongo(AbstractEvent<PersistentUser> event) {
         OracleUserEventSubscriber sqlSubscriber = new OracleUserEventSubscriber(EVENT_BUS);
         MongoUserEventSubscriber noSqlSubscriber = new MongoUserEventSubscriber(EVENT_BUS);

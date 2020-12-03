@@ -31,5 +31,4 @@ public class MongoPostEventSubscriber extends AbstractSubscriber {
         LOGGER.info(RECEIVED_AND_APPLYING_EVENT, postDeletedEvent.getClass().getSimpleName(), postDeletedEvent);
         postDeletedEvent.apply(REUSABLE_MONGO_OBJECT);
     }
-
 }

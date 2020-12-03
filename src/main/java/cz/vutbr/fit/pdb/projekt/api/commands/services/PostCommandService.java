@@ -11,7 +11,6 @@ import cz.vutbr.fit.pdb.projekt.features.helperInterfaces.ObjectInterface;
 import cz.vutbr.fit.pdb.projekt.features.helperInterfaces.objects.PostInterface;
 import cz.vutbr.fit.pdb.projekt.features.helperInterfaces.persistent.PersistentPost;
 import cz.vutbr.fit.pdb.projekt.features.nosqlfeatures.group.GroupDocument;
-import cz.vutbr.fit.pdb.projekt.features.nosqlfeatures.group.GroupDocumentRepository;
 import cz.vutbr.fit.pdb.projekt.features.nosqlfeatures.group.embedded.PostEmbedded;
 import cz.vutbr.fit.pdb.projekt.features.sqlfeatures.group.GroupRepository;
 import cz.vutbr.fit.pdb.projekt.features.sqlfeatures.group.GroupTable;
@@ -33,7 +32,6 @@ import java.util.Optional;
 
 import static org.springframework.data.mongodb.core.query.Criteria.where;
 
-
 @Service
 @AllArgsConstructor
 public class PostCommandService implements CommandDeleteService<PersistentPost> {
@@ -41,7 +39,6 @@ public class PostCommandService implements CommandDeleteService<PersistentPost> 
     private final PostRepository postRepository;
     private final UserRepository userRepository;
     private final GroupRepository groupRepository;
-    private final GroupDocumentRepository groupDocumentRepository;
     private final MongoTemplate mongoTemplate;
 
     private static final EventBus EVENT_BUS = EventBus.getDefault();
@@ -78,7 +75,7 @@ public class PostCommandService implements CommandDeleteService<PersistentPost> 
         return ResponseEntity.ok().body("Skupina byla smazána");
     }
 
-
+/* methods called from events */
     @Override
     public PersistentPost assignFromTo(ObjectInterface objectInterface, PersistentPost post) {
         PostInterface persistentPostInterface = (PostInterface) post;
@@ -118,9 +115,7 @@ public class PostCommandService implements CommandDeleteService<PersistentPost> 
         return null;
     }
 
-
-    /* private methods */
-
+/* private methods */
     private void subscribeEventToOracleAndMongo(AbstractEvent<PersistentPost> event) {
         OraclePostEventSubscriber sqlSubscriber = new OraclePostEventSubscriber(EVENT_BUS);
         MongoPostEventSubscriber noSqlSubscriber = new MongoPostEventSubscriber(EVENT_BUS);

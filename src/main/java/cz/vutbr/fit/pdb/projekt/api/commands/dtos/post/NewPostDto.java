@@ -23,4 +23,5 @@ public class NewPostDto {
 
     @NotNull(message = "Id skupiny, do které je příspěvek vkládán, je povinné")
     private Integer groupId;
+
 }

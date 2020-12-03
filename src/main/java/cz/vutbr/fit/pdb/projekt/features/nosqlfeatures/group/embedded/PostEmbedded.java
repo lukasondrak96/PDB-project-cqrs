@@ -17,6 +17,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class PostEmbedded implements PostInterface, PersistentPost {
+
     private int id;
     private String title;
     private String text;
