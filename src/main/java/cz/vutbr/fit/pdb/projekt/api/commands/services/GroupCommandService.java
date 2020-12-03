@@ -161,9 +161,9 @@ public class GroupCommandService implements GroupWithStateChangingService<Persis
             groupRepository.delete((GroupTable) group);
         } else {
             GroupDocument groupDocument = (GroupDocument) group;
-            updateNameOfGroupInUsersGroupsMember(groupDocument);
-            updateNameOfGroupInUsersGroupsAdmin(groupDocument);
-            groupDocumentRepository.delete((GroupDocument) group);
+            removeGroupInUsersGroupsMember(groupDocument);
+            removeGroupInUsersGroupsAdmin(groupDocument);
+            groupDocumentRepository.delete(groupDocument);
         }
         return null;
     }
@@ -184,7 +184,7 @@ public class GroupCommandService implements GroupWithStateChangingService<Persis
 /* private methods */
     private boolean groupTableEqualsUpdateGroupDto(GroupTable table, UpdateGroupDto dto) {
         return dto.getName().equals(table.getName()) &&
-                dto.getDescription() == table.getDescription();
+                dto.getDescription().equals(table.getDescription());
     }
 
 
