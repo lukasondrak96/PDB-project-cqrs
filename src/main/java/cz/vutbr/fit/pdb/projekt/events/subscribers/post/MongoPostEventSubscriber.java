@@ -1,7 +1,9 @@
 package cz.vutbr.fit.pdb.projekt.events.subscribers.post;
 
 import cz.vutbr.fit.pdb.projekt.events.events.ConfirmedEventAdapter;
+import cz.vutbr.fit.pdb.projekt.events.events.post.PostDeletedEvent;
 import cz.vutbr.fit.pdb.projekt.events.subscribers.AbstractSubscriber;
+import cz.vutbr.fit.pdb.projekt.features.helperInterfaces.persistent.PersistentPost;
 import cz.vutbr.fit.pdb.projekt.features.nosqlfeatures.group.embedded.PostEmbedded;
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -24,10 +26,10 @@ public class MongoPostEventSubscriber extends AbstractSubscriber {
         createConfirmedEvent.apply(REUSABLE_MONGO_OBJECT);
     }
 
-//    @Subscribe
-//    public void onGroupStateChangedEvent(GroupStateChangedEvent<PersistentGroup> groupStateChangedEvent) {
-//        LOGGER.info(RECEIVED_AND_APPLYING_EVENT, groupStateChangedEvent.getClass().getSimpleName(), groupStateChangedEvent);
-//        groupStateChangedEvent.apply(REUSABLE_MONGO_OBJECT);
-//    }
+    @Subscribe
+    public void onPostDeletedEvent(PostDeletedEvent<PersistentPost> postDeletedEvent) {
+        LOGGER.info(RECEIVED_AND_APPLYING_EVENT, postDeletedEvent.getClass().getSimpleName(), postDeletedEvent);
+        postDeletedEvent.apply(REUSABLE_MONGO_OBJECT);
+    }
 
 }

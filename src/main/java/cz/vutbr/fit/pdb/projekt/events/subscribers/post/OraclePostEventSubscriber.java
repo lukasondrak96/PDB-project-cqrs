@@ -2,6 +2,7 @@ package cz.vutbr.fit.pdb.projekt.events.subscribers.post;
 
 import cz.vutbr.fit.pdb.projekt.events.events.ConfirmedEventAdapter;
 import cz.vutbr.fit.pdb.projekt.events.events.OracleCreatedEvent;
+import cz.vutbr.fit.pdb.projekt.events.events.post.PostDeletedEvent;
 import cz.vutbr.fit.pdb.projekt.events.subscribers.AbstractSubscriber;
 import cz.vutbr.fit.pdb.projekt.events.subscribers.group.OracleGroupEventSubscriber;
 import cz.vutbr.fit.pdb.projekt.features.helperInterfaces.persistent.PersistentPost;
@@ -31,5 +32,11 @@ public class OraclePostEventSubscriber extends AbstractSubscriber {
             LOGGER.info(POSTING_EVENT, confirmedPostCreatedEvent.getClass().getSimpleName(), confirmedPostCreatedEvent);
             post(confirmedPostCreatedEvent);
         }
+    }
+
+    @Subscribe
+    public void onPostDeletedEvent(PostDeletedEvent<PersistentPost> postDeletedEvent) {
+        LOGGER.info(RECEIVED_AND_APPLYING_EVENT, postDeletedEvent.getClass().getSimpleName(), postDeletedEvent);
+        postDeletedEvent.apply(REUSABLE_ORACLE_OBJECT);
     }
 }

@@ -42,11 +42,10 @@ public class GroupCommandService implements GroupWithStateChangingService<Persis
 
     private final GroupRepository groupRepository;
     private final UserRepository userRepository;
-
-
     private final GroupDocumentRepository groupDocumentRepository;
-    private static final EventBus EVENT_BUS = EventBus.getDefault();
     private final MongoTemplate mongoTemplate;
+
+    private static final EventBus EVENT_BUS = EventBus.getDefault();
 
     public ResponseEntity<?> createGroup(NewGroupDto newGroupDto) {
         if (groupRepository.countByName(newGroupDto.getName()) != 0) {

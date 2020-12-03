@@ -26,6 +26,6 @@ public class PostCommandController {
 
     @DeleteMapping("{id}/delete")
     public ResponseEntity<?> deletePost(@PathVariable(value = "id") int postId) {
-        return null;
+        return postCommandService.deletePost(postId);
     }
 }
