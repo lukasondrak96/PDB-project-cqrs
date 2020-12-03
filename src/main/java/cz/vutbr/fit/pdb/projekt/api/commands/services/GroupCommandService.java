@@ -25,6 +25,7 @@ import cz.vutbr.fit.pdb.projekt.features.sqlfeatures.user.UserTable;
 import lombok.AllArgsConstructor;
 import org.greenrobot.eventbus.EventBus;
 import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.http.HttpStatus;
@@ -156,10 +157,14 @@ public class GroupCommandService implements GroupWithStateChangingService<Persis
 
     @Override
     public PersistentGroup finishDeleting(PersistentGroup group) {
-        if (group instanceof GroupTable)
+        if (group instanceof GroupTable) {
             groupRepository.delete((GroupTable) group);
-        else
+        } else {
+            GroupDocument groupDocument = (GroupDocument) group;
+            updateNameOfGroupInUsersGroupsMember(groupDocument);
+            updateNameOfGroupInUsersGroupsAdmin(groupDocument);
             groupDocumentRepository.delete((GroupDocument) group);
+        }
         return null;
     }
 
@@ -206,6 +211,24 @@ public class GroupCommandService implements GroupWithStateChangingService<Persis
                 new Query(where("groups_admin.id").is(groupDocument.getId())),
                 new Update()
                         .set("groups_admin.$.name", groupDocument.getName()),
+                UserDocument.class
+        );
+    }
+
+    private void removeGroupInUsersGroupsAdmin(GroupDocument groupDocument) {
+        mongoTemplate.updateMulti(
+                new Query(),
+                new Update()
+                        .pull("groups_member", Query.query(Criteria.where("groups_member.$id").is(groupDocument.getId()))),
+                UserDocument.class
+        );
+    }
+
+    private void removeGroupInUsersGroupsMember(GroupDocument groupDocument) {
+        mongoTemplate.updateMulti(
+                new Query(where("groups_admin.id").is(groupDocument.getId())),
+                new Update()
+                    .pull("groups_admin", Query.query(Criteria.where("groups_admin.$id").is(groupDocument.getId()))),
                 UserDocument.class
         );
     }
