@@ -165,12 +165,11 @@ public class CommentCommandService implements CommandDeleteService<PersistentCom
         );
     }
 
-    //TODO
     private void updateCommentInPost(CommentEmbedded comment) {
         mongoTemplate.updateMulti(
-                new Query(where("posts.id").is(comment.getPostReference().getId())),
+                new Query(where("posts.comments.id").is(comment.getId())),
                 new Update()
-                        .push("posts.$.comments", comment),
+                        .set("posts.$[outer].comments.$[inner]", comment),
                 GroupDocument.class
         );
     }
