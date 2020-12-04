@@ -81,11 +81,8 @@ public class GroupCommandService implements GroupChangingService<PersistentGroup
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Nebyl nalezen záznam pro editaci");
         }
 
-        final GroupTable groupTable = new GroupTable(groupId, updateGroupDto.getName(),
-                updateGroupDto.getDescription(),
-                oldGroupTable.getState(),
-                oldGroupTable.getUserReference()
-        );
+        final GroupTable groupTable = new GroupTable(groupId, updateGroupDto.getName(), updateGroupDto.getDescription(),
+                oldGroupTable.getState(), oldGroupTable.getUserReference(), oldGroupTable.getUsers());
 
         GroupUpdatedEvent<PersistentGroup> updatedEvent = new GroupUpdatedEvent<>(groupTable, this);
         subscribeEventToOracleAndMongo(updatedEvent);

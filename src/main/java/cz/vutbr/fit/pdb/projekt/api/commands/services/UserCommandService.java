@@ -70,7 +70,8 @@ public class UserCommandService implements UserWithStateChangingService<Persiste
         }
 
         final UserTable userTable = new UserTable(userId, updateUserDto.getEmail(), updateUserDto.getName(),
-                updateUserDto.getSurname(), updateUserDto.getBirthDate(), updateUserDto.getSex(), oldUserTable.getState());
+                updateUserDto.getSurname(), updateUserDto.getBirthDate(), updateUserDto.getSex(),
+                oldUserTable.getState(), oldUserTable.getGroups());
 
         UserUpdatedEvent<PersistentUser> updatedEvent = new UserUpdatedEvent<>(userTable, this);
         subscribeChangeEventToOracleAndMongo(updatedEvent);

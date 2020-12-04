@@ -4,6 +4,7 @@ import cz.vutbr.fit.pdb.projekt.features.helperInterfaces.objects.GroupInterface
 import cz.vutbr.fit.pdb.projekt.features.helperInterfaces.persistent.PersistentGroup;
 import cz.vutbr.fit.pdb.projekt.features.helperInterfaces.references.UserReference;
 import cz.vutbr.fit.pdb.projekt.features.sqlfeatures.user.UserTable;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.OnDelete;
@@ -16,16 +17,9 @@ import java.util.List;
 @Entity
 @Data
 @NoArgsConstructor
+@AllArgsConstructor
 public class GroupTable implements GroupInterface, PersistentGroup {
     public GroupTable(String name, String description, GroupState state, UserTable userReference) {
-        this.name = name;
-        this.description = description;
-        this.state = state;
-        this.userReference = userReference;
-    }
-
-    public GroupTable(int id, String name, String description, GroupState state, UserTable userReference) {
-        this.id = id;
         this.name = name;
         this.description = description;
         this.state = state;

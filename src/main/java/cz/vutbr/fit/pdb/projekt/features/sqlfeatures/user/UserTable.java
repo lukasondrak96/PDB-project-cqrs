@@ -4,6 +4,7 @@ import cz.vutbr.fit.pdb.projekt.features.helperInterfaces.objects.UserInterface;
 import cz.vutbr.fit.pdb.projekt.features.helperInterfaces.persistent.PersistentUser;
 import cz.vutbr.fit.pdb.projekt.features.helperInterfaces.references.UserReference;
 import cz.vutbr.fit.pdb.projekt.features.sqlfeatures.group.GroupTable;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -15,6 +16,7 @@ import java.util.List;
 @Entity
 @Data
 @NoArgsConstructor
+@AllArgsConstructor
 public class UserTable implements UserInterface, PersistentUser, UserReference {
     public UserTable(String email, String name, String surname, Date birthDate, UserSex sex) {
         this.email = email;
@@ -23,16 +25,6 @@ public class UserTable implements UserInterface, PersistentUser, UserReference {
         this.birthDate = birthDate;
         this.sex = sex;
         this.state = UserState.ACTIVATED;
-    }
-
-    public UserTable(Integer id, String email, String name, String surname, Date birthDate, UserSex sex, UserState state) {
-        this.id = id;
-        this.email = email;
-        this.name = name;
-        this.surname = surname;
-        this.birthDate = birthDate;
-        this.sex = sex;
-        this.state = state;
     }
 
     @Id
