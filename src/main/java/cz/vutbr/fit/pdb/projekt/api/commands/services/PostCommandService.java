@@ -65,22 +65,22 @@ public class PostCommandService implements CommandDeleteService<PersistentPost> 
     public ResponseEntity<?> deletePost(int postId) {
         Optional<PostTable> postTableOptional = postRepository.findById(postId);
         if (postTableOptional.isEmpty())
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Skupina s tímto id neexistuje");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Příspěvek s tímto id neexistuje");
 
         PostTable postTable = postTableOptional.get();
 
-        PostDeletedEvent<PersistentPost> deletedEvent = new PostDeletedEvent<>(postTable,this);
+        PostDeletedEvent<PersistentPost> deletedEvent = new PostDeletedEvent<>(postTable, this);
         subscribeEventToOracleAndMongo(deletedEvent);
 
-        return ResponseEntity.ok().body("Skupina byla smazána");
+        return ResponseEntity.ok().body("Příspěvek byl smazán");
     }
 
-/* methods called from events */
+    /* methods called from events */
     @Override
     public PersistentPost assignFromTo(ObjectInterface objectInterface, PersistentPost post) {
         PostInterface persistentPostInterface = (PostInterface) post;
         PostInterface postInterface = (PostInterface) objectInterface;
-        if(post instanceof PostTable || post instanceof PostEmbedded) {
+        if (post instanceof PostTable || post instanceof PostEmbedded) {
             persistentPostInterface.setId(postInterface.getId());
             persistentPostInterface.setTitle(postInterface.getTitle());
             persistentPostInterface.setText(postInterface.getText());
@@ -115,7 +115,12 @@ public class PostCommandService implements CommandDeleteService<PersistentPost> 
         return null;
     }
 
-/* private methods */
+    /* private methods */
+    private boolean isPostTableEqualToUpdatePostDto(PostTable table, UpdatePostDto dto) {
+        return dto.getText().equals(table.getText()) &&
+                dto.getTitle().equals(table.getTitle());
+    }
+
     private void subscribeEventToOracleAndMongo(AbstractEvent<PersistentPost> event) {
         OraclePostEventSubscriber sqlSubscriber = new OraclePostEventSubscriber(EVENT_BUS);
         MongoPostEventSubscriber noSqlSubscriber = new MongoPostEventSubscriber(EVENT_BUS);

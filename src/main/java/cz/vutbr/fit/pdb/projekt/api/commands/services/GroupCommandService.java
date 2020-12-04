@@ -70,15 +70,15 @@ public class GroupCommandService implements GroupChangingService<PersistentGroup
         return ResponseEntity.ok().body("Skupina byla vytvořena");
     }
 
-    public ResponseEntity<?> updateGroup(Integer groupId, UpdateGroupDto updateGroupDto) {
+    public ResponseEntity<?> updateGroup(int groupId, UpdateGroupDto updateGroupDto) {
         Optional<GroupTable> groupTableOptional = groupRepository.findById(groupId);
-        if(groupTableOptional.isEmpty())
+        if (groupTableOptional.isEmpty())
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Tato skupina neexistuje");
 
         GroupTable oldGroupTable = groupTableOptional.get();
 
-        if (groupTableEqualsUpdateGroupDto(oldGroupTable, updateGroupDto)) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Nebyl nalezen záznam pro editaci");
+        if (isGroupTableEqualToUpdateGroupDto(oldGroupTable, updateGroupDto)) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Nebyly nalezeny žádné změny pro editaci");
         }
 
         final GroupTable groupTable = new GroupTable(groupId, updateGroupDto.getName(), updateGroupDto.getDescription(),
@@ -87,7 +87,7 @@ public class GroupCommandService implements GroupChangingService<PersistentGroup
         GroupUpdatedEvent<PersistentGroup> updatedEvent = new GroupUpdatedEvent<>(groupTable, this);
         subscribeEventToOracleAndMongo(updatedEvent);
 
-        return ResponseEntity.ok().body("Data byla aktualizována");
+        return ResponseEntity.ok().body("Skupina byla aktualizována");
     }
 
     public ResponseEntity<?> deleteGroup(int groupId) {
@@ -97,7 +97,7 @@ public class GroupCommandService implements GroupChangingService<PersistentGroup
 
         GroupTable groupTable = groupTableOptional.get();
 
-        GroupDeletedEvent<PersistentGroup> deletedEvent = new GroupDeletedEvent<>(groupTable,this);
+        GroupDeletedEvent<PersistentGroup> deletedEvent = new GroupDeletedEvent<>(groupTable, this);
         subscribeEventToOracleAndMongo(deletedEvent);
 
         return ResponseEntity.ok().body("Skupina byla smazána");
@@ -109,7 +109,7 @@ public class GroupCommandService implements GroupChangingService<PersistentGroup
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Skupina s tímto id neexistuje");
 
         GroupTable groupTable = groupTableOptional.get();
-        if(groupTable.getState() == groupState)
+        if (groupTable.getState() == groupState)
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Skupina již má stav " + groupState.name());
 
         GroupStateChangedEvent<PersistentGroup> groupStateChangedEvent = new GroupStateChangedEvent<>(groupTable, groupState, this);
@@ -126,7 +126,7 @@ public class GroupCommandService implements GroupChangingService<PersistentGroup
         GroupTable groupTable = groupTableOptional.get();
 
         Optional<UserTable> userTableOptional = userRepository.findById(userId);
-        if(userTableOptional.isEmpty())
+        if (userTableOptional.isEmpty())
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Uživatel s tímto id neexistuje");
         UserTable userTable = userTableOptional.get();
 
@@ -144,7 +144,7 @@ public class GroupCommandService implements GroupChangingService<PersistentGroup
         GroupTable groupTable = groupTableOptional.get();
 
         Optional<UserTable> userTableOptional = userRepository.findById(userId);
-        if(userTableOptional.isEmpty())
+        if (userTableOptional.isEmpty())
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Uživatel s tímto id neexistuje");
         UserTable userTable = userTableOptional.get();
 
@@ -161,7 +161,7 @@ public class GroupCommandService implements GroupChangingService<PersistentGroup
         GroupTable groupTable = groupTableOptional.get();
 
         Optional<UserTable> userTableOptional = userRepository.findById(userId);
-        if(userTableOptional.isEmpty())
+        if (userTableOptional.isEmpty())
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Uživatel s tímto id neexistuje");
         UserTable userTable = userTableOptional.get();
 
@@ -171,12 +171,12 @@ public class GroupCommandService implements GroupChangingService<PersistentGroup
         return ResponseEntity.ok().body("Uživatel byl odebrán ze skupiny");
     }
 
-/* methods called from events */
+    /* methods called from events */
     @Override
     public PersistentGroup assignFromTo(ObjectInterface objectInterface, PersistentGroup group) {
         GroupInterface persistentGroupInterface = (GroupInterface) group;
         GroupInterface groupInterface = (GroupInterface) objectInterface;
-        if(group instanceof GroupTable || group instanceof GroupDocument) {
+        if (group instanceof GroupTable || group instanceof GroupDocument) {
             persistentGroupInterface.setId(groupInterface.getId());
             persistentGroupInterface.setName(groupInterface.getName());
             persistentGroupInterface.setState(groupInterface.getState());
@@ -184,14 +184,14 @@ public class GroupCommandService implements GroupChangingService<PersistentGroup
             persistentGroupInterface.setUserReference(groupInterface.getUserReference());
         }
 
-        if(group instanceof GroupTable) {
-            ((GroupTable)persistentGroupInterface).setUsers(((GroupTable) groupInterface).getUsers());
-        } else {
-            ArrayList<MemberEmbedded> memberEmbeddeds = new ArrayList<>();
+        if (group instanceof GroupTable) {
+            ((GroupTable) persistentGroupInterface).setUsers(((GroupTable) groupInterface).getUsers());
+        } else if (group instanceof GroupDocument) {
+            ArrayList<MemberEmbedded> memberEmbeddings = new ArrayList<>();
             ((GroupTable) groupInterface).getUsers().forEach(user -> {
-                memberEmbeddeds.add(new MemberEmbedded(user.getId(), user.getName(), user.getSurname()));
+                memberEmbeddings.add(new MemberEmbedded(user.getId(), user.getName(), user.getSurname()));
             });
-            ((GroupDocument)persistentGroupInterface).setMembers(memberEmbeddeds);
+            ((GroupDocument) persistentGroupInterface).setMembers(memberEmbeddings);
         }
         return (PersistentGroup) persistentGroupInterface;
     }
@@ -289,7 +289,7 @@ public class GroupCommandService implements GroupChangingService<PersistentGroup
     }
 
     /* private methods */
-    private boolean groupTableEqualsUpdateGroupDto(GroupTable table, UpdateGroupDto dto) {
+    private boolean isGroupTableEqualToUpdateGroupDto(GroupTable table, UpdateGroupDto dto) {
         return dto.getName().equals(table.getName()) &&
                 dto.getDescription().equals(table.getDescription());
     }
@@ -371,7 +371,7 @@ public class GroupCommandService implements GroupChangingService<PersistentGroup
         mongoTemplate.updateMulti(
                 new Query(where("groups_admin.id").is(groupDocument.getId())),
                 new Update()
-                    .pull("groups_admin", Query.query(Criteria.where("groups_admin.$id").is(groupDocument.getId()))),
+                        .pull("groups_admin", Query.query(Criteria.where("groups_admin.$id").is(groupDocument.getId()))),
                 UserDocument.class
         );
     }

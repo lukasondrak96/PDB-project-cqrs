@@ -14,7 +14,6 @@ import cz.vutbr.fit.pdb.projekt.features.helperInterfaces.ObjectInterface;
 import cz.vutbr.fit.pdb.projekt.features.helperInterfaces.objects.UserInterface;
 import cz.vutbr.fit.pdb.projekt.features.helperInterfaces.persistent.PersistentUser;
 import cz.vutbr.fit.pdb.projekt.features.nosqlfeatures.group.GroupDocument;
-import cz.vutbr.fit.pdb.projekt.features.nosqlfeatures.group.embedded.CreatorEmbedded;
 import cz.vutbr.fit.pdb.projekt.features.nosqlfeatures.user.UserDocument;
 import cz.vutbr.fit.pdb.projekt.features.nosqlfeatures.user.UserDocumentRepository;
 import cz.vutbr.fit.pdb.projekt.features.sqlfeatures.user.UserRepository;
@@ -60,13 +59,13 @@ public class UserCommandService implements UserWithStateChangingService<Persiste
     @Transactional
     public ResponseEntity<?> updateUser(Integer userId, UpdateUserDto updateUserDto) {
         Optional<UserTable> userTableOptional = userRepository.findById(userId);
-        if(userTableOptional.isEmpty())
+        if (userTableOptional.isEmpty())
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Tento uživatel neexistuje");
 
         UserTable oldUserTable = userTableOptional.get();
 
-        if (userTableEqualsUpdateUserDto(oldUserTable, updateUserDto)) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Nebyl nalezen záznam pro editaci");
+        if (isUserTableEqualToUpdateUserDto(oldUserTable, updateUserDto)) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Nebyly nalezeny žádné změny pro editaci");
         }
 
         final UserTable userTable = new UserTable(userId, updateUserDto.getEmail(), updateUserDto.getName(),
@@ -76,7 +75,7 @@ public class UserCommandService implements UserWithStateChangingService<Persiste
         UserUpdatedEvent<PersistentUser> updatedEvent = new UserUpdatedEvent<>(userTable, this);
         subscribeChangeEventToOracleAndMongo(updatedEvent);
 
-        return ResponseEntity.ok().body("Data byla aktualizována");
+        return ResponseEntity.ok().body("Osobní údaje byly aktualizovány");
     }
 
     @Transactional
@@ -117,7 +116,7 @@ public class UserCommandService implements UserWithStateChangingService<Persiste
         return ResponseEntity.ok().body("Uživatel byl deaktivován");
     }
 
-/* methods called from events */
+    /* methods called from events */
     @Override
     public PersistentUser finishUpdating(PersistentUser user) {
         if (user instanceof UserTable) {
@@ -166,7 +165,7 @@ public class UserCommandService implements UserWithStateChangingService<Persiste
     public PersistentUser assignFromTo(ObjectInterface objectInterface, PersistentUser user) {
         UserInterface persistentUserInterface = (UserInterface) user;
         UserInterface userInterface = (UserInterface) objectInterface;
-        if(user instanceof UserTable || user instanceof UserDocument) {
+        if (user instanceof UserTable || user instanceof UserDocument) {
             persistentUserInterface.setId(userInterface.getId());
             persistentUserInterface.setName(userInterface.getName());
             persistentUserInterface.setSurname(userInterface.getSurname());
@@ -178,17 +177,8 @@ public class UserCommandService implements UserWithStateChangingService<Persiste
         return (PersistentUser) persistentUserInterface;
     }
 
-/* private methods */
-    private void subscribeChangeEventToOracleAndMongo(AbstractEvent<PersistentUser> event) {
-        OracleUserEventSubscriber sqlSubscriber = new OracleUserEventSubscriber(EVENT_BUS);
-        MongoUserEventSubscriber noSqlSubscriber = new MongoUserEventSubscriber(EVENT_BUS);
-        EVENT_BUS.post(event);
-
-        EVENT_BUS.unregister(sqlSubscriber);
-        EVENT_BUS.unregister(noSqlSubscriber);
-    }
-
-    private boolean userTableEqualsUpdateUserDto(UserTable table, UpdateUserDto dto) {
+    /* private methods */
+    private boolean isUserTableEqualToUpdateUserDto(UserTable table, UpdateUserDto dto) {
         return dto.getEmail().equals(table.getEmail()) &&
                 dto.getName().equals(table.getName()) &&
                 dto.getSurname().equals(table.getSurname()) &&
@@ -196,8 +186,13 @@ public class UserCommandService implements UserWithStateChangingService<Persiste
                 dto.getSex() == table.getSex();
     }
 
-    private boolean groupCreatorChangedName(UserDocument userDocument, CreatorEmbedded groupCreator) {
-        return !groupCreator.getName().equals(userDocument.getName()) || !groupCreator.getSurname().equals(userDocument.getSurname());
+    private void subscribeChangeEventToOracleAndMongo(AbstractEvent<PersistentUser> event) {
+        OracleUserEventSubscriber sqlSubscriber = new OracleUserEventSubscriber(EVENT_BUS);
+        MongoUserEventSubscriber noSqlSubscriber = new MongoUserEventSubscriber(EVENT_BUS);
+        EVENT_BUS.post(event);
+
+        EVENT_BUS.unregister(sqlSubscriber);
+        EVENT_BUS.unregister(noSqlSubscriber);
     }
 
     private void updateGroupCreatorsNameAndSurname(UserDocument userDocument) {

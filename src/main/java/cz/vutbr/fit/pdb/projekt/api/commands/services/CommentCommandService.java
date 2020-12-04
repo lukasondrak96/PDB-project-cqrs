@@ -79,7 +79,7 @@ public class CommentCommandService implements CommandDeleteService<PersistentCom
     public PersistentComment assignFromTo(ObjectInterface objectInterface, PersistentComment comment) {
         CommentInterface persistentCommandInterface = (CommentInterface) comment;
         CommentInterface commentInterface = (CommentInterface) objectInterface;
-        if(comment instanceof CommentTable || comment instanceof CommentEmbedded) {
+        if (comment instanceof CommentTable || comment instanceof CommentEmbedded) {
             persistentCommandInterface.setId(commentInterface.getId());
             persistentCommandInterface.setText(commentInterface.getText());
             persistentCommandInterface.setCreatedAt(commentInterface.getCreatedAt());
@@ -89,7 +89,7 @@ public class CommentCommandService implements CommandDeleteService<PersistentCom
         return (PersistentComment) persistentCommandInterface;
     }
 
-/* methods called from events */
+    /* methods called from events */
     @Override
     public PersistentComment finishSaving(PersistentComment comment) {
         if (comment instanceof CommentTable) {
@@ -114,7 +114,7 @@ public class CommentCommandService implements CommandDeleteService<PersistentCom
         return null;
     }
 
-/* private methods */
+    /* private methods */
     private void subscribeEventToOracleAndMongo(AbstractEvent<PersistentComment> event) {
         OracleCommentEventSubscriber sqlSubscriber = new OracleCommentEventSubscriber(EVENT_BUS);
         MongoCommentEventSubscriber noSqlSubscriber = new MongoCommentEventSubscriber(EVENT_BUS);
