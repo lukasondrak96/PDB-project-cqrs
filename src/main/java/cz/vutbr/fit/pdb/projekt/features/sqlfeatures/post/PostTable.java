@@ -20,7 +20,7 @@ import java.util.Date;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class PostTable implements PostInterface, PersistentPost {
+public class PostTable implements PostInterface, PersistentPost, Comparable {
 
     public PostTable(String title, String text, Date createdAt, GroupTable groupReference, UserTable userReference) {
         this.title = title;
@@ -70,5 +70,10 @@ public class PostTable implements PostInterface, PersistentPost {
                 ", createdAt=" + createdAt.toString() +
                 '\'' +
                 '}';
+    }
+
+    @Override
+    public int compareTo(Object o) {
+        return 0;
     }
 }

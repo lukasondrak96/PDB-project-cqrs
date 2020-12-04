@@ -2,6 +2,7 @@ package cz.vutbr.fit.pdb.projekt.api.commands.services;
 
 import cz.vutbr.fit.pdb.projekt.api.commands.dtos.group.NewGroupDto;
 import cz.vutbr.fit.pdb.projekt.api.commands.dtos.post.NewPostDto;
+import cz.vutbr.fit.pdb.projekt.api.commands.dtos.post.UpdatePostDto;
 import cz.vutbr.fit.pdb.projekt.api.commands.dtos.user.NewUserDto;
 import cz.vutbr.fit.pdb.projekt.features.nosqlfeatures.group.GroupDocument;
 import cz.vutbr.fit.pdb.projekt.features.sqlfeatures.group.GroupState;
@@ -10,7 +11,9 @@ import cz.vutbr.fit.pdb.projekt.features.sqlfeatures.user.UserSex;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import java.util.Comparator;
 import java.util.Date;
+import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -28,10 +31,10 @@ class PostCommandServiceTest extends AbstractServiceTest {
     @Test
     void test_createPost() {
         userCommandService.createUser(TEST_GROUP_CREATOR);
-        int creatorId = userRepository.findAll().get(0).getId();
+        int creatorId = userRepository.findByEmail("test@test").get().getId();
         NewGroupDto newGroupDto = new NewGroupDto("testGroupName", "testGroupDescription", GroupState.PRIVATE, creatorId);
         groupCommandService.createGroup(newGroupDto);
-        int createdGroupId = groupRepository.findAll().get(0).getId();
+        int createdGroupId = groupRepository.findByName("testGroupName").get().getId();
 
 
         postCommandService.createPost(new NewPostDto(TEST_TITLE, TEST_TEXT, creatorId, createdGroupId));
@@ -52,12 +55,40 @@ class PostCommandServiceTest extends AbstractServiceTest {
 
 
     @Test
-    void test_deletePost() {
+    void test_updatePost() {
         userCommandService.createUser(TEST_GROUP_CREATOR);
-        int creatorId = userRepository.findAll().get(0).getId();
+        int creatorId = userRepository.findByEmail("test@test").get().getId();
         NewGroupDto newGroupDto = new NewGroupDto("testGroupName", "testGroupDescription", GroupState.PRIVATE, creatorId);
         groupCommandService.createGroup(newGroupDto);
-        int createdGroupId = groupRepository.findAll().get(0).getId();
+        int createdGroupId = groupRepository.findByName("testGroupName").get().getId();
+        postCommandService.createPost(new NewPostDto(TEST_TITLE, TEST_TEXT, creatorId, createdGroupId));
+        List<PostTable> allPosts = findAllPostsAndSortThem();
+        int createdPostId = allPosts.get(0).getId();
+        UpdatePostDto updatePostDto = new UpdatePostDto(TEST_TITLE + "updated", TEST_TEXT + "updated");
+
+
+        postCommandService.updatePost(createdPostId, updatePostDto);
+
+
+        Optional<PostTable> updatedPostOptional = postRepository.findById(createdPostId);
+        assertTrue(updatedPostOptional.isPresent());
+        PostTable updatedPost = updatedPostOptional.get();
+        assertEquals(TEST_TITLE + "updated", updatedPost.getTitle());
+        assertEquals(TEST_TEXT + "updated", updatedPost.getText());
+        assertEquals(creatorId, updatedPost.getUserReference().getId());
+        assertEquals(createdGroupId, updatedPost.getGroupReference().getId());
+
+        GroupDocument groupWithPostNoSqlOptional = groupDocumentRepository.findById(createdGroupId).get();
+        assertEquals(1, groupWithPostNoSqlOptional.getPosts().size());
+    }
+
+    @Test
+    void test_deletePost() {
+        userCommandService.createUser(TEST_GROUP_CREATOR);
+        int creatorId = userRepository.findByEmail("test@test").get().getId();
+        NewGroupDto newGroupDto = new NewGroupDto("testGroupName", "testGroupDescription", GroupState.PRIVATE, creatorId);
+        groupCommandService.createGroup(newGroupDto);
+        int createdGroupId = groupRepository.findByName("testGroupName").get().getId();
         postCommandService.createPost(new NewPostDto(TEST_TITLE, TEST_TEXT, creatorId, createdGroupId));
         int createdPostId = postRepository.findAll().get(0).getId();
 
@@ -75,23 +106,24 @@ class PostCommandServiceTest extends AbstractServiceTest {
     @Test
     void test_deletePostWithMultiplePostsInGroup() {
         userCommandService.createUser(TEST_GROUP_CREATOR);
-        int creatorId = userRepository.findAll().get(0).getId();
+        int creatorId = userRepository.findByEmail("test@test").get().getId();
         NewGroupDto newGroupDto = new NewGroupDto("testGroupName", "testGroupDescription", GroupState.PRIVATE, creatorId);
         groupCommandService.createGroup(newGroupDto);
-        int createdGroupId = groupRepository.findAll().get(0).getId();
+        int createdGroupId = groupRepository.findByName("testGroupName").get().getId();
 
         NewPostDto firstPost = new NewPostDto(TEST_TITLE, TEST_TEXT, creatorId, createdGroupId);
         postCommandService.createPost(firstPost);
-        int createdPost1Id = postRepository.findAll().get(0).getId();
 
         NewPostDto secondPost = new NewPostDto(TEST_TITLE + "2", TEST_TEXT + "2", creatorId, createdGroupId);
         postCommandService.createPost(secondPost);
-        int createdPost2Id = postRepository.findAll().get(1).getId();
 
         NewPostDto thirdPost = new NewPostDto(TEST_TITLE + "3", TEST_TEXT + "3", creatorId, createdGroupId);
         postCommandService.createPost(thirdPost);
-        int createdPost3Id = postRepository.findAll().get(2).getId();
 
+        List<PostTable> allPostsSortedById = findAllPostsAndSortThem();
+        int createdPost1Id = allPostsSortedById.get(0).getId();
+        int createdPost2Id = allPostsSortedById.get(1).getId();
+        int createdPost3Id = allPostsSortedById.get(2).getId();
 
         postCommandService.deletePost(createdPost2Id);  //delete second post
 
@@ -111,6 +143,11 @@ class PostCommandServiceTest extends AbstractServiceTest {
         assertEquals(createdPost3Id, updatedGroupDocument.getPosts().get(1).getId());
     }
 
+    private List<PostTable> findAllPostsAndSortThem() {
+        List<PostTable> allPosts = postRepository.findAll();
+        allPosts.sort(Comparator.comparingInt(PostTable::getId));
+        return allPosts;
+    }
 
 }
 

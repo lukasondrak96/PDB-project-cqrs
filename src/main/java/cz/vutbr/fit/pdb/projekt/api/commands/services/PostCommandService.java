@@ -167,12 +167,11 @@ public class PostCommandService implements CommandDeleteService<PersistentPost> 
         );
     }
 
-    //TODO upravit (je to vykopirovany create)
     private void updatePostInGroup(PostEmbedded post) {
         mongoTemplate.updateMulti(
-                new Query(where("id").is(post.getGroupReference().getId())),
+                new Query(where("posts.id").is(post.getGroupReference().getId())),
                 new Update()
-                        .push("posts", post),
+                        .set("posts.$", post),
                 GroupDocument.class
         );
     }
