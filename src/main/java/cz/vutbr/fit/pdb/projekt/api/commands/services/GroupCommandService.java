@@ -148,6 +148,8 @@ public class GroupCommandService implements GroupChangingService<PersistentGroup
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Uživatel s tímto id neexistuje");
         UserTable userTable = userTableOptional.get();
 
+        groupTable.addUser(userTable);
+
         GroupMemberAddedEvent<PersistentGroup> groupMemberAddedEvent = new GroupMemberAddedEvent<>(groupTable, userTable, this);
         subscribeEventToOracleAndMongo(groupMemberAddedEvent);
 
@@ -264,12 +266,10 @@ public class GroupCommandService implements GroupChangingService<PersistentGroup
     public PersistentGroup finishMemberAdding(PersistentGroup group, UserTable userTable) {
         if (group instanceof GroupTable) {
             GroupTable groupTable = (GroupTable) group;
-            groupTable.addUser(userTable);
             return groupRepository.save(groupTable);
         } else {
             GroupDocument groupDocument = (GroupDocument) group;
             updateAddGroupMembersInUserDocument(userTable.getId(), groupDocument);
-            groupDocument.getMembers().add(new MemberEmbedded(userTable.getId(), userTable.getName(), userTable.getSurname()));
             return groupDocumentRepository.save(groupDocument);
         }
     }

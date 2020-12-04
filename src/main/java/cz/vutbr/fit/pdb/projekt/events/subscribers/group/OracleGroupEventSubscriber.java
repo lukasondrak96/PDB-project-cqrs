@@ -60,7 +60,7 @@ public class OracleGroupEventSubscriber extends AbstractSubscriber {
     @Subscribe
     public void onGroupMemberAddedEvent(GroupMemberAddedEvent<PersistentGroup> groupMemberAddedEvent) {
         LOGGER.info(RECEIVED_AND_APPLYING_EVENT, groupMemberAddedEvent.getClass().getSimpleName(), groupMemberAddedEvent);
-        groupMemberAddedEvent.apply(REUSABLE_ORACLE_OBJECT);
+        groupMemberAddedEvent.apply((PersistentGroup) groupMemberAddedEvent.getObjectInterface());
     }
 
     @Subscribe

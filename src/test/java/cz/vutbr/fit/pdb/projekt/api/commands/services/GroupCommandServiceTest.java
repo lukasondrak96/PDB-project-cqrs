@@ -27,7 +27,7 @@ class GroupCommandServiceTest extends AbstractServiceTest {
     private final String TEST_DESCRIPTION = "testDescription";
     private final GroupState TEST_STATE_PRIVATE = GroupState.PRIVATE;
     private final GroupState TEST_STATE_PUBLIC = GroupState.PUBLIC;
-    private final NewUserDto TEST_GROUP_CREATOR = new NewUserDto("test@test", "testName", "testSurname", new Date(300L), UserSex.FEMALE);
+    private final NewUserDto TEST_GROUP_CREATOR = new NewUserDto("group@creator", "groupCreatorName", "groupCreatorSurname", new Date(300L), UserSex.FEMALE);
 
     private final String TEST_ADDITION_TO_CHANGE_STRING = "Addition";
     private final NewUserDto TEST_GROUP_NEW_CREATOR = new NewUserDto("new@creator", "newCreator", "newCreatorSurname", new Date(300L), UserSex.FEMALE);
@@ -37,8 +37,8 @@ class GroupCommandServiceTest extends AbstractServiceTest {
     @Test
     void test_createGroup() {
         userCommandService.createUser(TEST_GROUP_CREATOR);
-        int creatorId = userRepository.findAll().get(0).getId();
-        CreatorEmbedded testCreatorEmbedded = new CreatorEmbedded(creatorId, "testName", "testSurname");
+        int creatorId = userRepository.findByEmail("group@creator").get().getId();
+        CreatorEmbedded testCreatorEmbedded = new CreatorEmbedded(creatorId, "groupCreatorName", "groupCreatorSurname");
         NewGroupDto newGroupDto = new NewGroupDto(
                 TEST_NAME, TEST_DESCRIPTION, TEST_STATE_PRIVATE, creatorId
         );
@@ -46,7 +46,7 @@ class GroupCommandServiceTest extends AbstractServiceTest {
         groupCommandService.createGroup(newGroupDto);
 
 
-        int createdGroupId = groupRepository.findAll().get(0).getId();
+        int createdGroupId = groupRepository.findByName(TEST_NAME).get().getId();
         Optional<GroupTable> createdGroupSqlOptional = groupRepository.findById(createdGroupId);
         Optional<GroupDocument> createdGroupNoSqlOptional = groupDocumentRepository.findById(createdGroupId);
 
@@ -65,8 +65,8 @@ class GroupCommandServiceTest extends AbstractServiceTest {
     @Test
     void test_updateGroup() {
         userCommandService.createUser(TEST_GROUP_CREATOR);
-        int creatorId = userRepository.findAll().get(0).getId();
-        CreatorEmbedded testCreatorEmbedded = new CreatorEmbedded(creatorId, "testName", "testSurname");
+        int creatorId = userRepository.findByEmail("group@creator").get().getId();
+        CreatorEmbedded testCreatorEmbedded = new CreatorEmbedded(creatorId, "groupCreatorName", "groupCreatorSurname");
 
         NewGroupDto newGroupDto = new NewGroupDto(
                 TEST_NAME, TEST_DESCRIPTION, TEST_STATE_PRIVATE, creatorId
@@ -75,7 +75,7 @@ class GroupCommandServiceTest extends AbstractServiceTest {
         UpdateGroupDto updateGroupDto = new UpdateGroupDto(
                 TEST_NAME + TEST_ADDITION_TO_CHANGE_STRING, TEST_DESCRIPTION + TEST_ADDITION_TO_CHANGE_STRING
         );
-        int createdGroupId = groupRepository.findAll().get(0).getId();
+        int createdGroupId = groupRepository.findByName(TEST_NAME).get().getId();
 
 
         groupCommandService.updateGroup(createdGroupId, updateGroupDto);
@@ -97,12 +97,12 @@ class GroupCommandServiceTest extends AbstractServiceTest {
     @Test
     void test_deleteGroup() {
         userCommandService.createUser(TEST_GROUP_CREATOR);
-        int creatorId = userRepository.findAll().get(0).getId();
+        int creatorId = userRepository.findByEmail("group@creator").get().getId();
         NewGroupDto newGroupDto = new NewGroupDto(
                 TEST_NAME, TEST_DESCRIPTION, TEST_STATE_PRIVATE, creatorId
         );
         groupCommandService.createGroup(newGroupDto);
-        int createdGroupId = groupRepository.findAll().get(0).getId();
+        int createdGroupId = groupRepository.findByName(TEST_NAME).get().getId();
 
 
         groupCommandService.deleteGroup(createdGroupId);
@@ -115,27 +115,27 @@ class GroupCommandServiceTest extends AbstractServiceTest {
     }
 
     @Test
-    void test_deletePostWithMultiplePostsInGroup() {
+    void test_deleteGroupWithMultipleGroups() {
         userCommandService.createUser(TEST_GROUP_CREATOR);
-        int creatorId = userRepository.findAll().get(0).getId();
+        int creatorId = userRepository.findByEmail("group@creator").get().getId();
 
         NewGroupDto firstGroup = new NewGroupDto(
                 TEST_NAME, TEST_DESCRIPTION, TEST_STATE_PRIVATE, creatorId
         );
         groupCommandService.createGroup(firstGroup);
-        int firstGroupId = groupRepository.findAll().get(0).getId();
+        int firstGroupId = groupRepository.findByName(TEST_NAME).get().getId();
 
         NewGroupDto secondGroup = new NewGroupDto(
                 TEST_NAME + "2", TEST_DESCRIPTION  + "2", TEST_STATE_PRIVATE, creatorId
         );
         groupCommandService.createGroup(secondGroup);
-        int secondGroupId = groupRepository.findAll().get(1).getId();
+        int secondGroupId = groupRepository.findByName(TEST_NAME + "2").get().getId();
 
         NewGroupDto thirdGroup = new NewGroupDto(
                 TEST_NAME + "3", TEST_DESCRIPTION  + "3", TEST_STATE_PRIVATE, creatorId
         );
         groupCommandService.createGroup(thirdGroup);
-        int thirdGroupId = groupRepository.findAll().get(2).getId();
+        int thirdGroupId = groupRepository.findByName(TEST_NAME + "3").get().getId();
 
 
         groupCommandService.deleteGroup(secondGroupId); //delete second group
@@ -162,12 +162,12 @@ class GroupCommandServiceTest extends AbstractServiceTest {
     @Test
     void test_changeGroupState_private_to_public() {
         userCommandService.createUser(TEST_GROUP_CREATOR);
-        int creatorId = userRepository.findAll().get(0).getId();
+        int creatorId = userRepository.findByEmail("group@creator").get().getId();
         NewGroupDto newGroupDto = new NewGroupDto(
                 TEST_NAME, TEST_DESCRIPTION, TEST_STATE_PRIVATE, creatorId
         );
         groupCommandService.createGroup(newGroupDto);
-        int createdGroupId = groupRepository.findAll().get(0).getId();
+        int createdGroupId = groupRepository.findByName(TEST_NAME).get().getId();
 
         groupCommandService.changeGroupState(createdGroupId, GroupState.PUBLIC);
 
@@ -183,12 +183,12 @@ class GroupCommandServiceTest extends AbstractServiceTest {
     @Test
     void test_changeGroupState_private_to_archived() {
         userCommandService.createUser(TEST_GROUP_CREATOR);
-        int creatorId = userRepository.findAll().get(0).getId();
+        int creatorId = userRepository.findByEmail("group@creator").get().getId();
         NewGroupDto newGroupDto = new NewGroupDto(
                 TEST_NAME, TEST_DESCRIPTION, TEST_STATE_PRIVATE, creatorId
         );
         groupCommandService.createGroup(newGroupDto);
-        int createdGroupId = groupRepository.findAll().get(0).getId();
+        int createdGroupId = groupRepository.findByName(TEST_NAME).get().getId();
 
         groupCommandService.changeGroupState(createdGroupId, GroupState.ARCHIVED);
 
@@ -204,12 +204,12 @@ class GroupCommandServiceTest extends AbstractServiceTest {
     @Test
     void test_changeGroupState_public_to_private() {
         userCommandService.createUser(TEST_GROUP_CREATOR);
-        int creatorId = userRepository.findAll().get(0).getId();
+        int creatorId = userRepository.findByEmail("group@creator").get().getId();
         NewGroupDto newGroupDto = new NewGroupDto(
                 TEST_NAME, TEST_DESCRIPTION, TEST_STATE_PUBLIC, creatorId
         );
         groupCommandService.createGroup(newGroupDto);
-        int createdGroupId = groupRepository.findAll().get(0).getId();
+        int createdGroupId = groupRepository.findByName(TEST_NAME).get().getId();
 
 
         groupCommandService.changeGroupState(createdGroupId, GroupState.PRIVATE);
@@ -227,14 +227,14 @@ class GroupCommandServiceTest extends AbstractServiceTest {
     @Test
     void test_changeGroupAdmin() {
         userCommandService.createUser(TEST_GROUP_CREATOR);
-        UserTable groupCreator = userRepository.findAll().get(0);
+        UserTable groupCreator = userRepository.findByEmail("group@creator").get();
         NewGroupDto newGroupDto = new NewGroupDto(
                 TEST_NAME, TEST_DESCRIPTION, TEST_STATE_PUBLIC, groupCreator.getId()
         );
         groupCommandService.createGroup(newGroupDto);
-        int createdGroupId = groupRepository.findAll().get(0).getId();
+        int createdGroupId = groupRepository.findByName(TEST_NAME).get().getId();
         userCommandService.createUser(TEST_GROUP_NEW_CREATOR);
-        UserTable newAdmin = userRepository.findAll().get(1);
+        UserTable newAdmin = userRepository.findByEmail("new@creator").get();
 
 
         groupCommandService.changeGroupAdmin(createdGroupId, newAdmin.getId());
@@ -264,14 +264,14 @@ class GroupCommandServiceTest extends AbstractServiceTest {
     @Test
     void test_addGroupMember() {
         userCommandService.createUser(TEST_GROUP_CREATOR);
-        UserTable groupCreator = userRepository.findAll().get(0);
+        UserTable groupCreator = userRepository.findByEmail("group@creator").get();
         NewGroupDto newGroupDto = new NewGroupDto(
                 TEST_NAME, TEST_DESCRIPTION, TEST_STATE_PUBLIC, groupCreator.getId()
         );
         groupCommandService.createGroup(newGroupDto);
-        int createdGroupId = groupRepository.findAll().get(0).getId();
+        int createdGroupId = groupRepository.findByName(TEST_NAME).get().getId();
         userCommandService.createUser(TEST_GROUP_NEW_MEMBER);
-        UserTable newMember = userRepository.findAll().get(1);
+        UserTable newMember = userRepository.findByEmail("new@member").get();
 
 
         groupCommandService.addGroupMember(createdGroupId, newMember.getId());
@@ -296,16 +296,106 @@ class GroupCommandServiceTest extends AbstractServiceTest {
     }
 
     @Test
-    void test_removeGroupMember() {
+    void test_addAndRemoveWithMoreGroupMembers() {
         userCommandService.createUser(TEST_GROUP_CREATOR);
-        UserTable groupCreator = userRepository.findAll().get(0);
+        UserTable groupCreator = userRepository.findByEmail("group@creator").get();
         NewGroupDto newGroupDto = new NewGroupDto(
                 TEST_NAME, TEST_DESCRIPTION, TEST_STATE_PUBLIC, groupCreator.getId()
         );
         groupCommandService.createGroup(newGroupDto);
-        int createdGroupId = groupRepository.findAll().get(0).getId();
+        int createdGroupId = groupRepository.findByName(TEST_NAME).get().getId();
+        userCommandService.createUser(new NewUserDto("new@member1", "newMember1", "newMemberSurname1", new Date(300L), UserSex.FEMALE));
+        UserTable newMember1 = userRepository.findByEmail("new@member1").get();
+
+        userCommandService.createUser(new NewUserDto("new@member2", "newMember2", "newMemberSurname2", new Date(300L), UserSex.FEMALE));
+        UserTable newMember2 = userRepository.findByEmail("new@member2").get();
+
+        userCommandService.createUser(new NewUserDto("new@member3", "newMember3", "newMemberSurname3", new Date(300L), UserSex.FEMALE));
+        UserTable newMember3 = userRepository.findByEmail("new@member3").get();
+
+
+        groupCommandService.addGroupMember(createdGroupId, newMember1.getId());
+        groupCommandService.addGroupMember(createdGroupId, newMember2.getId());
+        groupCommandService.addGroupMember(createdGroupId, newMember3.getId());
+        groupCommandService.removeGroupMember(createdGroupId, newMember2.getId()); //remove second member
+
+
+        GroupTable updatedGroupSql = groupRepository.findById(createdGroupId).get();
+        GroupDocument updatedGroupNoSql = groupDocumentRepository.findById(createdGroupId).get();
+        assertEquals(2, updatedGroupNoSql.getMembers().size());
+        assertEquals(newMember1.getId(), updatedGroupSql.getUsers().get(0).getId());
+        assertEquals(newMember3.getId(), updatedGroupNoSql.getMembers().get(1).getId());
+
+        UserDocument newMember1Document = userDocumentRepository.findById(newMember1.getId()).get();
+        assertEquals(1, newMember1Document.getGroupsMember().size());
+
+        UserDocument newMember2Document = userDocumentRepository.findById(newMember2.getId()).get();
+        assertEquals(0, newMember2Document.getGroupsMember().size());
+
+        UserDocument newMember3Document = userDocumentRepository.findById(newMember3.getId()).get();
+        assertEquals(1, newMember3Document.getGroupsMember().size());
+    }
+
+
+    @Test
+    void test_addWithMoreGroupMembers() {
+        userCommandService.createUser(TEST_GROUP_CREATOR);
+        UserTable groupCreator = userRepository.findByEmail("group@creator").get();
+        NewGroupDto newGroupDto = new NewGroupDto(
+                TEST_NAME, TEST_DESCRIPTION, TEST_STATE_PUBLIC, groupCreator.getId()
+        );
+        groupCommandService.createGroup(newGroupDto);
+        int createdGroupId = groupRepository.findByName(TEST_NAME).get().getId();
+        userCommandService.createUser(new NewUserDto("new@member1", "newMember1", "newMemberSurname1", new Date(300L), UserSex.FEMALE));
+        UserTable newMember1 = userRepository.findByEmail("new@member1").get();
+
+        userCommandService.createUser(new NewUserDto("new@member2", "newMember2", "newMemberSurname2", new Date(300L), UserSex.FEMALE));
+        UserTable newMember2 = userRepository.findByEmail("new@member2").get();
+
+        userCommandService.createUser(new NewUserDto("new@member3", "newMember3", "newMemberSurname3", new Date(300L), UserSex.FEMALE));
+        UserTable newMember3 = userRepository.findByEmail("new@member3").get();
+
+
+        groupCommandService.addGroupMember(createdGroupId, newMember1.getId());
+        groupCommandService.addGroupMember(createdGroupId, newMember2.getId());
+        groupCommandService.addGroupMember(createdGroupId, newMember3.getId());
+
+
+        GroupTable updatedGroupSql = groupRepository.findById(createdGroupId).get();
+        assertEquals(3, updatedGroupSql.getUsers().size());
+        assertEquals(newMember1.getId(), updatedGroupSql.getUsers().get(0).getId());
+        assertEquals(newMember2.getId(), updatedGroupSql.getUsers().get(1).getId());
+        assertEquals(newMember3.getId(), updatedGroupSql.getUsers().get(2).getId());
+
+
+        GroupDocument updatedGroupNoSql = groupDocumentRepository.findById(createdGroupId).get();
+        assertEquals(3, updatedGroupNoSql.getMembers().size());
+        assertEquals(newMember1.getId(), updatedGroupNoSql.getMembers().get(0).getId());
+        assertEquals(newMember2.getId(), updatedGroupNoSql.getMembers().get(1).getId());
+        assertEquals(newMember3.getId(), updatedGroupNoSql.getMembers().get(2).getId());
+
+        UserDocument newMember1Document = userDocumentRepository.findById(newMember1.getId()).get();
+        assertEquals(1, newMember1Document.getGroupsMember().size());
+
+        UserDocument newMember2Document = userDocumentRepository.findById(newMember2.getId()).get();
+        assertEquals(1, newMember2Document.getGroupsMember().size());
+
+        UserDocument newMember3Document = userDocumentRepository.findById(newMember3.getId()).get();
+        assertEquals(1, newMember3Document.getGroupsMember().size());
+    }
+
+
+    @Test
+    void test_removeGroupMember() {
+        userCommandService.createUser(TEST_GROUP_CREATOR);
+        UserTable groupCreator = userRepository.findByEmail("group@creator").get();
+        NewGroupDto newGroupDto = new NewGroupDto(
+                TEST_NAME, TEST_DESCRIPTION, TEST_STATE_PUBLIC, groupCreator.getId()
+        );
+        groupCommandService.createGroup(newGroupDto);
+        int createdGroupId = groupRepository.findByName(TEST_NAME).get().getId();
         userCommandService.createUser(TEST_GROUP_NEW_MEMBER);
-        UserTable member = userRepository.findAll().get(1);
+        UserTable member = userRepository.findByEmail("new@member").get();
         groupCommandService.addGroupMember(createdGroupId, member.getId());
 
 

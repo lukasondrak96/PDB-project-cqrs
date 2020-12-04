@@ -8,7 +8,7 @@ import cz.vutbr.fit.pdb.projekt.features.sqlfeatures.user.UserTable;
 
 public class GroupMemberAddedEvent<T extends PersistentObject> extends AbstractEvent<T> {
 
-    private UserTable userTable;
+    private final UserTable userTable;
 
     public GroupMemberAddedEvent(ObjectInterface objectInterface, UserTable userTable, GroupChangingService<T> commandService) {
         super(objectInterface, commandService);

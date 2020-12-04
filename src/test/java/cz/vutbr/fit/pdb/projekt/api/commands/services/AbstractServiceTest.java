@@ -4,6 +4,7 @@ import cz.vutbr.fit.pdb.projekt.features.nosqlfeatures.group.GroupDocumentReposi
 import cz.vutbr.fit.pdb.projekt.features.nosqlfeatures.user.UserDocumentRepository;
 import cz.vutbr.fit.pdb.projekt.features.sqlfeatures.comment.CommentRepository;
 import cz.vutbr.fit.pdb.projekt.features.sqlfeatures.group.GroupRepository;
+import cz.vutbr.fit.pdb.projekt.features.sqlfeatures.message.MessageRepository;
 import cz.vutbr.fit.pdb.projekt.features.sqlfeatures.post.PostRepository;
 import cz.vutbr.fit.pdb.projekt.features.sqlfeatures.user.UserRepository;
 import org.junit.jupiter.api.AfterEach;
@@ -43,6 +44,12 @@ abstract class AbstractServiceTest {
     @Autowired
     CommentRepository commentRepository;
 
+    @Autowired
+    MessageCommandService messageCommandService;
+
+    @Autowired
+    MessageRepository messageRepository;
+
     @BeforeEach
     void setUp() {
         userRepository.deleteAll();
@@ -51,6 +58,7 @@ abstract class AbstractServiceTest {
         groupRepository.deleteAll();
         postRepository.deleteAll();
         commentRepository.deleteAll();
+        messageRepository.deleteAll();
     }
 
     @AfterEach
@@ -61,6 +69,7 @@ abstract class AbstractServiceTest {
         groupRepository.deleteAll();
         postRepository.deleteAll();
         commentRepository.deleteAll();
+        messageRepository.deleteAll();
     }
 
 }

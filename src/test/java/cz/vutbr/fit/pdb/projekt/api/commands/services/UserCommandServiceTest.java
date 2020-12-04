@@ -51,7 +51,7 @@ class UserCommandServiceTest extends AbstractServiceTest {
         userCommandService.createUser(newUserDto);
 
 
-        int createdUserId = userRepository.findAll().get(0).getId();
+        int createdUserId = userRepository.findByEmail(TEST_EMAIL).get().getId();
         Optional<UserTable> createdUserSqlOptional = userRepository.findById(createdUserId);
         Optional<UserDocument> createdUserNoSqlOptional = userDocumentRepository.findById(createdUserId);
         assertTrue(createdUserSqlOptional.isPresent());
@@ -78,7 +78,7 @@ class UserCommandServiceTest extends AbstractServiceTest {
                 TEST_SURNAME + TEST_ADDITION_TO_CHANGE_STRING, TEST_BIRTH_DATE_UPDATE, TEST_SEX_UPDATE
         );
         userCommandService.createUser(newUserDto);
-        int createdUserId = userRepository.findAll().get(0).getId();
+        int createdUserId = userRepository.findByEmail(TEST_EMAIL).get().getId();
 
 
         userCommandService.updateUser(createdUserId, updateUserDto);
@@ -111,7 +111,7 @@ class UserCommandServiceTest extends AbstractServiceTest {
                 TEST_SURNAME + TEST_ADDITION_TO_CHANGE_STRING, TEST_BIRTH_DATE, TEST_SEX
         );
         userCommandService.createUser(newUserDto);
-        int createdUserId = userRepository.findAll().get(0).getId();
+        int createdUserId = userRepository.findByEmail(TEST_EMAIL).get().getId();
         groupCommandService.createGroup(new NewGroupDto(TEST_NAME, null, TEST_GROUP_STATE, createdUserId));
 
         userCommandService.updateUser(createdUserId, updateUserDto);
@@ -148,9 +148,9 @@ class UserCommandServiceTest extends AbstractServiceTest {
                 TEST_SURNAME + TEST_ADDITION_TO_CHANGE_STRING, TEST_BIRTH_DATE, TEST_SEX
         );
         userCommandService.createUser(newUserDto);
-        int createdUserId = userRepository.findAll().get(0).getId();
+        int createdUserId = userRepository.findByEmail(TEST_EMAIL).get().getId();
         groupCommandService.createGroup(new NewGroupDto(TEST_NAME, null, TEST_GROUP_STATE, createdUserId));
-        int createdGroupId = groupRepository.findAll().get(0).getId();
+        int createdGroupId = groupRepository.findByName(TEST_NAME).get().getId();
         postCommandService.createPost(new NewPostDto(TEST_TITLE, TEST_TEXT, createdUserId, createdGroupId));
 
 
@@ -195,9 +195,9 @@ class UserCommandServiceTest extends AbstractServiceTest {
                 TEST_SURNAME + TEST_ADDITION_TO_CHANGE_STRING, TEST_BIRTH_DATE, TEST_SEX
         );
         userCommandService.createUser(newUserDto);
-        int createdUserId = userRepository.findAll().get(0).getId();
+        int createdUserId = userRepository.findByEmail(TEST_EMAIL).get().getId();
         groupCommandService.createGroup(new NewGroupDto(TEST_NAME, null, TEST_GROUP_STATE, createdUserId));
-        int createdGroupId = groupRepository.findAll().get(0).getId();
+        int createdGroupId = groupRepository.findByName(TEST_NAME).get().getId();
         postCommandService.createPost(new NewPostDto(TEST_TITLE, TEST_TEXT, createdUserId, createdGroupId));
         int createdPostId = postRepository.findAll().get(0).getId();
         commentCommandService.createComment(new NewCommentDto(TEST_TEXT, createdUserId, createdPostId));
@@ -244,7 +244,7 @@ class UserCommandServiceTest extends AbstractServiceTest {
                 TEST_EMAIL, TEST_NAME, TEST_SURNAME, TEST_BIRTH_DATE, TEST_SEX
         );
         userCommandService.createUser(newUserDto);
-        int createdUserId = userRepository.findAll().get(0).getId();
+        int createdUserId = userRepository.findByEmail(TEST_EMAIL).get().getId();
 
         //deactivate
         userCommandService.deactivateUser(createdUserId);
