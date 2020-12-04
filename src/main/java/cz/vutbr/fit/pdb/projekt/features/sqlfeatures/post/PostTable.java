@@ -5,6 +5,7 @@ import cz.vutbr.fit.pdb.projekt.features.helperInterfaces.persistent.PersistentP
 import cz.vutbr.fit.pdb.projekt.features.helperInterfaces.references.UserReference;
 import cz.vutbr.fit.pdb.projekt.features.sqlfeatures.group.GroupTable;
 import cz.vutbr.fit.pdb.projekt.features.sqlfeatures.user.UserTable;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -18,6 +19,7 @@ import java.util.Date;
 @Getter
 @Setter
 @NoArgsConstructor
+@AllArgsConstructor
 public class PostTable implements PostInterface, PersistentPost {
 
     public PostTable(String title, String text, Date createdAt, GroupTable groupReference, UserTable userReference) {

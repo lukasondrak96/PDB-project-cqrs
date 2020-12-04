@@ -2,6 +2,7 @@ package cz.vutbr.fit.pdb.projekt.events.subscribers.post;
 
 import cz.vutbr.fit.pdb.projekt.events.events.ConfirmedEventAdapter;
 import cz.vutbr.fit.pdb.projekt.events.events.post.PostDeletedEvent;
+import cz.vutbr.fit.pdb.projekt.events.events.post.PostUpdatedEvent;
 import cz.vutbr.fit.pdb.projekt.events.subscribers.AbstractSubscriber;
 import cz.vutbr.fit.pdb.projekt.features.helperInterfaces.persistent.PersistentPost;
 import cz.vutbr.fit.pdb.projekt.features.nosqlfeatures.group.embedded.PostEmbedded;
@@ -24,6 +25,12 @@ public class MongoPostEventSubscriber extends AbstractSubscriber {
     public void onPostCreateConfirmedEvent(ConfirmedEventAdapter<PostEmbedded> createConfirmedEvent) {
         LOGGER.info(RECEIVED_AND_APPLYING_EVENT, createConfirmedEvent.getClass().getSimpleName(), createConfirmedEvent);
         createConfirmedEvent.apply(REUSABLE_MONGO_OBJECT);
+    }
+
+    @Subscribe
+    public void onPostUpdateConfirmedEvent(PostUpdatedEvent<PersistentPost> postUpdatedEvent) {
+        LOGGER.info(RECEIVED_AND_APPLYING_EVENT, postUpdatedEvent.getClass().getSimpleName(), postUpdatedEvent);
+        postUpdatedEvent.apply(REUSABLE_MONGO_OBJECT);
     }
 
     @Subscribe

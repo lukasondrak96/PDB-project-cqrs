@@ -1,20 +1,21 @@
 package cz.vutbr.fit.pdb.projekt.events.events.post;
 
-import cz.vutbr.fit.pdb.projekt.api.commands.services.PostCommandService;
-import cz.vutbr.fit.pdb.projekt.events.events.EventInterface;
-import cz.vutbr.fit.pdb.projekt.features.helperInterfaces.persistent.PersistentPost;
+import cz.vutbr.fit.pdb.projekt.api.commands.services.helpingservices.CommandService;
+import cz.vutbr.fit.pdb.projekt.events.events.AbstractEvent;
+import cz.vutbr.fit.pdb.projekt.features.helperInterfaces.ObjectInterface;
+import cz.vutbr.fit.pdb.projekt.features.helperInterfaces.PersistentObject;
 
-public class PostUpdatedEvent implements EventInterface<PersistentPost> {
+public class PostUpdatedEvent<T extends PersistentObject> extends AbstractEvent<T> {
 
-    private final PostCommandService service;
-
-    public PostUpdatedEvent(PostCommandService service) {
-        this.service = service;
+    public PostUpdatedEvent(ObjectInterface objectInterface, CommandService<T> commandService) {
+        super(objectInterface, commandService);
     }
 
     @Override
-    public PersistentPost apply(PersistentPost persistentPost) {
-        return null;
+    public T apply(T persistentObject) {
+        CommandService<T> commandService = getCommandService();
+        persistentObject = commandService.assignFromTo(getObjectInterface(), persistentObject);
+        return commandService.finishUpdating(persistentObject);
     }
 
 }

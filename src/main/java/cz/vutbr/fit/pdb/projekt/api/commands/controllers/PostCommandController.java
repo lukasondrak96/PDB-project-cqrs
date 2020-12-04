@@ -1,6 +1,7 @@
 package cz.vutbr.fit.pdb.projekt.api.commands.controllers;
 
 import cz.vutbr.fit.pdb.projekt.api.commands.dtos.post.NewPostDto;
+import cz.vutbr.fit.pdb.projekt.api.commands.dtos.post.UpdatePostDto;
 import cz.vutbr.fit.pdb.projekt.api.commands.services.PostCommandService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -20,8 +21,8 @@ public class PostCommandController {
     }
 
     @PutMapping("{id}/edit")
-    public ResponseEntity<?> editPost(@PathVariable(value = "id") int postId) {
-        return null;
+    public ResponseEntity<?> editPost(@PathVariable(value = "id") int postId, @Valid @RequestBody UpdatePostDto updatePostDto) {
+        return postCommandService.updatePost(postId, updatePostDto);
     }
 
     @DeleteMapping("{id}/delete")

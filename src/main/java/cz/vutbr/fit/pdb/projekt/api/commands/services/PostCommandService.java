@@ -1,10 +1,12 @@
 package cz.vutbr.fit.pdb.projekt.api.commands.services;
 
 import cz.vutbr.fit.pdb.projekt.api.commands.dtos.post.NewPostDto;
+import cz.vutbr.fit.pdb.projekt.api.commands.dtos.post.UpdatePostDto;
 import cz.vutbr.fit.pdb.projekt.api.commands.services.helpingservices.CommandDeleteService;
 import cz.vutbr.fit.pdb.projekt.events.events.AbstractEvent;
 import cz.vutbr.fit.pdb.projekt.events.events.OracleCreatedEvent;
 import cz.vutbr.fit.pdb.projekt.events.events.post.PostDeletedEvent;
+import cz.vutbr.fit.pdb.projekt.events.events.post.PostUpdatedEvent;
 import cz.vutbr.fit.pdb.projekt.events.subscribers.post.MongoPostEventSubscriber;
 import cz.vutbr.fit.pdb.projekt.events.subscribers.post.OraclePostEventSubscriber;
 import cz.vutbr.fit.pdb.projekt.features.helperInterfaces.ObjectInterface;
@@ -62,6 +64,27 @@ public class PostCommandService implements CommandDeleteService<PersistentPost> 
         return ResponseEntity.ok().body("Příspěvek byl vytvořen");
     }
 
+
+    public ResponseEntity<?> updatePost(int postId, UpdatePostDto updatePostDto) {
+        Optional<PostTable> postTableOptional = postRepository.findById(postId);
+        if (postTableOptional.isEmpty())
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Příspěvek s tímto id neexistuje");
+
+        PostTable oldPostTable = postTableOptional.get();
+
+        if (isPostTableEqualToUpdatePostDto(oldPostTable, updatePostDto)) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Nebyly nalezeny žádné změny pro editaci");
+        }
+
+        final PostTable postTable = new PostTable(postId, updatePostDto.getTitle(), updatePostDto.getText(),
+                oldPostTable.getCreatedAt(), oldPostTable.getGroupReference(), oldPostTable.getUserReference());
+
+        PostUpdatedEvent<PersistentPost> updatedEvent = new PostUpdatedEvent<>(postTable, this);
+        subscribeEventToOracleAndMongo(updatedEvent);
+
+        return ResponseEntity.ok().body("Příspěvek byl aktualizován");
+    }
+
     public ResponseEntity<?> deletePost(int postId) {
         Optional<PostTable> postTableOptional = postRepository.findById(postId);
         if (postTableOptional.isEmpty())
@@ -102,8 +125,13 @@ public class PostCommandService implements CommandDeleteService<PersistentPost> 
     }
 
     @Override
-    public PersistentPost finishUpdating(PersistentPost persistentObject) {
-        return null;
+    public PersistentPost finishUpdating(PersistentPost post) {
+        if (post instanceof PostTable) {
+            return postRepository.save((PostTable) post);
+        } else {
+            updatePostInGroup((PostEmbedded) post);
+            return post;
+        }
     }
 
     @Override
@@ -131,6 +159,16 @@ public class PostCommandService implements CommandDeleteService<PersistentPost> 
     }
 
     private void addPostToGroup(PostEmbedded post) {
+        mongoTemplate.updateMulti(
+                new Query(where("id").is(post.getGroupReference().getId())),
+                new Update()
+                        .push("posts", post),
+                GroupDocument.class
+        );
+    }
+
+    //TODO
+    private void updatePostInGroup(PostEmbedded post) {
         mongoTemplate.updateMulti(
                 new Query(where("id").is(post.getGroupReference().getId())),
                 new Update()
