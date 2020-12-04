@@ -154,7 +154,24 @@ public class GroupCommandService implements GroupChangingService<PersistentGroup
         GroupMemberAddedEvent<PersistentGroup> groupMemberAddedEvent = new GroupMemberAddedEvent<>(groupTable, userTable, this);
         subscribeEventToOracleAndMongo(groupMemberAddedEvent);
 
-        return ResponseEntity.ok().body("Stav skupiny byl změněn");
+        return ResponseEntity.ok().body("Uživatel byl přidán do skupiny");
+    }
+
+    public ResponseEntity<?> removeGroupMember(int groupId, int userId) {
+        Optional<GroupTable> groupTableOptional = groupRepository.findById(groupId);
+        if (groupTableOptional.isEmpty())
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Skupina s tímto id neexistuje");
+        GroupTable groupTable = groupTableOptional.get();
+
+        Optional<UserTable> userTableOptional = userRepository.findById(userId);
+        if(userTableOptional.isEmpty())
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Uživatel s tímto id neexistuje");
+        UserTable userTable = userTableOptional.get();
+
+        GroupMemberRemovedEvent<PersistentGroup> groupMemberRemovedEvent = new GroupMemberRemovedEvent<>(groupTable, userTable, this);
+        subscribeEventToOracleAndMongo(groupMemberRemovedEvent);
+
+        return ResponseEntity.ok().body("Uživatel byl odebrán ze skupiny");
     }
 
 /* methods called from events */
@@ -254,8 +271,22 @@ public class GroupCommandService implements GroupChangingService<PersistentGroup
             return groupRepository.save(groupTable);
         } else {
             GroupDocument groupDocument = (GroupDocument) group;
-            updateGroupMembersInUserDocument(userTable.getId(), groupDocument);
+            updateAddGroupMembersInUserDocument(userTable.getId(), groupDocument);
             groupDocument.getMembers().add(new MemberEmbedded(userTable.getId(), userTable.getName(), userTable.getSurname()));
+            return groupDocumentRepository.save(groupDocument);
+        }
+    }
+
+    @Override
+    public PersistentGroup finishMemberRemoving(PersistentGroup group, UserTable userTable) {
+        if (group instanceof GroupTable) {
+            GroupTable groupTable = (GroupTable) group;
+            groupTable.removeUser(userTable);
+            return groupRepository.save(groupTable);
+        } else {
+            GroupDocument groupDocument = (GroupDocument) group;
+            updateRemoveGroupMembersInUserDocument(userTable.getId(), groupDocument);
+            groupDocument.getMembers().remove(new MemberEmbedded(userTable.getId(), userTable.getName(), userTable.getSurname()));
             return groupDocumentRepository.save(groupDocument);
         }
     }
@@ -276,11 +307,20 @@ public class GroupCommandService implements GroupChangingService<PersistentGroup
     }
 
 
-    private void updateGroupMembersInUserDocument(int newMemberId, GroupDocument groupDocument) {
+    private void updateAddGroupMembersInUserDocument(int newMemberId, GroupDocument groupDocument) {
         mongoTemplate.updateMulti(
                 new Query(where("id").is(newMemberId)),
                 new Update()
                         .push("groupsMember", new GroupEmbedded(groupDocument.getId(), groupDocument.getName())),
+                UserDocument.class
+        );
+    }
+
+    private void updateRemoveGroupMembersInUserDocument(int newMemberId, GroupDocument groupDocument) {
+        mongoTemplate.updateMulti(
+                new Query(where("id").is(newMemberId)),
+                new Update()
+                        .pull("groupsMember", new GroupEmbedded(groupDocument.getId(), groupDocument.getName())),
                 UserDocument.class
         );
     }

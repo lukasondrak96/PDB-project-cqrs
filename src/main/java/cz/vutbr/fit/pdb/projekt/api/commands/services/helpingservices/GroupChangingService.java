@@ -11,4 +11,7 @@ public interface GroupChangingService<T extends PersistentObject> extends Comman
     T finishAdminChanging(T group, UserTable userTable);
 
     T finishMemberAdding(T persistentObject, UserTable userTable);
+
+    T finishMemberRemoving(T persistentObject, UserTable userTable);
+
 }

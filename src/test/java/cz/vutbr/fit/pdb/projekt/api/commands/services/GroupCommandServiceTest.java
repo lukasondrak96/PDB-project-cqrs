@@ -217,7 +217,7 @@ class GroupCommandServiceTest extends AbstractServiceTest {
     }
 
     @Test
-    void test_addMemberToGroup() {
+    void test_addGroupMember() {
         userCommandService.createUser(TEST_GROUP_CREATOR);
         UserTable groupCreator = userRepository.findAll().get(0);
         NewGroupDto newGroupDto = new NewGroupDto(
@@ -247,6 +247,37 @@ class GroupCommandServiceTest extends AbstractServiceTest {
 
         UserDocument newMemberDocument = userDocumentRepository.findById(newMember.getId()).get();
         assertEquals(1, newMemberDocument.getGroupsMember().size());
+
+    }
+
+    @Test
+    void test_removeGroupMember() {
+        userCommandService.createUser(TEST_GROUP_CREATOR);
+        UserTable groupCreator = userRepository.findAll().get(0);
+        NewGroupDto newGroupDto = new NewGroupDto(
+                TEST_NAME, TEST_DESCRIPTION, TEST_STATE_PUBLIC, groupCreator.getId()
+        );
+        groupCommandService.createGroup(newGroupDto);
+        int createdGroupId = groupRepository.findAll().get(0).getId();
+        userCommandService.createUser(TEST_GROUP_NEW_MEMBER);
+        UserTable member = userRepository.findAll().get(1);
+        groupCommandService.addGroupMember(createdGroupId, member.getId());
+
+
+        groupCommandService.removeGroupMember(createdGroupId, member.getId());
+
+
+        Optional<GroupTable> updatedGroupSqlOptional = groupRepository.findById(createdGroupId);
+        Optional<GroupDocument> updatedGroupNoSqlOptional = groupDocumentRepository.findById(createdGroupId);
+        assertTrue(updatedGroupSqlOptional.isPresent());
+        assertTrue(updatedGroupNoSqlOptional.isPresent());
+        GroupTable updatedGroupTable = updatedGroupSqlOptional.get();
+        GroupDocument updatedGroupDocument = updatedGroupNoSqlOptional.get();
+        assertTrue(updatedGroupTable.getUsers().isEmpty());
+        assertTrue(updatedGroupDocument.getMembers().isEmpty());
+
+        UserDocument newMemberDocument = userDocumentRepository.findById(member.getId()).get();
+        assertEquals(0, newMemberDocument.getGroupsMember().size());
 
     }
 }
