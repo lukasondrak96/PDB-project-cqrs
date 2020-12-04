@@ -44,9 +44,9 @@ public class GroupCommandController {
     }
 
     @GetMapping("{id}/remove-user/{userId}")
-    public ResponseEntity<?> removeUserToGroup(@PathVariable(value = "id") int groupId,
-                                               @PathVariable(value = "userId") int userId) {
-        return null;
+    public ResponseEntity<?> removeUserFromGroup(@PathVariable(value = "id") int groupId,
+                                                 @PathVariable(value = "userId") int userId) {
+        return groupCommandService.removeGroupMember(groupId, userId);
     }
 
     @GetMapping("{id}/change-admin/{userId}")

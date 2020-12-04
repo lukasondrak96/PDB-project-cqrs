@@ -33,6 +33,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.Optional;
 
 import static org.springframework.data.mongodb.core.query.Criteria.where;
@@ -167,6 +168,16 @@ public class GroupCommandService implements GroupChangingService<PersistentGroup
             persistentGroupInterface.setState(groupInterface.getState());
             persistentGroupInterface.setDescription(groupInterface.getDescription());
             persistentGroupInterface.setUserReference(groupInterface.getUserReference());
+        }
+
+        if(group instanceof GroupTable) {
+            ((GroupTable)persistentGroupInterface).setUsers(((GroupTable) groupInterface).getUsers());
+        } else {
+            ArrayList<MemberEmbedded> memberEmbeddeds = new ArrayList<>();
+            ((GroupTable) groupInterface).getUsers().forEach(user -> {
+                memberEmbeddeds.add(new MemberEmbedded(user.getId(), user.getName(), user.getSurname()));
+            });
+            ((GroupDocument)persistentGroupInterface).setMembers(memberEmbeddeds);
         }
         return (PersistentGroup) persistentGroupInterface;
     }

@@ -48,7 +48,12 @@ public class GroupTable implements GroupInterface, PersistentGroup {
     @OnDelete(action = OnDeleteAction.CASCADE)
     private UserTable userReference;
 
-    @ManyToMany(mappedBy = "groups", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @JoinTable(
+            name = "user_group_link",
+            joinColumns = {@JoinColumn(name = "id")},
+            inverseJoinColumns = {@JoinColumn(name = "idUser")}
+    )
     private List<UserTable> users = new ArrayList<>();
 
     public void addUser(UserTable user) {
@@ -57,8 +62,8 @@ public class GroupTable implements GroupInterface, PersistentGroup {
     }
 
     public void removeUser(UserTable user) {
-        this.users.remove(user);
-        user.getGroups().remove(this);
+        this.users.removeIf(userInList -> userInList.getId() == user.getId());
+        user.getGroups().removeIf(groupInList -> groupInList.getId() == this.getId());
     }
 
     @Override
