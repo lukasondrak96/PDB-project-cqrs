@@ -296,6 +296,49 @@ class GroupCommandServiceTest extends AbstractServiceTest {
     }
 
     @Test
+    void test_addAndRemoveWithMoreGroupMembers() {
+        userCommandService.createUser(TEST_GROUP_CREATOR);
+        UserTable groupCreator = userRepository.findAll().get(0);
+        NewGroupDto newGroupDto = new NewGroupDto(
+                TEST_NAME, TEST_DESCRIPTION, TEST_STATE_PUBLIC, groupCreator.getId()
+        );
+        groupCommandService.createGroup(newGroupDto);
+        int createdGroupId = groupRepository.findAll().get(0).getId();
+        userCommandService.createUser(new NewUserDto("new@member1", "newMember1", "newMemberSurname1", new Date(300L), UserSex.FEMALE));
+        UserTable newMember1 = userRepository.findAll().get(1);
+
+        userCommandService.createUser(new NewUserDto("new@member2", "newMember2", "newMemberSurname2", new Date(300L), UserSex.FEMALE));
+        UserTable newMember2 = userRepository.findAll().get(2);
+
+        userCommandService.createUser(new NewUserDto("new@member3", "newMember3", "newMemberSurname3", new Date(300L), UserSex.FEMALE));
+        UserTable newMember3 = userRepository.findAll().get(3);
+
+
+        groupCommandService.addGroupMember(createdGroupId, newMember1.getId());
+        groupCommandService.addGroupMember(createdGroupId, newMember2.getId());
+        groupCommandService.addGroupMember(createdGroupId, newMember3.getId());
+//        groupCommandService.removeGroupMember(createdGroupId, newMember2.getId()); //remove second member
+
+
+        GroupTable updatedGroupSql = groupRepository.findById(createdGroupId).get();
+        GroupDocument updatedGroupNoSql = groupDocumentRepository.findById(createdGroupId).get();
+        assertEquals(2, updatedGroupNoSql.getMembers().size());
+        assertEquals(newMember1.getId(), updatedGroupSql.getUsers().get(0).getId());
+        assertEquals(newMember3.getId(), updatedGroupNoSql.getMembers().get(1).getId());
+
+        UserDocument newMember1Document = userDocumentRepository.findById(newMember1.getId()).get();
+        assertEquals(1, newMember1Document.getGroupsMember().size());
+
+        UserDocument newMember2Document = userDocumentRepository.findById(newMember2.getId()).get();
+        assertEquals(0, newMember2Document.getGroupsMember().size());
+
+        UserDocument newMember3Document = userDocumentRepository.findById(newMember3.getId()).get();
+        assertEquals(1, newMember3Document.getGroupsMember().size());
+    }
+
+
+
+    @Test
     void test_removeGroupMember() {
         userCommandService.createUser(TEST_GROUP_CREATOR);
         UserTable groupCreator = userRepository.findAll().get(0);

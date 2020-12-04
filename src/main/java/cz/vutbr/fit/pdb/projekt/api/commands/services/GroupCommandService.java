@@ -269,7 +269,7 @@ public class GroupCommandService implements GroupChangingService<PersistentGroup
         } else {
             GroupDocument groupDocument = (GroupDocument) group;
             updateAddGroupMembersInUserDocument(userTable.getId(), groupDocument);
-            groupDocument.getMembers().add(new MemberEmbedded(userTable.getId(), userTable.getName(), userTable.getSurname()));
+//            groupDocument.getMembers().add(new MemberEmbedded(userTable.getId(), userTable.getName(), userTable.getSurname()));
             return groupDocumentRepository.save(groupDocument);
         }
     }
