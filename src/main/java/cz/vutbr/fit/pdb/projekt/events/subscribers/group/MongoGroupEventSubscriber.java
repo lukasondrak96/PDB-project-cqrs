@@ -27,31 +27,31 @@ public class MongoGroupEventSubscriber extends AbstractSubscriber {
     }
 
     @Subscribe
-    public void onGroupUpdatedEvent(GroupUpdatedEvent<PersistentGroup> groupUpdatedEvent) {
+    public void onGroupUpdateConfirmedEvent(GroupUpdatedEvent<PersistentGroup> groupUpdatedEvent) {
         LOGGER.info(RECEIVED_AND_APPLYING_EVENT, groupUpdatedEvent.getClass().getSimpleName(), groupUpdatedEvent);
         groupUpdatedEvent.apply(REUSABLE_MONGO_OBJECT);
     }
 
     @Subscribe
-    public void onGroupDeletedEvent(GroupDeletedEvent<PersistentGroup> groupDeletedEvent) {
+    public void onGroupDeleteConfirmedEvent(GroupDeletedEvent<PersistentGroup> groupDeletedEvent) {
         LOGGER.info(RECEIVED_AND_APPLYING_EVENT, groupDeletedEvent.getClass().getSimpleName(), groupDeletedEvent);
         groupDeletedEvent.apply(REUSABLE_MONGO_OBJECT);
     }
 
     @Subscribe
-    public void onGroupStateChangedEvent(GroupStateChangedEvent<PersistentGroup> groupStateChangedEvent) {
+    public void onGroupStateChangeConfirmedEvent(GroupStateChangedEvent<PersistentGroup> groupStateChangedEvent) {
         LOGGER.info(RECEIVED_AND_APPLYING_EVENT, groupStateChangedEvent.getClass().getSimpleName(), groupStateChangedEvent);
         groupStateChangedEvent.apply(REUSABLE_MONGO_OBJECT);
     }
 
     @Subscribe
-    public void onGroupAdminChangedEvent(GroupAdminChangedEvent<PersistentGroup> groupAdminChangedEvent) {
+    public void onGroupAdminChangeConfirmedEvent(GroupAdminChangedEvent<PersistentGroup> groupAdminChangedEvent) {
         LOGGER.info(RECEIVED_AND_APPLYING_EVENT, groupAdminChangedEvent.getClass().getSimpleName(), groupAdminChangedEvent);
         groupAdminChangedEvent.apply(REUSABLE_MONGO_OBJECT);
     }
 
     @Subscribe
-    public void onGroupMemberAddedEvent(GroupMemberAddedEvent<PersistentGroup> groupMemberAddedEvent) {
+    public void onGroupMemberAddedConfirmedEvent(GroupMemberAddedEvent<PersistentGroup> groupMemberAddedEvent) {
         LOGGER.info(RECEIVED_AND_APPLYING_EVENT, groupMemberAddedEvent.getClass().getSimpleName(), groupMemberAddedEvent);
         groupMemberAddedEvent.apply(REUSABLE_MONGO_OBJECT);
     }

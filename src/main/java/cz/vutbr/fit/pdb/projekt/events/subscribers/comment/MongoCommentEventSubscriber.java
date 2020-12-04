@@ -28,7 +28,7 @@ public class MongoCommentEventSubscriber extends AbstractSubscriber {
     }
 
     @Subscribe
-    public void onCommentDeletedEvent(CommentDeletedEvent<PersistentComment> commentDeletedEvent) {
+    public void onCommentDeleteConfirmedEvent(CommentDeletedEvent<PersistentComment> commentDeletedEvent) {
         LOGGER.info(RECEIVED_AND_APPLYING_EVENT, commentDeletedEvent.getClass().getSimpleName(), commentDeletedEvent);
         commentDeletedEvent.apply(REUSABLE_MONGO_OBJECT);
     }

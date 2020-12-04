@@ -29,19 +29,19 @@ public class MongoUserEventSubscriber extends AbstractSubscriber {
     }
 
     @Subscribe
-    public void onUserUpdatedEvent(UserUpdatedEvent<PersistentUser> userUpdatedEvent) {
+    public void onUserUpdateConfirmedEvent(UserUpdatedEvent<PersistentUser> userUpdatedEvent) {
         LOGGER.info(RECEIVED_AND_APPLYING_EVENT, userUpdatedEvent.getClass().getSimpleName(), userUpdatedEvent);
         userUpdatedEvent.apply(REUSABLE_MONGO_OBJECT);
     }
 
     @Subscribe
-    public void onUserActivatedEvent(UserActivatedEvent<PersistentUser> userActivatedEvent) {
+    public void onUserActivateConfirmedEvent(UserActivatedEvent<PersistentUser> userActivatedEvent) {
         LOGGER.info(RECEIVED_AND_APPLYING_EVENT, userActivatedEvent.getClass().getSimpleName(), userActivatedEvent);
         userActivatedEvent.apply(REUSABLE_MONGO_OBJECT);
     }
 
     @Subscribe
-    public void onUserDeactivatedEvent(UserDeactivatedEvent<PersistentUser> userDeactivatedEvent) {
+    public void onUserDeactivateConfirmedEvent(UserDeactivatedEvent<PersistentUser> userDeactivatedEvent) {
         LOGGER.info(RECEIVED_AND_APPLYING_EVENT, userDeactivatedEvent.getClass().getSimpleName(), userDeactivatedEvent);
         userDeactivatedEvent.apply(REUSABLE_MONGO_OBJECT);
     }

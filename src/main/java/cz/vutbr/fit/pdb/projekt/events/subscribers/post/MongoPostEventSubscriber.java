@@ -27,7 +27,7 @@ public class MongoPostEventSubscriber extends AbstractSubscriber {
     }
 
     @Subscribe
-    public void onPostDeletedEvent(PostDeletedEvent<PersistentPost> postDeletedEvent) {
+    public void onPostDeleteConfirmedEvent(PostDeletedEvent<PersistentPost> postDeletedEvent) {
         LOGGER.info(RECEIVED_AND_APPLYING_EVENT, postDeletedEvent.getClass().getSimpleName(), postDeletedEvent);
         postDeletedEvent.apply(REUSABLE_MONGO_OBJECT);
     }
