@@ -2,6 +2,7 @@ package cz.vutbr.fit.pdb.projekt.events.subscribers.comment;
 
 import cz.vutbr.fit.pdb.projekt.events.events.ConfirmedEventAdapter;
 import cz.vutbr.fit.pdb.projekt.events.events.comment.CommentDeletedEvent;
+import cz.vutbr.fit.pdb.projekt.events.events.comment.CommentUpdatedEvent;
 import cz.vutbr.fit.pdb.projekt.events.subscribers.AbstractSubscriber;
 import cz.vutbr.fit.pdb.projekt.events.subscribers.post.MongoPostEventSubscriber;
 import cz.vutbr.fit.pdb.projekt.features.helperInterfaces.persistent.PersistentComment;
@@ -25,6 +26,12 @@ public class MongoCommentEventSubscriber extends AbstractSubscriber {
     public void onCommentCreateConfirmedEvent(ConfirmedEventAdapter<CommentEmbedded> createConfirmedEvent) {
         LOGGER.info(RECEIVED_AND_APPLYING_EVENT, createConfirmedEvent.getClass().getSimpleName(), createConfirmedEvent);
         createConfirmedEvent.apply(REUSABLE_MONGO_OBJECT);
+    }
+
+    @Subscribe
+    public void onCommentUpdatedEvent(CommentUpdatedEvent<PersistentComment> commentUpdatedEvent) {
+        LOGGER.info(RECEIVED_AND_APPLYING_EVENT, commentUpdatedEvent.getClass().getSimpleName(), commentUpdatedEvent);
+        commentUpdatedEvent.apply(REUSABLE_MONGO_OBJECT);
     }
 
     @Subscribe

@@ -1,10 +1,12 @@
 package cz.vutbr.fit.pdb.projekt.api.commands.services;
 
 import cz.vutbr.fit.pdb.projekt.api.commands.dtos.comment.NewCommentDto;
+import cz.vutbr.fit.pdb.projekt.api.commands.dtos.comment.UpdateCommentDto;
 import cz.vutbr.fit.pdb.projekt.api.commands.services.helpingservices.CommandDeleteService;
 import cz.vutbr.fit.pdb.projekt.events.events.AbstractEvent;
 import cz.vutbr.fit.pdb.projekt.events.events.OracleCreatedEvent;
 import cz.vutbr.fit.pdb.projekt.events.events.comment.CommentDeletedEvent;
+import cz.vutbr.fit.pdb.projekt.events.events.comment.CommentUpdatedEvent;
 import cz.vutbr.fit.pdb.projekt.events.subscribers.comment.MongoCommentEventSubscriber;
 import cz.vutbr.fit.pdb.projekt.events.subscribers.comment.OracleCommentEventSubscriber;
 import cz.vutbr.fit.pdb.projekt.features.helperInterfaces.ObjectInterface;
@@ -62,6 +64,27 @@ public class CommentCommandService implements CommandDeleteService<PersistentCom
         return ResponseEntity.ok().body("Komentář byl vytvořen");
     }
 
+
+    public ResponseEntity<?> updateComment(int commentId, UpdateCommentDto updateCommentDto) {
+        Optional<CommentTable> commentTableOptional = commentRepository.findById(commentId);
+        if (commentTableOptional.isEmpty())
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Komentář s tímto id neexistuje");
+
+        CommentTable oldCommentTable = commentTableOptional.get();
+
+        if (isCommentTableEqualToUpdateCommentDto(oldCommentTable, updateCommentDto)) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Nebyly nalezeny žádné změny pro editaci");
+        }
+
+        final CommentTable commentTable = new CommentTable(commentId, updateCommentDto.getText(),
+                oldCommentTable.getCreatedAt(), oldCommentTable.getPostReference(), oldCommentTable.getUserReference());
+
+        CommentUpdatedEvent<PersistentComment> updatedEvent = new CommentUpdatedEvent<>(commentTable, this);
+        subscribeEventToOracleAndMongo(updatedEvent);
+
+        return ResponseEntity.ok().body("Komentář byl aktualizován");
+    }
+
     public ResponseEntity<?> deleteComment(int commentId) {
         Optional<CommentTable> commentTableOptional = commentRepository.findById(commentId);
         if (commentTableOptional.isEmpty())
@@ -101,8 +124,13 @@ public class CommentCommandService implements CommandDeleteService<PersistentCom
     }
 
     @Override
-    public PersistentComment finishUpdating(PersistentComment persistentObject) {
-        return null;
+    public PersistentComment finishUpdating(PersistentComment comment) {
+        if (comment instanceof CommentTable) {
+            return commentRepository.save((CommentTable) comment);
+        } else {
+            updateCommentInPost((CommentEmbedded) comment);
+            return comment;
+        }
     }
 
     @Override
@@ -115,6 +143,10 @@ public class CommentCommandService implements CommandDeleteService<PersistentCom
     }
 
     /* private methods */
+    private boolean isCommentTableEqualToUpdateCommentDto(CommentTable table, UpdateCommentDto dto) {
+        return dto.getText().equals(table.getText());
+    }
+
     private void subscribeEventToOracleAndMongo(AbstractEvent<PersistentComment> event) {
         OracleCommentEventSubscriber sqlSubscriber = new OracleCommentEventSubscriber(EVENT_BUS);
         MongoCommentEventSubscriber noSqlSubscriber = new MongoCommentEventSubscriber(EVENT_BUS);
@@ -125,6 +157,16 @@ public class CommentCommandService implements CommandDeleteService<PersistentCom
     }
 
     private void addCommentToPost(CommentEmbedded comment) {
+        mongoTemplate.updateMulti(
+                new Query(where("posts.id").is(comment.getPostReference().getId())),
+                new Update()
+                        .push("posts.$.comments", comment),
+                GroupDocument.class
+        );
+    }
+
+    //TODO
+    private void updateCommentInPost(CommentEmbedded comment) {
         mongoTemplate.updateMulti(
                 new Query(where("posts.id").is(comment.getPostReference().getId())),
                 new Update()

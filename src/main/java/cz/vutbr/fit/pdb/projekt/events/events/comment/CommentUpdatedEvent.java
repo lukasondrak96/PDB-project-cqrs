@@ -1,20 +1,21 @@
 package cz.vutbr.fit.pdb.projekt.events.events.comment;
 
-import cz.vutbr.fit.pdb.projekt.api.commands.services.CommentCommandService;
-import cz.vutbr.fit.pdb.projekt.events.events.EventInterface;
-import cz.vutbr.fit.pdb.projekt.features.helperInterfaces.persistent.PersistentComment;
+import cz.vutbr.fit.pdb.projekt.api.commands.services.helpingservices.CommandService;
+import cz.vutbr.fit.pdb.projekt.events.events.AbstractEvent;
+import cz.vutbr.fit.pdb.projekt.features.helperInterfaces.ObjectInterface;
+import cz.vutbr.fit.pdb.projekt.features.helperInterfaces.PersistentObject;
 
-public class CommentUpdatedEvent implements EventInterface<PersistentComment> {
+public class CommentUpdatedEvent<T extends PersistentObject> extends AbstractEvent<T> {
 
-    private final CommentCommandService service;
-
-    public CommentUpdatedEvent(CommentCommandService service) {
-        this.service = service;
+    public CommentUpdatedEvent(ObjectInterface objectInterface, CommandService<T> commandService) {
+        super(objectInterface, commandService);
     }
 
     @Override
-    public PersistentComment apply(PersistentComment persistentComment) {
-        return null;
+    public T apply(T persistentObject) {
+        CommandService<T> commandService = getCommandService();
+        persistentObject = commandService.assignFromTo(getObjectInterface(), persistentObject);
+        return commandService.finishUpdating(persistentObject);
     }
 
 }

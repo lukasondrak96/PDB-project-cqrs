@@ -5,6 +5,7 @@ import cz.vutbr.fit.pdb.projekt.features.helperInterfaces.persistent.PersistentC
 import cz.vutbr.fit.pdb.projekt.features.helperInterfaces.references.UserReference;
 import cz.vutbr.fit.pdb.projekt.features.sqlfeatures.post.PostTable;
 import cz.vutbr.fit.pdb.projekt.features.sqlfeatures.user.UserTable;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -18,6 +19,7 @@ import java.util.Date;
 @Getter
 @Setter
 @NoArgsConstructor
+@AllArgsConstructor
 public class CommentTable implements CommentInterface, PersistentComment {
 
     public CommentTable(String text, Date createdAt, PostTable postReference, UserTable userReference) {

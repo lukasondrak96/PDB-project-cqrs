@@ -1,6 +1,7 @@
 package cz.vutbr.fit.pdb.projekt.api.commands.controllers;
 
 import cz.vutbr.fit.pdb.projekt.api.commands.dtos.comment.NewCommentDto;
+import cz.vutbr.fit.pdb.projekt.api.commands.dtos.comment.UpdateCommentDto;
 import cz.vutbr.fit.pdb.projekt.api.commands.services.CommentCommandService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -20,8 +21,8 @@ public class CommentCommandController {
     }
 
     @PutMapping("{id}/edit")
-    public ResponseEntity<?> editComment(@PathVariable(value = "id") int commentId) {
-        return null;
+    public ResponseEntity<?> editComment(@PathVariable(value = "id") int commentId, @Valid @RequestBody UpdateCommentDto updateCommentDto) {
+        return commentCommandService.updateComment(commentId, updateCommentDto);
     }
 
     @DeleteMapping("{id}/delete")
