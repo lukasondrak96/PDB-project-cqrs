@@ -15,6 +15,7 @@ public class CommentDeletedEvent<T extends PersistentObject> extends AbstractEve
     @Override
     public T apply(T persistentObject) {
         CommandDeleteService<T> commandService = (CommandDeleteService<T>) getCommandService();
+        persistentObject = commandService.assignFromTo(getObjectInterface(), persistentObject);
         return commandService.finishDeleting(persistentObject);
     }
 
