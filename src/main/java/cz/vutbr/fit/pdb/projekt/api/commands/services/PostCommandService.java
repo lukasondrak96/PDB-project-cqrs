@@ -109,7 +109,7 @@ public class PostCommandService implements CommandDeleteService<PersistentPost> 
     @Override
     public PersistentPost finishDeleting(PersistentPost post) {
         if (post instanceof PostTable)
-            postRepository.delete((PostTable) post);
+            postRepository.deleteById(((PostTable) post).getId());
         else
             removePostFromGroup((PostEmbedded) post);
         return null;

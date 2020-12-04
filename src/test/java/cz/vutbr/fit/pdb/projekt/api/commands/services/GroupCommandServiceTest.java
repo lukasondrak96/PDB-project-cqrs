@@ -108,11 +108,56 @@ class GroupCommandServiceTest extends AbstractServiceTest {
         groupCommandService.deleteGroup(createdGroupId);
 
 
-        Optional<GroupTable> updatedGroupSqlOptional = groupRepository.findById(createdGroupId);
-        Optional<GroupDocument> updatedGroupNoSqlOptional = groupDocumentRepository.findById(createdGroupId);
-        assertTrue(updatedGroupSqlOptional.isEmpty());
-        assertTrue(updatedGroupNoSqlOptional.isEmpty());
+        Optional<GroupTable> deletedGroupSqlOptional = groupRepository.findById(createdGroupId);
+        Optional<GroupDocument> deletedGroupNoSqlOptional = groupDocumentRepository.findById(createdGroupId);
+        assertTrue(deletedGroupSqlOptional.isEmpty());
+        assertTrue(deletedGroupNoSqlOptional.isEmpty());
     }
+
+    @Test
+    void test_deletePostWithMultiplePostsInGroup() {
+        userCommandService.createUser(TEST_GROUP_CREATOR);
+        int creatorId = userRepository.findAll().get(0).getId();
+
+        NewGroupDto firstGroup = new NewGroupDto(
+                TEST_NAME, TEST_DESCRIPTION, TEST_STATE_PRIVATE, creatorId
+        );
+        groupCommandService.createGroup(firstGroup);
+        int firstGroupId = groupRepository.findAll().get(0).getId();
+
+        NewGroupDto secondGroup = new NewGroupDto(
+                TEST_NAME + "2", TEST_DESCRIPTION  + "2", TEST_STATE_PRIVATE, creatorId
+        );
+        groupCommandService.createGroup(secondGroup);
+        int secondGroupId = groupRepository.findAll().get(1).getId();
+
+        NewGroupDto thirdGroup = new NewGroupDto(
+                TEST_NAME + "3", TEST_DESCRIPTION  + "3", TEST_STATE_PRIVATE, creatorId
+        );
+        groupCommandService.createGroup(thirdGroup);
+        int thirdGroupId = groupRepository.findAll().get(2).getId();
+
+
+        groupCommandService.deleteGroup(secondGroupId); //delete second group
+
+
+        Optional<GroupTable> firstGroupSqlOptional = groupRepository.findById(firstGroupId);
+        Optional<GroupDocument> firstGroupNoSqlOptional = groupDocumentRepository.findById(firstGroupId);
+        assertTrue(firstGroupSqlOptional.isPresent());
+        assertTrue(firstGroupNoSqlOptional.isPresent());
+
+        Optional<GroupTable> secondGroupSqlOptional = groupRepository.findById(secondGroupId);
+        Optional<GroupDocument> secondGroupNoSqlOptional = groupDocumentRepository.findById(secondGroupId);
+        assertTrue(secondGroupSqlOptional.isEmpty());
+        assertTrue(secondGroupNoSqlOptional.isEmpty());
+
+        Optional<GroupTable> thirdGroupSqlOptional = groupRepository.findById(thirdGroupId);
+        Optional<GroupDocument> thirdGroupNoSqlOptional = groupDocumentRepository.findById(thirdGroupId);
+        assertTrue(thirdGroupSqlOptional.isPresent());
+        assertTrue(thirdGroupNoSqlOptional.isPresent());
+    }
+
+
 
     @Test
     void test_changeGroupState_private_to_public() {
