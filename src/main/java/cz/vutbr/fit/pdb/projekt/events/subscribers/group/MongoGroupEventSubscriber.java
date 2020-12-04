@@ -45,6 +45,12 @@ public class MongoGroupEventSubscriber extends AbstractSubscriber {
     }
 
     @Subscribe
+    public void onGroupAdminChangedEvent(GroupAdminChangedEvent<PersistentGroup> groupAdminChangedEvent) {
+        LOGGER.info(RECEIVED_AND_APPLYING_EVENT, groupAdminChangedEvent.getClass().getSimpleName(), groupAdminChangedEvent);
+        groupAdminChangedEvent.apply(REUSABLE_MONGO_OBJECT);
+    }
+
+    @Subscribe
     public void onGroupMemberAddedEvent(GroupMemberAddedEvent<PersistentGroup> groupMemberAddedEvent) {
         LOGGER.info(RECEIVED_AND_APPLYING_EVENT, groupMemberAddedEvent.getClass().getSimpleName(), groupMemberAddedEvent);
         groupMemberAddedEvent.apply(REUSABLE_MONGO_OBJECT);
