@@ -1,5 +1,6 @@
 package cz.vutbr.fit.pdb.projekt.api.queries.controllers;
 
+import cz.vutbr.fit.pdb.projekt.api.queries.services.GroupQueryService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -11,23 +12,26 @@ import org.springframework.web.bind.annotation.RestController;
 @AllArgsConstructor
 @RequestMapping("/query/groups")
 public class GroupQueryController {
+
+    private final GroupQueryService groupQueryService;
+
     @GetMapping
     public ResponseEntity<?> getAllGroups() {
-        return null;
+        return groupQueryService.getAllGroups();
     }
 
     @GetMapping("{id}/members")
     public ResponseEntity<?> getGroupMembers(@PathVariable(value = "id") int groupId) {
-        return null;
+        return groupQueryService.getGroupMembers(groupId);
     }
 
     @GetMapping("{id}/admin")
     public ResponseEntity<?> getGroupAdmin(@PathVariable(value = "id") int groupId) {
-        return null;
+        return groupQueryService.getGroupAdmin(groupId);
     }
 
     @GetMapping("{id}/posts")
     public ResponseEntity<?> getAllPostInGroup(@PathVariable(value = "id") int groupId) {
-        return null;
+        return groupQueryService.getAllPostInGroup(groupId);
     }
 }
