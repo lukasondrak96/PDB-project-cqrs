@@ -1,5 +1,6 @@
 package cz.vutbr.fit.pdb.projekt.api.commands.services;
 
+import cz.vutbr.fit.pdb.projekt.api.AbstractServiceTest;
 import cz.vutbr.fit.pdb.projekt.api.commands.dtos.comment.NewCommentDto;
 import cz.vutbr.fit.pdb.projekt.api.commands.dtos.comment.UpdateCommentDto;
 import cz.vutbr.fit.pdb.projekt.api.commands.dtos.group.NewGroupDto;

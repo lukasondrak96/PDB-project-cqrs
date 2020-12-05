@@ -1,5 +1,6 @@
-package cz.vutbr.fit.pdb.projekt.api.commands.services;
+package cz.vutbr.fit.pdb.projekt.api;
 
+import cz.vutbr.fit.pdb.projekt.api.commands.services.*;
 import cz.vutbr.fit.pdb.projekt.features.nosqlfeatures.group.GroupDocumentRepository;
 import cz.vutbr.fit.pdb.projekt.features.nosqlfeatures.user.UserDocumentRepository;
 import cz.vutbr.fit.pdb.projekt.features.sqlfeatures.comment.CommentRepository;
@@ -11,47 +12,47 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.springframework.beans.factory.annotation.Autowired;
 
-abstract class AbstractServiceTest {
+public abstract class AbstractServiceTest {
 
 
     @Autowired
-    UserCommandService userCommandService;
+    public UserCommandService userCommandService;
 
     @Autowired
-    UserRepository userRepository;
+    public UserRepository userRepository;
 
     @Autowired
-    UserDocumentRepository userDocumentRepository;
+    public UserDocumentRepository userDocumentRepository;
 
     @Autowired
-    GroupCommandService groupCommandService;
+    public GroupCommandService groupCommandService;
 
     @Autowired
-    GroupRepository groupRepository;
+    public GroupRepository groupRepository;
 
     @Autowired
-    GroupDocumentRepository groupDocumentRepository;
+    public GroupDocumentRepository groupDocumentRepository;
 
     @Autowired
-    PostCommandService postCommandService;
+    public PostCommandService postCommandService;
 
     @Autowired
-    PostRepository postRepository;
+    public PostRepository postRepository;
 
     @Autowired
-    CommentCommandService commentCommandService;
+    public CommentCommandService commentCommandService;
 
     @Autowired
-    CommentRepository commentRepository;
+    public CommentRepository commentRepository;
 
     @Autowired
-    MessageCommandService messageCommandService;
+    public MessageCommandService messageCommandService;
 
     @Autowired
-    MessageRepository messageRepository;
+    public MessageRepository messageRepository;
 
     @BeforeEach
-    void setUp() {
+    public void setUp() {
         userRepository.deleteAll();
         userDocumentRepository.deleteAll();
         groupDocumentRepository.deleteAll();
@@ -62,7 +63,7 @@ abstract class AbstractServiceTest {
     }
 
     @AfterEach
-    void tearDown() {
+    public void tearDown() {
         userRepository.deleteAll();
         userDocumentRepository.deleteAll();
         groupDocumentRepository.deleteAll();
