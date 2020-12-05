@@ -68,10 +68,13 @@ class CommentCommandServiceTest extends AbstractServiceTest {
         List<PostTable> allPosts = findAllPostsAndSortThem();
         int createdPostId = allPosts.get(0).getId();
         commentCommandService.createComment(new NewCommentDto(TEST_TEXT, creatorId, createdPostId));
+        List<CommentTable> allComments = findAllCommentsAndSortThem();
+        int createdCommentId = allComments.get(0).getId();
+
         UpdateCommentDto updateCommentDto = new UpdateCommentDto(TEST_TEXT + "updated");
 
 
-        commentCommandService.updateComment(createdPostId, updateCommentDto);
+        commentCommandService.updateComment(createdCommentId, updateCommentDto);
 
 
         int updatedCommentId = commentRepository.findAll().get(0).getId();
