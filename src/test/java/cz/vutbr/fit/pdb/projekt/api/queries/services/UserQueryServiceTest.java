@@ -150,7 +150,6 @@ class UserQueryServiceTest extends AbstractQueryServiceTest {
         assertEquals(TEST_NAME + "2", responseEntity.getBody().get(1).getName());
     }
 
-    //TODO groupCommandService.addGroupMember still does not work properly
     @Test
     void test_getGroupsWhereUserIsMember() {
         NewUserDto newUserDto = new NewUserDto(
@@ -176,8 +175,8 @@ class UserQueryServiceTest extends AbstractQueryServiceTest {
         );
         userCommandService.createUser(groupsMember);
         int groupsMemberId = userRepository.findByEmail(TEST_EMAIL + "2").get().getId();
-        groupCommandService.addGroupMember(groupsMemberId, firstGroupId);
-        groupCommandService.addGroupMember(groupsMemberId, secondGroupId);
+        groupCommandService.addGroupMember(firstGroupId, groupsMemberId);
+        groupCommandService.addGroupMember(secondGroupId, groupsMemberId);
 
 
         ResponseEntity<List<GroupEmbedded>> responseEntity = userQueryService.getGroupsWhereUserIsMember(groupsMemberId);
