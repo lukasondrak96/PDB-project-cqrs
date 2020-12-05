@@ -1,18 +1,22 @@
 package cz.vutbr.fit.pdb.projekt.api.queries.services;
 
 
+import cz.vutbr.fit.pdb.projekt.api.commands.dtos.comment.NewCommentDto;
 import cz.vutbr.fit.pdb.projekt.api.commands.dtos.group.NewGroupDto;
 import cz.vutbr.fit.pdb.projekt.api.commands.dtos.post.NewPostDto;
 import cz.vutbr.fit.pdb.projekt.api.commands.dtos.user.NewUserDto;
 import cz.vutbr.fit.pdb.projekt.features.nosqlfeatures.group.GroupDocument;
+import cz.vutbr.fit.pdb.projekt.features.nosqlfeatures.group.embedded.CommentEmbedded;
 import cz.vutbr.fit.pdb.projekt.features.nosqlfeatures.group.embedded.CreatorEmbedded;
 import cz.vutbr.fit.pdb.projekt.features.nosqlfeatures.group.embedded.MemberEmbedded;
 import cz.vutbr.fit.pdb.projekt.features.nosqlfeatures.group.embedded.PostEmbedded;
+import cz.vutbr.fit.pdb.projekt.features.sqlfeatures.comment.CommentTable;
 import cz.vutbr.fit.pdb.projekt.features.sqlfeatures.group.GroupState;
 import cz.vutbr.fit.pdb.projekt.features.sqlfeatures.user.UserSex;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 
@@ -149,5 +153,48 @@ public class GroupQueryServiceTest extends AbstractQueryServiceTest {
         assertEquals(creatorId, creator.getId());
         assertEquals("groupCreatorName", creator.getName());
         assertEquals("groupCreatorSurname", creator.getSurname());
+    }
+
+    @Test
+    public void test_getAllCommentsFromPost() {
+        userCommandService.createUser(TEST_GROUP_CREATOR);
+        int creatorId = userRepository.findByEmail("group@creator").get().getId();
+
+        NewGroupDto group = new NewGroupDto(
+                TEST_NAME, TEST_DESCRIPTION, TEST_STATE_PRIVATE, creatorId
+        );
+        groupCommandService.createGroup(group);
+        int createdGroupId = groupRepository.findByName(TEST_NAME).get().getId();
+
+        postCommandService.createPost(new NewPostDto("testPostTitle", "testPostText", creatorId, createdGroupId));
+        int createdPostId = postRepository.findAll().get(0).getId();
+
+        commentCommandService.createComment(new NewCommentDto("test text", creatorId, createdPostId));
+        commentCommandService.createComment(new NewCommentDto("test text2", creatorId, createdPostId));
+        commentCommandService.createComment(new NewCommentDto("test text3", creatorId, createdPostId));
+        List<CommentTable> allCommentsSorted = findAllCommentsAndSortThem();
+        CommentTable createdComment1 = allCommentsSorted.get(0);
+        CommentTable createdComment2 = allCommentsSorted.get(1);
+        CommentTable createdComment3 = allCommentsSorted.get(2);
+
+
+        List<CommentEmbedded> allCommentsInPost = postQueryService.getAllCommentsFromPost(createdPostId).getBody();
+
+
+        assertEquals(3, allCommentsInPost.size());
+        assertEquals(createdComment1.getText(), allCommentsInPost.get(0).getText());
+        assertEquals(createdComment1.getId(), allCommentsInPost.get(0).getId());
+
+        assertEquals(createdComment2.getText(), allCommentsInPost.get(1).getText());
+        assertEquals(createdComment2.getId(), allCommentsInPost.get(1).getId());
+
+        assertEquals(createdComment3.getText(), allCommentsInPost.get(2).getText());
+        assertEquals(createdComment3.getId(), allCommentsInPost.get(2).getId());
+    }
+
+    private List<CommentTable> findAllCommentsAndSortThem() {
+        List<CommentTable> allComments = commentRepository.findAll();
+        allComments.sort(Comparator.comparingInt(CommentTable::getId));
+        return allComments;
     }
 }

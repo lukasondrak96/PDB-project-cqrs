@@ -15,8 +15,5 @@ public abstract class AbstractQueryServiceTest extends AbstractServiceTest {
     public PostQueryService postQueryService;
 
     @Autowired
-    public CommentQueryService commentQueryService;
-
-    @Autowired
     public MessageQueryService messageQueryService;
 }
