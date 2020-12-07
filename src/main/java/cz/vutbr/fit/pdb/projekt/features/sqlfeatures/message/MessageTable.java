@@ -22,7 +22,6 @@ public class MessageTable implements MessageInterface, PersistentMessage {
     public MessageTable(String text, UserTable sender, UserTable recipient) {
         this.text = text;
         this.createdAt = new Date();
-        this.readAt = null;
         this.sender = sender;
         this.recipient = recipient;
     }
@@ -35,8 +34,6 @@ public class MessageTable implements MessageInterface, PersistentMessage {
     private String text;
 
     private Date createdAt;
-
-    private Date readAt;
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "idUserSender", referencedColumnName = "id")

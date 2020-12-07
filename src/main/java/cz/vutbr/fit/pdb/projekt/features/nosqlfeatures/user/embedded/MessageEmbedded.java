@@ -18,12 +18,21 @@ public class MessageEmbedded implements MessageInterface, PersistentMessage {
     private int id;
     private String text;
     private Date createdAt;
-    private Date readAt;
+    private boolean sent;
+
+    public MessageEmbedded(int id, String text, Date createdAt, UserReference sender, UserReference recipient) {
+        this.id = id;
+        this.text = text;
+        this.createdAt = createdAt;
+        this.sender = sender;
+        this.recipient = recipient;
+    }
 
     @Transient
     private UserReference sender;
 
     @Transient
     private UserReference recipient;
+
 
 }

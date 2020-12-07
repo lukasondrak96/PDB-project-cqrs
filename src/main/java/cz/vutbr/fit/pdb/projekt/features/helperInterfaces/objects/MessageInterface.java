@@ -18,10 +18,6 @@ public interface MessageInterface extends ObjectInterface {
 
     void setCreatedAt(Date createdAt);
 
-    Date getReadAt();
-
-    void setReadAt(Date readAt);
-
     UserReference getSender();
 
     void setSender(UserReference sender);
