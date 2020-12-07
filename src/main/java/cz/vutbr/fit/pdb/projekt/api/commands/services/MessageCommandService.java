@@ -45,7 +45,7 @@ public class MessageCommandService implements CreateCommandService<PersistentMes
         }
         UserTable sender = userSenderOptional.get();
 
-        Optional<UserTable> userRecipientOptional = userRepository.findById(newMessageDto.getSenderId());
+        Optional<UserTable> userRecipientOptional = userRepository.findById(newMessageDto.getRecipientId());
         if (userRecipientOptional.isEmpty()) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Příjemce s tímto id neexistuje");
         }
@@ -78,7 +78,8 @@ public class MessageCommandService implements CreateCommandService<PersistentMes
         if (message instanceof MessageTable) {
             return messageRepository.save((MessageTable) message);
         } else {
-            addMessageToUser((MessageEmbedded) message);
+            addMessageToSender((MessageEmbedded) message);
+            addMessageToRecipient((MessageEmbedded) message);
             return message;
         }
     }
@@ -93,7 +94,16 @@ public class MessageCommandService implements CreateCommandService<PersistentMes
         EVENT_BUS.unregister(noSqlSubscriber);
     }
 
-    private void addMessageToUser(MessageEmbedded message) {
+    private void addMessageToSender(MessageEmbedded message) {
+        mongoTemplate.updateMulti(
+                new Query(where("id").is(message.getRecipient())),
+                new Update()
+                        .push("posts", message),
+                UserDocument.class
+        );
+    }
+
+    private void addMessageToRecipient(MessageEmbedded message) {
         mongoTemplate.updateMulti(
                 new Query(where("id").is(message.getSender())),
                 new Update()
