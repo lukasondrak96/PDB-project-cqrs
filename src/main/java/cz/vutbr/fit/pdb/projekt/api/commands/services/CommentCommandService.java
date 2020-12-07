@@ -2,7 +2,7 @@ package cz.vutbr.fit.pdb.projekt.api.commands.services;
 
 import cz.vutbr.fit.pdb.projekt.api.commands.dtos.comment.NewCommentDto;
 import cz.vutbr.fit.pdb.projekt.api.commands.dtos.comment.UpdateCommentDto;
-import cz.vutbr.fit.pdb.projekt.api.commands.services.helpingservices.CommandDeleteService;
+import cz.vutbr.fit.pdb.projekt.api.commands.services.helpingservices.DeleteCommandService;
 import cz.vutbr.fit.pdb.projekt.events.events.AbstractEvent;
 import cz.vutbr.fit.pdb.projekt.events.events.OracleCreatedEvent;
 import cz.vutbr.fit.pdb.projekt.events.events.comment.CommentDeletedEvent;
@@ -36,7 +36,7 @@ import static org.springframework.data.mongodb.core.query.Criteria.where;
 
 @Service
 @AllArgsConstructor
-public class CommentCommandService implements CommandDeleteService<PersistentComment> {
+public class CommentCommandService implements DeleteCommandService<PersistentComment> {
 
     private final CommentRepository commentRepository;
     private final PostRepository postRepository;

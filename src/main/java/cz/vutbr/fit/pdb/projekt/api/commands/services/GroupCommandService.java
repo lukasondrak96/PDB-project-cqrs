@@ -2,7 +2,7 @@ package cz.vutbr.fit.pdb.projekt.api.commands.services;
 
 import cz.vutbr.fit.pdb.projekt.api.commands.dtos.group.NewGroupDto;
 import cz.vutbr.fit.pdb.projekt.api.commands.dtos.group.UpdateGroupDto;
-import cz.vutbr.fit.pdb.projekt.api.commands.services.helpingservices.CommandDeleteService;
+import cz.vutbr.fit.pdb.projekt.api.commands.services.helpingservices.DeleteCommandService;
 import cz.vutbr.fit.pdb.projekt.api.commands.services.helpingservices.GroupChangingService;
 import cz.vutbr.fit.pdb.projekt.events.events.AbstractEvent;
 import cz.vutbr.fit.pdb.projekt.events.events.OracleCreatedEvent;
@@ -40,7 +40,7 @@ import static org.springframework.data.mongodb.core.query.Criteria.where;
 
 @Service
 @AllArgsConstructor
-public class GroupCommandService implements GroupChangingService<PersistentGroup>, CommandDeleteService<PersistentGroup> {
+public class GroupCommandService implements GroupChangingService<PersistentGroup>, DeleteCommandService<PersistentGroup> {
 
     private final GroupRepository groupRepository;
     private final UserRepository userRepository;

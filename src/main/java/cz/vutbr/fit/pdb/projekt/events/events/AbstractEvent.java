@@ -1,6 +1,6 @@
 package cz.vutbr.fit.pdb.projekt.events.events;
 
-import cz.vutbr.fit.pdb.projekt.api.commands.services.helpingservices.CommandService;
+import cz.vutbr.fit.pdb.projekt.api.commands.services.helpingservices.CreateCommandService;
 import cz.vutbr.fit.pdb.projekt.features.helperInterfaces.ObjectInterface;
 import cz.vutbr.fit.pdb.projekt.features.helperInterfaces.PersistentObject;
 import lombok.AllArgsConstructor;
@@ -12,7 +12,7 @@ import lombok.Setter;
 @Setter
 public abstract class AbstractEvent<T extends PersistentObject> implements EventInterface<T> {
     private ObjectInterface objectInterface;
-    protected CommandService<T> commandService;
+    protected CreateCommandService<T> commandService;
 
     public AbstractEvent(ObjectInterface objectInterface) {
         this.objectInterface = objectInterface;
