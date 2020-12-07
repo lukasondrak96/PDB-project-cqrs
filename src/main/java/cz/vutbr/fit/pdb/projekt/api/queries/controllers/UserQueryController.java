@@ -2,6 +2,7 @@ package cz.vutbr.fit.pdb.projekt.api.queries.controllers;
 
 import cz.vutbr.fit.pdb.projekt.api.queries.services.UserQueryService;
 import cz.vutbr.fit.pdb.projekt.features.nosqlfeatures.user.UserDocument;
+import cz.vutbr.fit.pdb.projekt.features.nosqlfeatures.user.embedded.ConversationEmbedded;
 import cz.vutbr.fit.pdb.projekt.features.nosqlfeatures.user.embedded.GroupEmbedded;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -57,16 +58,22 @@ public class UserQueryController {
         return responseEntity;
     }
 
-    //TODO
     @GetMapping("{id}/conversations")
-    public ResponseEntity<?> getAllUserConversations(@PathVariable(value = "id") int postId) {
-        return null;
+    public ResponseEntity<?> getAllUserConversations(@PathVariable(value = "id") int userId) {
+        ResponseEntity<List<ConversationEmbedded>> responseEntity = userQueryService.getAllUserConversations(userId);
+        if(responseEntity.getBody() == null) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Uživatel s tímto id neexistuje");
+        }
+        return responseEntity;
     }
 
-    //TODO
-    @GetMapping("{id}/conversations/{conversationId}")
-    public ResponseEntity<?> getAllMessagesFromConversation(@PathVariable(value = "id") int postId,
-                                                    @PathVariable(value = "conversationId") int conversationId) {
-        return null;
+    @GetMapping("{id}/conversations/{otherUserId}")
+    public ResponseEntity<?> getAllMessagesFromConversation(@PathVariable(value = "id") int userId,
+                                                    @PathVariable(value = "otherUserId") int anotherUserId) {
+        ResponseEntity<List<ConversationEmbedded>> responseEntity = userQueryService.getAllMessagesFromConversation(userId, anotherUserId);
+        if(responseEntity.getBody() == null) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Uživatel s tímto id neexistuje");
+        }
+        return responseEntity;
     }
 }

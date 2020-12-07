@@ -2,6 +2,7 @@ package cz.vutbr.fit.pdb.projekt.api.queries.services;
 
 import cz.vutbr.fit.pdb.projekt.features.nosqlfeatures.user.UserDocument;
 import cz.vutbr.fit.pdb.projekt.features.nosqlfeatures.user.UserDocumentRepository;
+import cz.vutbr.fit.pdb.projekt.features.nosqlfeatures.user.embedded.ConversationEmbedded;
 import cz.vutbr.fit.pdb.projekt.features.nosqlfeatures.user.embedded.GroupEmbedded;
 import cz.vutbr.fit.pdb.projekt.features.sqlfeatures.user.UserState;
 import lombok.AllArgsConstructor;
@@ -11,6 +12,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
@@ -49,4 +51,24 @@ public class UserQueryService {
         return ResponseEntity.ok().body(userDocumentOptional.get().getGroupsAdmin());
     }
 
+    public ResponseEntity<List<ConversationEmbedded>> getAllUserConversations(int userId) {
+        Optional<UserDocument> userDocumentOptional = userDocumentRepository.findById(userId);
+        if(userDocumentOptional.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+        }
+        return ResponseEntity.ok().body(userDocumentOptional.get().getConversationsWithUser());
+    }
+
+    public ResponseEntity<List<ConversationEmbedded>> getAllMessagesFromConversation(int userId, int anotherUserId) {
+        Optional<UserDocument> userDocumentOptional = userDocumentRepository.findById(userId);
+        if(userDocumentOptional.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+        }
+        return ResponseEntity.ok().body(
+                userDocumentOptional.get()
+                        .getConversationsWithUser()
+                        .stream()
+                        .filter(conversation -> conversation.getId() == anotherUserId)
+                        .collect(Collectors.toList()));
+    }
 }

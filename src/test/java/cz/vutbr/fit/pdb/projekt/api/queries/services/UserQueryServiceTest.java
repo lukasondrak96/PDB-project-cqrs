@@ -1,13 +1,10 @@
 package cz.vutbr.fit.pdb.projekt.api.queries.services;
 
-import cz.vutbr.fit.pdb.projekt.api.commands.dtos.comment.NewCommentDto;
 import cz.vutbr.fit.pdb.projekt.api.commands.dtos.group.NewGroupDto;
-import cz.vutbr.fit.pdb.projekt.api.commands.dtos.post.NewPostDto;
+import cz.vutbr.fit.pdb.projekt.api.commands.dtos.message.NewMessageDto;
 import cz.vutbr.fit.pdb.projekt.api.commands.dtos.user.NewUserDto;
-import cz.vutbr.fit.pdb.projekt.api.commands.dtos.user.UpdateUserDto;
-import cz.vutbr.fit.pdb.projekt.features.nosqlfeatures.group.GroupDocument;
-import cz.vutbr.fit.pdb.projekt.features.nosqlfeatures.group.embedded.PostEmbedded;
 import cz.vutbr.fit.pdb.projekt.features.nosqlfeatures.user.UserDocument;
+import cz.vutbr.fit.pdb.projekt.features.nosqlfeatures.user.embedded.ConversationEmbedded;
 import cz.vutbr.fit.pdb.projekt.features.nosqlfeatures.user.embedded.GroupEmbedded;
 import cz.vutbr.fit.pdb.projekt.features.sqlfeatures.group.GroupState;
 import cz.vutbr.fit.pdb.projekt.features.sqlfeatures.user.UserSex;
@@ -21,7 +18,6 @@ import java.util.Date;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @SpringBootTest
 class UserQueryServiceTest extends AbstractQueryServiceTest {
@@ -32,8 +28,6 @@ class UserQueryServiceTest extends AbstractQueryServiceTest {
     private final Date TEST_BIRTH_DATE = new Date(300L);
     private final UserSex TEST_SEX = UserSex.FEMALE;
     private final String TEST_ADDITION_TO_CHANGE_STRING = "Addition";
-    private final Date TEST_BIRTH_DATE_UPDATE = new Date(500L);
-    private final UserSex TEST_SEX_UPDATE = UserSex.MALE;
 
     private final UserState STATE_ACTIVATED = UserState.ACTIVATED;
     private final UserState STATE_DEACTIVATED = UserState.DEACTIVATED;
@@ -43,7 +37,11 @@ class UserQueryServiceTest extends AbstractQueryServiceTest {
 
     private final String TEST_DESCRIPTION = "testDescription";
     private final GroupState TEST_STATE_PRIVATE = GroupState.PRIVATE;
-    private final GroupState TEST_STATE_PUBLIC = GroupState.PUBLIC;
+
+    private final NewUserDto TEST_SENDER = new NewUserDto("sender@sender", "senderName", "senderSurname", new Date(300L), UserSex.FEMALE);
+    private final NewUserDto TEST_RECIPIENT = new NewUserDto("recipient@recipient", "recipientName", "recipientSurname", new Date(300L), UserSex.FEMALE);
+    private final NewUserDto TEST_RECIPIENT_2 = new NewUserDto("recipient2@recipient2", "recipient2Name", "recipient2Surname", new Date(300L), UserSex.FEMALE);
+
 
     @Test
     void test_getAllUsers() {
@@ -189,84 +187,55 @@ class UserQueryServiceTest extends AbstractQueryServiceTest {
         assertEquals(TEST_NAME + "2", responseEntity.getBody().get(1).getName());
     }
 
-
     @Test
-    void test_updateUser_updatesNameAndSurnameInComments() {
-        NewUserDto newUserDto = new NewUserDto(
-                TEST_EMAIL, TEST_NAME, TEST_SURNAME, TEST_BIRTH_DATE, TEST_SEX
-        );
-        UpdateUserDto updateUserDto = new UpdateUserDto(
-                TEST_EMAIL + TEST_ADDITION_TO_CHANGE_STRING, TEST_NAME + TEST_ADDITION_TO_CHANGE_STRING,
-                TEST_SURNAME + TEST_ADDITION_TO_CHANGE_STRING, TEST_BIRTH_DATE, TEST_SEX
-        );
-        userCommandService.createUser(newUserDto);
-        int createdUserId = userRepository.findByEmail(TEST_EMAIL).get().getId();
-        groupCommandService.createGroup(new NewGroupDto(TEST_NAME, null, TEST_GROUP_STATE, createdUserId));
-        int createdGroupId = groupRepository.findByName(TEST_NAME).get().getId();
-        postCommandService.createPost(new NewPostDto(TEST_TITLE, TEST_TEXT, createdUserId, createdGroupId));
-        int createdPostId = postRepository.findAll().get(0).getId();
-        commentCommandService.createComment(new NewCommentDto(TEST_TEXT, createdUserId, createdPostId));
+    void test_getAllUserConversations() {
+        userCommandService.createUser(TEST_SENDER);
+        UserTable sender = userRepository.findByEmail(TEST_SENDER.getEmail()).get();
+        int senderId = sender.getId();
+
+        userCommandService.createUser(TEST_RECIPIENT);
+        UserTable recipient1 = userRepository.findByEmail(TEST_RECIPIENT.getEmail()).get();
+        int recipient1Id = recipient1.getId();
+
+        userCommandService.createUser(TEST_RECIPIENT_2);
+        UserTable recipient2 = userRepository.findByEmail(TEST_RECIPIENT_2.getEmail()).get();
+        int recipient2Id = recipient2.getId();
+
+        NewMessageDto messageToFirstRecipient = new NewMessageDto(TEST_TEXT, senderId, recipient1Id);
+        NewMessageDto messageToSecondRecipient = new NewMessageDto(TEST_TEXT + "2", senderId, recipient2Id);
+        messageCommandService.createMessage(messageToFirstRecipient);
+        messageCommandService.createMessage(messageToSecondRecipient);
 
 
-        userCommandService.updateUser(createdUserId, updateUserDto);
+        List<ConversationEmbedded> allSendersConversations = userQueryService.getAllUserConversations(senderId).getBody();
 
 
-        UserTable userTable = userRepository.findById(createdUserId).get();
-
-        boolean allCommentsCreatorsChangedInSql = commentRepository.findAll()
-                .stream()
-                .filter(comment -> comment.getUserReference().getId() == userTable.getId())
-                .allMatch(comment ->
-                        (comment.getUserReference().getName().equals(userTable.getName())) &&
-                                (comment.getUserReference().getSurname().equals(userTable.getSurname()))
-                );
-
-        List<GroupDocument> allGroups = groupDocumentRepository.findAll();
-        boolean allCommentsCreatorsChangedInNoSql = true;
-        for (GroupDocument groupDocument : allGroups) {
-            for(PostEmbedded postEmbedded : groupDocument.getPosts()) {
-                allCommentsCreatorsChangedInNoSql = postEmbedded.getComments()
-                        .stream()
-                        .filter(comment -> comment.getId() == userTable.getId())
-                        .allMatch(comment ->
-                                (comment.getCreator().getName().equals(userTable.getName())) &&
-                                        (comment.getCreator().getSurname().equals(userTable.getSurname()))
-
-                        );
-                if(!allCommentsCreatorsChangedInNoSql)
-                    break;
-            }
-        }
-
-        assertTrue(allCommentsCreatorsChangedInSql);
-        assertTrue(allCommentsCreatorsChangedInNoSql);
+        assertEquals(2, allSendersConversations.size());
+        assertEquals(1, allSendersConversations.get(0).getMessages().size());
+        assertEquals(1, allSendersConversations.get(1).getMessages().size());
     }
 
-
     @Test
-    void test_deactivate_and_activateUser() {
-        NewUserDto newUserDto = new NewUserDto(
-                TEST_EMAIL, TEST_NAME, TEST_SURNAME, TEST_BIRTH_DATE, TEST_SEX
-        );
-        userCommandService.createUser(newUserDto);
-        int createdUserId = userRepository.findByEmail(TEST_EMAIL).get().getId();
+    void test_getAllMessagesFromConversation() {
+        userCommandService.createUser(TEST_SENDER);
+        UserTable sender = userRepository.findByEmail(TEST_SENDER.getEmail()).get();
+        int senderId = sender.getId();
 
-        //deactivate
-        userCommandService.deactivateUser(createdUserId);
+        userCommandService.createUser(TEST_RECIPIENT);
+        UserTable recipient1 = userRepository.findByEmail(TEST_RECIPIENT.getEmail()).get();
+        int recipient1Id = recipient1.getId();
 
-
-        UserTable deactivatedUserTable = userRepository.findById(createdUserId).get();
-        UserDocument deactivatedUserDocument = userDocumentRepository.findById(createdUserId).get();
-        assertEquals(STATE_DEACTIVATED, deactivatedUserTable.getState());
-        assertEquals(STATE_DEACTIVATED, deactivatedUserDocument.getState());
-
-        //activate
-        userCommandService.activateUser(createdUserId);
+        NewMessageDto firstMessage = new NewMessageDto(TEST_TEXT, senderId, recipient1Id);
+        NewMessageDto secondMessage = new NewMessageDto(TEST_TEXT + "2", senderId, recipient1Id);
+        messageCommandService.createMessage(firstMessage);
+        messageCommandService.createMessage(secondMessage);
 
 
-        UserTable activatedUserTable = userRepository.findById(createdUserId).get();
-        UserDocument activatedUserDocument = userDocumentRepository.findById(createdUserId).get();
-        assertEquals(STATE_ACTIVATED, activatedUserTable.getState());
-        assertEquals(STATE_ACTIVATED, activatedUserDocument.getState());
+        List<ConversationEmbedded> allSendersConversations = userQueryService.getAllUserConversations(senderId).getBody();
+
+
+        assertEquals(1, allSendersConversations.size());
+        assertEquals(2, allSendersConversations.get(0).getMessages().size());
     }
+
 }
