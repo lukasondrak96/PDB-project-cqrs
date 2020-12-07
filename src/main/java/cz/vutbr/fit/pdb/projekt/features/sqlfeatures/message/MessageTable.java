@@ -1,5 +1,8 @@
 package cz.vutbr.fit.pdb.projekt.features.sqlfeatures.message;
 
+import cz.vutbr.fit.pdb.projekt.features.helperInterfaces.objects.MessageInterface;
+import cz.vutbr.fit.pdb.projekt.features.helperInterfaces.persistent.PersistentMessage;
+import cz.vutbr.fit.pdb.projekt.features.helperInterfaces.references.UserReference;
 import cz.vutbr.fit.pdb.projekt.features.sqlfeatures.user.UserTable;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -14,14 +17,14 @@ import java.util.Date;
 @Getter
 @Setter
 @NoArgsConstructor
-public class MessageTable {
+public class MessageTable implements MessageInterface, PersistentMessage {
 
-    public MessageTable(String text, Date createdAt, Date readAt, UserTable userReferenceSender, UserTable userReferenceReceiver) {
+    public MessageTable(String text, UserTable sender, UserTable recipient) {
         this.text = text;
-        this.createdAt = createdAt;
-        this.readAt = readAt;
-        this.userReferenceSender = userReferenceSender;
-        this.userReferenceReceiver = userReferenceReceiver;
+        this.createdAt = new Date();
+        this.readAt = null;
+        this.sender = sender;
+        this.recipient = recipient;
     }
 
     @Id
@@ -38,12 +41,12 @@ public class MessageTable {
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "idUserSender", referencedColumnName = "id")
     @OnDelete(action = OnDeleteAction.CASCADE)
-    private UserTable userReferenceSender;
+    private UserTable sender;
 
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "idUserReceiver", referencedColumnName = "id")
+    @JoinColumn(name = "idUserRecipient", referencedColumnName = "id")
     @OnDelete(action = OnDeleteAction.CASCADE)
-    private UserTable userReferenceReceiver;
+    private UserTable recipient;
 
     @Override
     public String toString() {
@@ -53,5 +56,15 @@ public class MessageTable {
                 ", createdAt=" + createdAt.toString() +
                 '\'' +
                 '}';
+    }
+
+    @Override
+    public void setSender(UserReference sender) {
+        this.sender = (UserTable) sender;
+    }
+
+    @Override
+    public void setRecipient(UserReference recipient) {
+        this.recipient = (UserTable) recipient;
     }
 }
