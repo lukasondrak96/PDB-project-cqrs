@@ -79,6 +79,7 @@ public class GroupQueryServiceTest extends AbstractQueryServiceTest {
         );
         groupCommandService.createGroup(group);
         int createdGroupId = groupRepository.findByName(TEST_NAME).get().getId();
+        groupCommandService.addGroupMember(createdGroupId, creatorId);
 
         postCommandService.createPost(new NewPostDto("testPostTitle", "testPostText", creatorId, createdGroupId));
         postCommandService.createPost(new NewPostDto("testPostTitle2", "testPostText2", creatorId, createdGroupId));
@@ -165,6 +166,7 @@ public class GroupQueryServiceTest extends AbstractQueryServiceTest {
         );
         groupCommandService.createGroup(group);
         int createdGroupId = groupRepository.findByName(TEST_NAME).get().getId();
+        groupCommandService.addGroupMember(createdGroupId, creatorId);
 
         postCommandService.createPost(new NewPostDto("testPostTitle", "testPostText", creatorId, createdGroupId));
         int createdPostId = postRepository.findAll().get(0).getId();

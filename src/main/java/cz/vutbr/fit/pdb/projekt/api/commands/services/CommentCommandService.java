@@ -68,6 +68,10 @@ public class CommentCommandService implements DeleteCommandService<PersistentCom
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Skupina, ve které se nachází příspěvek, je archivovaná, nelze k němu přidávat komentáře");
         }
 
+        if (creator.getGroups().stream().noneMatch(groupTable -> groupTable.getId() == post.getGroupReference().getId())) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Uživatel není členem skupiny, ve které se příspěvek nachází, nemůže k němu psát komentáře");
+        }
+
         final CommentTable commentTable = new CommentTable(newCommentDto.getText(), new Date(), post, creator);
         OracleCreatedEvent<PersistentComment> oracleCreatedEvent = new OracleCreatedEvent<>(commentTable, this);
         subscribeEventToOracleAndMongo(oracleCreatedEvent);

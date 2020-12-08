@@ -64,6 +64,10 @@ public class PostCommandService implements DeleteCommandService<PersistentPost> 
         }
         GroupTable group = groupOptional.get();
 
+        if (creator.getGroups().stream().noneMatch(groupTable -> groupTable.getId() == group.getId())) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Uživatel není členem skupiny, nemůže do ní přidávat příspěvky");
+        }
+
         if (group.getState() == GroupState.ARCHIVED) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Skupina je archivovaná, nelze do ní přidávat příspěvky");
         }

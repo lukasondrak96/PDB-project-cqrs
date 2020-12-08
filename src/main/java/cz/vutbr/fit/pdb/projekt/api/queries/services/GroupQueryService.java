@@ -23,6 +23,15 @@ public class GroupQueryService {
     }
 
 
+    public ResponseEntity<GroupDocument> getInformationAboutGroup(int groupId) {
+        Optional<GroupDocument> groupDocumentOptional = groupDocumentRepository.findById(groupId);
+        if(groupDocumentOptional.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+        }
+        return ResponseEntity.ok().body(groupDocumentOptional.get());
+    }
+
+
     public ResponseEntity<List<PostEmbedded>> getAllPostInGroup(int groupId) {
         Optional<GroupDocument> groupDocumentOptional = groupDocumentRepository.findById(groupId);
         if(groupDocumentOptional.isEmpty()) {

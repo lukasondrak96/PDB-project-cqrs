@@ -199,6 +199,8 @@ class UserCommandServiceTest extends AbstractServiceTest {
         int createdUserId = userRepository.findByEmail(TEST_EMAIL).get().getId();
         groupCommandService.createGroup(new NewGroupDto(TEST_NAME, null, TEST_GROUP_STATE, createdUserId));
         int createdGroupId = groupRepository.findByName(TEST_NAME).get().getId();
+        groupCommandService.addGroupMember(createdGroupId, createdUserId);
+
         postCommandService.createPost(new NewPostDto(TEST_TITLE, TEST_TEXT, createdUserId, createdGroupId));
         int createdPostId = postRepository.findAll().get(0).getId();
         commentCommandService.createComment(new NewCommentDto(TEST_TEXT, createdUserId, createdPostId));

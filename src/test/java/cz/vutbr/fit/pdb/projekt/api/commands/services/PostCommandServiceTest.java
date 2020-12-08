@@ -36,6 +36,7 @@ class PostCommandServiceTest extends AbstractServiceTest {
         NewGroupDto newGroupDto = new NewGroupDto("testGroupName", "testGroupDescription", GroupState.PRIVATE, creatorId);
         groupCommandService.createGroup(newGroupDto);
         int createdGroupId = groupRepository.findByName("testGroupName").get().getId();
+        groupCommandService.addGroupMember(createdGroupId, creatorId);
 
 
         postCommandService.createPost(new NewPostDto(TEST_TITLE, TEST_TEXT, creatorId, createdGroupId));
@@ -62,6 +63,7 @@ class PostCommandServiceTest extends AbstractServiceTest {
         NewGroupDto newGroupDto = new NewGroupDto("testGroupName", "testGroupDescription", GroupState.PRIVATE, creatorId);
         groupCommandService.createGroup(newGroupDto);
         int createdGroupId = groupRepository.findByName("testGroupName").get().getId();
+        groupCommandService.addGroupMember(createdGroupId, creatorId);
         postCommandService.createPost(new NewPostDto(TEST_TITLE, TEST_TEXT, creatorId, createdGroupId));
         List<PostTable> allPosts = findAllPostsAndSortThem();
         int createdPostId = allPosts.get(0).getId();
@@ -90,6 +92,7 @@ class PostCommandServiceTest extends AbstractServiceTest {
         NewGroupDto newGroupDto = new NewGroupDto("testGroupName", "testGroupDescription", GroupState.PRIVATE, creatorId);
         groupCommandService.createGroup(newGroupDto);
         int createdGroupId = groupRepository.findByName("testGroupName").get().getId();
+        groupCommandService.addGroupMember(createdGroupId, creatorId);
         postCommandService.createPost(new NewPostDto(TEST_TITLE, TEST_TEXT, creatorId, createdGroupId));
         int createdPostId = postRepository.findAll().get(0).getId();
 
@@ -111,6 +114,7 @@ class PostCommandServiceTest extends AbstractServiceTest {
         NewGroupDto newGroupDto = new NewGroupDto("testGroupName", "testGroupDescription", GroupState.PRIVATE, creatorId);
         groupCommandService.createGroup(newGroupDto);
         int createdGroupId = groupRepository.findByName("testGroupName").get().getId();
+        groupCommandService.addGroupMember(createdGroupId, creatorId);
 
         NewPostDto firstPost = new NewPostDto(TEST_TITLE, TEST_TEXT, creatorId, createdGroupId);
         postCommandService.createPost(firstPost);
@@ -125,6 +129,7 @@ class PostCommandServiceTest extends AbstractServiceTest {
         int createdPost1Id = allPostsSortedById.get(0).getId();
         int createdPost2Id = allPostsSortedById.get(1).getId();
         int createdPost3Id = allPostsSortedById.get(2).getId();
+
 
         postCommandService.deletePost(createdPost2Id);  //delete second post
 
