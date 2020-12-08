@@ -19,12 +19,6 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class GroupTable implements GroupInterface, PersistentGroup {
-    public GroupTable(String name, String description, GroupState state, UserTable userReference) {
-        this.name = name;
-        this.description = description;
-        this.state = state;
-        this.userReference = userReference;
-    }
 
     @Id
     @SequenceGenerator(name = "GroupIdGenerator", sequenceName = "GROUP_SEQUENCE", allocationSize = 1)
@@ -40,7 +34,14 @@ public class GroupTable implements GroupInterface, PersistentGroup {
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "creatorId", referencedColumnName = "id")
     @OnDelete(action = OnDeleteAction.CASCADE)
-    private UserTable userReference;
+    private UserTable creator;
+
+    public GroupTable(String name, String description, GroupState state, UserTable creator) {
+        this.name = name;
+        this.description = description;
+        this.state = state;
+        this.creator = creator;
+    }
 
     @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinTable(
@@ -49,6 +50,7 @@ public class GroupTable implements GroupInterface, PersistentGroup {
             inverseJoinColumns = {@JoinColumn(name = "idUser")}
     )
     private List<UserTable> users = new ArrayList<>();
+
 
     public void addUser(UserTable user) {
         this.users.add(user);
@@ -60,9 +62,8 @@ public class GroupTable implements GroupInterface, PersistentGroup {
         user.getGroups().removeIf(groupInList -> groupInList.getId() == this.getId());
     }
 
-    @Override
-    public void setUserReference(UserReference userReference) {
-        this.userReference = (UserTable) userReference;
+    public void setCreator(UserReference userReference) {
+        this.creator = (UserTable) userReference;
     }
 
     @Override

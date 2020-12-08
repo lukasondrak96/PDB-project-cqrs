@@ -77,7 +77,7 @@ public class CommentCommandService implements DeleteCommandService<PersistentCom
         }
 
         final CommentTable commentTable = new CommentTable(commentId, updateCommentDto.getText(),
-                oldCommentTable.getCreatedAt(), oldCommentTable.getPostReference(), oldCommentTable.getUserReference());
+                oldCommentTable.getCreatedAt(), oldCommentTable.getPostReference(), oldCommentTable.getCreator());
 
         CommentUpdatedEvent<PersistentComment> updatedEvent = new CommentUpdatedEvent<>(commentTable, this);
         subscribeEventToOracleAndMongo(updatedEvent);
@@ -107,7 +107,7 @@ public class CommentCommandService implements DeleteCommandService<PersistentCom
             persistentCommandInterface.setText(commentInterface.getText());
             persistentCommandInterface.setCreatedAt(commentInterface.getCreatedAt());
             persistentCommandInterface.setPostReference(commentInterface.getPostReference());
-            persistentCommandInterface.setUserReference(commentInterface.getUserReference());
+            persistentCommandInterface.setCreator(commentInterface.getCreator());
         }
         return (PersistentComment) persistentCommandInterface;
     }

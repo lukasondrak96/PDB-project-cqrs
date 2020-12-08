@@ -19,9 +19,9 @@ public interface CommentInterface extends ObjectInterface {
 
     void setCreatedAt(Date createdAt);
 
-    UserReference getUserReference();
+    UserReference getCreator();
 
-    void setUserReference(UserReference userReference);
+    void setCreator(UserReference userReference);
 
     PostTable getPostReference();
 

@@ -47,7 +47,7 @@ class PostCommandServiceTest extends AbstractServiceTest {
         PostTable createdPost = createdPostOptional.get();
         assertEquals(TEST_TITLE, createdPost.getTitle());
         assertEquals(TEST_TEXT, createdPost.getText());
-        assertEquals(creatorId, createdPost.getUserReference().getId());
+        assertEquals(creatorId, createdPost.getCreator().getId());
         assertEquals(createdGroupId, createdPost.getGroupReference().getId());
 
         GroupDocument groupWithPostNoSqlOptional = groupDocumentRepository.findById(createdGroupId).get();
@@ -76,7 +76,7 @@ class PostCommandServiceTest extends AbstractServiceTest {
         PostTable updatedPost = updatedPostOptional.get();
         assertEquals(TEST_TITLE + "updated", updatedPost.getTitle());
         assertEquals(TEST_TEXT + "updated", updatedPost.getText());
-        assertEquals(creatorId, updatedPost.getUserReference().getId());
+        assertEquals(creatorId, updatedPost.getCreator().getId());
         assertEquals(createdGroupId, updatedPost.getGroupReference().getId());
 
         GroupDocument groupWithPostNoSqlOptional = groupDocumentRepository.findById(createdGroupId).get();

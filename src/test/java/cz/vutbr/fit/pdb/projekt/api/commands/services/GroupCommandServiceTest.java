@@ -57,7 +57,7 @@ class GroupCommandServiceTest extends AbstractServiceTest {
         assertEquals(TEST_NAME, createdGroupSqlOptional.get().getName());
         assertEquals(TEST_DESCRIPTION, createdGroupSqlOptional.get().getDescription());
         assertEquals(TEST_STATE_PRIVATE, createdGroupSqlOptional.get().getState());
-        assertEquals(TEST_GROUP_CREATOR.getEmail(), createdGroupSqlOptional.get().getUserReference().getEmail());
+        assertEquals(TEST_GROUP_CREATOR.getEmail(), createdGroupSqlOptional.get().getCreator().getEmail());
 
         assertEquals(new GroupDocument(createdGroupId, TEST_NAME, TEST_DESCRIPTION, TEST_STATE_PRIVATE,
                 testCreatorEmbedded, new ArrayList<>(), new ArrayList<>()), createdGroupNoSqlOptional.get());
@@ -89,7 +89,7 @@ class GroupCommandServiceTest extends AbstractServiceTest {
         assertEquals(createdGroupId, updatedGroupSqlOptional.get().getId());
         assertEquals(TEST_NAME + TEST_ADDITION_TO_CHANGE_STRING, updatedGroupSqlOptional.get().getName());
         assertEquals(TEST_DESCRIPTION + TEST_ADDITION_TO_CHANGE_STRING, updatedGroupSqlOptional.get().getDescription());
-        assertEquals(TEST_GROUP_CREATOR.getEmail(), updatedGroupSqlOptional.get().getUserReference().getEmail());
+        assertEquals(TEST_GROUP_CREATOR.getEmail(), updatedGroupSqlOptional.get().getCreator().getEmail());
 
         assertEquals(new GroupDocument(createdGroupId, TEST_NAME + TEST_ADDITION_TO_CHANGE_STRING, TEST_DESCRIPTION + TEST_ADDITION_TO_CHANGE_STRING, TEST_STATE_PRIVATE,
                 testCreatorEmbedded, new ArrayList<>(), new ArrayList<>()), updatedGroupNoSqlOptional.get());
@@ -247,11 +247,11 @@ class GroupCommandServiceTest extends AbstractServiceTest {
         assertTrue(updatedGroupNoSqlOptional.isPresent());
         GroupTable updatedGroupTable = updatedGroupSqlOptional.get();
         GroupDocument updatedGroupDocument = updatedGroupNoSqlOptional.get();
-        assertEquals(newAdmin.getId(), updatedGroupTable.getUserReference().getId());
+        assertEquals(newAdmin.getId(), updatedGroupTable.getCreator().getId());
         assertEquals(newAdmin.getId(), updatedGroupDocument.getCreator().getId());
-        assertEquals(newAdmin.getName(), updatedGroupTable.getUserReference().getName());
+        assertEquals(newAdmin.getName(), updatedGroupTable.getCreator().getName());
         assertEquals(newAdmin.getName(), updatedGroupDocument.getCreator().getName());
-        assertEquals(newAdmin.getSurname(), updatedGroupTable.getUserReference().getSurname());
+        assertEquals(newAdmin.getSurname(), updatedGroupTable.getCreator().getSurname());
         assertEquals(newAdmin.getSurname(), updatedGroupDocument.getCreator().getSurname());
 
         UserDocument newAdminDocument = userDocumentRepository.findById(newAdmin.getId()).get();

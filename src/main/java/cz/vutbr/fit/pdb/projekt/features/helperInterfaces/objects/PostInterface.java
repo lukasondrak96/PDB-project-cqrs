@@ -23,9 +23,9 @@ public interface PostInterface extends ObjectInterface {
 
     void setCreatedAt(Date createdAt);
 
-    UserReference getUserReference();
+    UserReference getCreator();
 
-    void setUserReference(UserReference userReference);
+    void setCreator(UserReference userReference);
 
     GroupTable getGroupReference();
 

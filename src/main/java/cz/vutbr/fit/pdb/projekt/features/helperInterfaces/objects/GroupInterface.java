@@ -21,7 +21,7 @@ public interface GroupInterface extends ObjectInterface {
 
     void setState(GroupState state);
 
-    UserReference getUserReference();
+    UserReference getCreator();
 
-    void setUserReference(UserReference userReference);
+    void setCreator(UserReference userReference);
 }

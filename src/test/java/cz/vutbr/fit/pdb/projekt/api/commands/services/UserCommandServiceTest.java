@@ -121,10 +121,10 @@ class UserCommandServiceTest extends AbstractServiceTest {
         UserTable userTable = userRepository.findById(createdUserId).get();
         boolean allGroupCreatorsChangedInSql = groupRepository.findAll()
                 .stream()
-                .filter(group -> group.getUserReference().getId() == userTable.getId())
+                .filter(group -> group.getCreator().getId() == userTable.getId())
                 .allMatch(group ->
-                        (group.getUserReference().getName().equals(userTable.getName())) &&
-                                (group.getUserReference().getSurname().equals(userTable.getSurname()))
+                        (group.getCreator().getName().equals(userTable.getName())) &&
+                                (group.getCreator().getSurname().equals(userTable.getSurname()))
                 );
 
         boolean allGroupCreatorsChangedInNoSql = groupDocumentRepository.findAll()
@@ -161,10 +161,10 @@ class UserCommandServiceTest extends AbstractServiceTest {
         UserTable userTable = userRepository.findById(createdUserId).get();
         boolean allPostsCreatorsChangedInSql = postRepository.findAll()
                 .stream()
-                .filter(post -> post.getUserReference().getId() == userTable.getId())
+                .filter(post -> post.getCreator().getId() == userTable.getId())
                 .allMatch(post ->
-                        (post.getUserReference().getName().equals(userTable.getName())) &&
-                                (post.getUserReference().getSurname().equals(userTable.getSurname()))
+                        (post.getCreator().getName().equals(userTable.getName())) &&
+                                (post.getCreator().getSurname().equals(userTable.getSurname()))
                 );
 
         List<GroupDocument> allGroups = groupDocumentRepository.findAll();
@@ -211,10 +211,10 @@ class UserCommandServiceTest extends AbstractServiceTest {
 
         boolean allCommentsCreatorsChangedInSql = commentRepository.findAll()
                 .stream()
-                .filter(comment -> comment.getUserReference().getId() == userTable.getId())
+                .filter(comment -> comment.getCreator().getId() == userTable.getId())
                 .allMatch(comment ->
-                        (comment.getUserReference().getName().equals(userTable.getName())) &&
-                                (comment.getUserReference().getSurname().equals(userTable.getSurname()))
+                        (comment.getCreator().getName().equals(userTable.getName())) &&
+                                (comment.getCreator().getSurname().equals(userTable.getSurname()))
                 );
 
         List<GroupDocument> allGroups = groupDocumentRepository.findAll();

@@ -8,7 +8,6 @@ import cz.vutbr.fit.pdb.projekt.features.nosqlfeatures.group.embedded.CreatorEmb
 import cz.vutbr.fit.pdb.projekt.features.nosqlfeatures.group.embedded.MemberEmbedded;
 import cz.vutbr.fit.pdb.projekt.features.nosqlfeatures.group.embedded.PostEmbedded;
 import cz.vutbr.fit.pdb.projekt.features.sqlfeatures.group.GroupState;
-import cz.vutbr.fit.pdb.projekt.features.sqlfeatures.user.UserTable;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -53,13 +52,12 @@ public class GroupDocument implements GroupInterface, PersistentGroup {
     private List<MemberEmbedded> members = new ArrayList<>();
 
     @Override
-    public UserReference getUserReference() {
+    public UserReference getCreator() {
         return creator;
     }
 
     @Override
-    public void setUserReference(UserReference userReference) {
-        UserTable userTable = (UserTable) userReference;
-        creator = new CreatorEmbedded(userTable.getId(), userTable.getName(), userTable.getSurname());
+    public void setCreator(UserReference userReference) {
+        creator = new CreatorEmbedded(userReference.getId(), userReference.getName(), userReference.getSurname());
     }
 }

@@ -22,14 +22,6 @@ import java.util.Date;
 @AllArgsConstructor
 public class PostTable implements PostInterface, PersistentPost, Comparable {
 
-    public PostTable(String title, String text, Date createdAt, GroupTable groupReference, UserTable userReference) {
-        this.title = title;
-        this.text = text;
-        this.createdAt = createdAt;
-        this.groupReference = groupReference;
-        this.userReference = userReference;
-    }
-
     @Id
     @SequenceGenerator(name = "PostIdGenerator", sequenceName = "POST_SEQUENCE", allocationSize = 1)
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "PostIdGenerator")
@@ -49,11 +41,19 @@ public class PostTable implements PostInterface, PersistentPost, Comparable {
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "idUser", referencedColumnName = "id")
     @OnDelete(action = OnDeleteAction.CASCADE)
-    private UserTable userReference;
+    private UserTable creator;
+
+    public PostTable(String title, String text, Date createdAt, GroupTable groupReference, UserTable creator) {
+        this.title = title;
+        this.text = text;
+        this.createdAt = createdAt;
+        this.groupReference = groupReference;
+        this.creator = creator;
+    }
 
     @Override
-    public void setUserReference(UserReference userReference) {
-        this.userReference = (UserTable) userReference;
+    public void setCreator(UserReference userReference) {
+        this.creator = (UserTable) userReference;
     }
 
     @Override

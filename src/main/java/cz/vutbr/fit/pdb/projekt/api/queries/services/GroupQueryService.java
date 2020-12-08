@@ -45,7 +45,7 @@ public class GroupQueryService {
         if(groupDocumentOptional.isEmpty()) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
         }
-        return ResponseEntity.ok().body((CreatorEmbedded) groupDocumentOptional.get().getUserReference());
+        return ResponseEntity.ok().body((CreatorEmbedded) groupDocumentOptional.get().getCreator());
     }
 
 }

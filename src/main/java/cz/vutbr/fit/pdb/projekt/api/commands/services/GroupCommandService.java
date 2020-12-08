@@ -82,7 +82,7 @@ public class GroupCommandService implements GroupChangingService<PersistentGroup
         }
 
         final GroupTable groupTable = new GroupTable(groupId, updateGroupDto.getName(), updateGroupDto.getDescription(),
-                oldGroupTable.getState(), oldGroupTable.getUserReference(), oldGroupTable.getUsers());
+                oldGroupTable.getState(), oldGroupTable.getCreator(), oldGroupTable.getUsers());
 
         GroupUpdatedEvent<PersistentGroup> updatedEvent = new GroupUpdatedEvent<>(groupTable, this);
         subscribeEventToOracleAndMongo(updatedEvent);
@@ -183,7 +183,7 @@ public class GroupCommandService implements GroupChangingService<PersistentGroup
             persistentGroupInterface.setName(groupInterface.getName());
             persistentGroupInterface.setState(groupInterface.getState());
             persistentGroupInterface.setDescription(groupInterface.getDescription());
-            persistentGroupInterface.setUserReference(groupInterface.getUserReference());
+            persistentGroupInterface.setCreator(groupInterface.getCreator());
         }
 
         if (group instanceof GroupTable) {
@@ -252,7 +252,7 @@ public class GroupCommandService implements GroupChangingService<PersistentGroup
     public PersistentGroup finishAdminChanging(PersistentGroup group, UserTable userTable) {
         if (group instanceof GroupTable) {
             GroupTable groupTable = (GroupTable) group;
-            groupTable.setUserReference(userTable);
+            groupTable.setCreator(userTable);
             return groupRepository.save(groupTable);
         } else {
             GroupDocument groupDocument = (GroupDocument) group;

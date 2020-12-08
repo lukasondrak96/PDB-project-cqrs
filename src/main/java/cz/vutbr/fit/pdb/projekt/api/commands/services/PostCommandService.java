@@ -77,7 +77,7 @@ public class PostCommandService implements DeleteCommandService<PersistentPost> 
         }
 
         final PostTable postTable = new PostTable(postId, updatePostDto.getTitle(), updatePostDto.getText(),
-                oldPostTable.getCreatedAt(), oldPostTable.getGroupReference(), oldPostTable.getUserReference());
+                oldPostTable.getCreatedAt(), oldPostTable.getGroupReference(), oldPostTable.getCreator());
 
         PostUpdatedEvent<PersistentPost> updatedEvent = new PostUpdatedEvent<>(postTable, this);
         subscribeEventToOracleAndMongo(updatedEvent);
@@ -109,7 +109,7 @@ public class PostCommandService implements DeleteCommandService<PersistentPost> 
             persistentPostInterface.setText(postInterface.getText());
             persistentPostInterface.setCreatedAt(postInterface.getCreatedAt());
             persistentPostInterface.setGroupReference(postInterface.getGroupReference());
-            persistentPostInterface.setUserReference(postInterface.getUserReference());
+            persistentPostInterface.setCreator(postInterface.getCreator());
         }
         return (PersistentPost) persistentPostInterface;
     }

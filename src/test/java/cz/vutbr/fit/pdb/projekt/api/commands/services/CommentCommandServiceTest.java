@@ -50,7 +50,7 @@ class CommentCommandServiceTest extends AbstractServiceTest {
         assertTrue(createdCommentOptional.isPresent());
         CommentTable createdComment = createdCommentOptional.get();
         assertEquals(TEST_TEXT, createdComment.getText());
-        assertEquals(creatorId, createdComment.getUserReference().getId());
+        assertEquals(creatorId, createdComment.getCreator().getId());
         assertEquals(createdPostId, createdComment.getPostReference().getId());
 
         GroupDocument groupWithCommentNoSqlOptional = groupDocumentRepository.findById(createdGroupId).get();
@@ -82,7 +82,7 @@ class CommentCommandServiceTest extends AbstractServiceTest {
         assertTrue(updatedCommentOptional.isPresent());
         CommentTable updatedComment = updatedCommentOptional.get();
         assertEquals(TEST_TEXT + "updated", updatedComment.getText());
-        assertEquals(creatorId, updatedComment.getUserReference().getId());
+        assertEquals(creatorId, updatedComment.getCreator().getId());
         assertEquals(createdPostId, updatedComment.getPostReference().getId());
 
         GroupDocument groupWithPostNoSqlOptional = groupDocumentRepository.findById(createdGroupId).get();

@@ -22,13 +22,6 @@ import java.util.Date;
 @AllArgsConstructor
 public class CommentTable implements CommentInterface, PersistentComment {
 
-    public CommentTable(String text, Date createdAt, PostTable postReference, UserTable userReference) {
-        this.text = text;
-        this.createdAt = createdAt;
-        this.postReference = postReference;
-        this.userReference = userReference;
-    }
-
     @Id
     @SequenceGenerator(name = "CommentIdGenerator", sequenceName = "COMMENT_SEQUENCE", allocationSize = 1)
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "CommentIdGenerator")
@@ -46,11 +39,18 @@ public class CommentTable implements CommentInterface, PersistentComment {
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "idUser", referencedColumnName = "id")
     @OnDelete(action = OnDeleteAction.CASCADE)
-    private UserTable userReference;
+    private UserTable creator;
+
+    public CommentTable(String text, Date createdAt, PostTable postReference, UserTable creator) {
+        this.text = text;
+        this.createdAt = createdAt;
+        this.postReference = postReference;
+        this.creator = creator;
+    }
 
     @Override
-    public void setUserReference(UserReference userReference) {
-        this.userReference = (UserTable) userReference;
+    public void setCreator(UserReference userReference) {
+        this.creator = (UserTable) userReference;
     }
 
     @Override

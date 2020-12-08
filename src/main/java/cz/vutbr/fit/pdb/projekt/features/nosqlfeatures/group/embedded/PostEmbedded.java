@@ -30,12 +30,12 @@ public class PostEmbedded implements PostInterface, PersistentPost {
     private GroupTable groupReference;
 
     @Override
-    public UserReference getUserReference() {
+    public UserReference getCreator() {
         return creator;
     }
 
     @Override
-    public void setUserReference(UserReference userReference) {
+    public void setCreator(UserReference userReference) {
         UserTable userTable = (UserTable) userReference;
         creator = new CreatorEmbedded(userTable.getId(), userTable.getName(), userTable.getSurname());
     }
