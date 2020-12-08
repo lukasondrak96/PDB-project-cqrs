@@ -16,6 +16,7 @@ import cz.vutbr.fit.pdb.projekt.features.nosqlfeatures.group.GroupDocument;
 import cz.vutbr.fit.pdb.projekt.features.nosqlfeatures.group.embedded.CommentEmbedded;
 import cz.vutbr.fit.pdb.projekt.features.sqlfeatures.comment.CommentRepository;
 import cz.vutbr.fit.pdb.projekt.features.sqlfeatures.comment.CommentTable;
+import cz.vutbr.fit.pdb.projekt.features.sqlfeatures.group.GroupState;
 import cz.vutbr.fit.pdb.projekt.features.sqlfeatures.post.PostRepository;
 import cz.vutbr.fit.pdb.projekt.features.sqlfeatures.post.PostTable;
 import cz.vutbr.fit.pdb.projekt.features.sqlfeatures.user.UserRepository;
@@ -62,6 +63,10 @@ public class CommentCommandService implements DeleteCommandService<PersistentCom
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Příspěvek s tímto id neexistuje");
         }
         PostTable post = postOptional.get();
+
+        if (post.getGroupReference().getState() == GroupState.ARCHIVED) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Skupina, ve které se nachází příspěvek, je archivovaná, nelze k němu přidávat komentáře");
+        }
 
         final CommentTable commentTable = new CommentTable(newCommentDto.getText(), new Date(), post, creator);
         OracleCreatedEvent<PersistentComment> oracleCreatedEvent = new OracleCreatedEvent<>(commentTable, this);

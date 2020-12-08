@@ -15,6 +15,7 @@ import cz.vutbr.fit.pdb.projekt.features.helperInterfaces.persistent.PersistentP
 import cz.vutbr.fit.pdb.projekt.features.nosqlfeatures.group.GroupDocument;
 import cz.vutbr.fit.pdb.projekt.features.nosqlfeatures.group.embedded.PostEmbedded;
 import cz.vutbr.fit.pdb.projekt.features.sqlfeatures.group.GroupRepository;
+import cz.vutbr.fit.pdb.projekt.features.sqlfeatures.group.GroupState;
 import cz.vutbr.fit.pdb.projekt.features.sqlfeatures.group.GroupTable;
 import cz.vutbr.fit.pdb.projekt.features.sqlfeatures.post.PostRepository;
 import cz.vutbr.fit.pdb.projekt.features.sqlfeatures.post.PostTable;
@@ -62,6 +63,10 @@ public class PostCommandService implements DeleteCommandService<PersistentPost> 
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Skupina s tímto id neexistuje");
         }
         GroupTable group = groupOptional.get();
+
+        if (group.getState() == GroupState.ARCHIVED) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Skupina je archivovaná, nelze do ní přidávat příspěvky");
+        }
 
         final PostTable postTable = new PostTable(newPostDto.getTitle(), newPostDto.getText(), new Date(), group, creator);
         OracleCreatedEvent<PersistentPost> oracleCreatedEvent = new OracleCreatedEvent<>(postTable, this);

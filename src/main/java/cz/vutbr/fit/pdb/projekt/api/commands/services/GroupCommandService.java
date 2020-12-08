@@ -152,6 +152,10 @@ public class GroupCommandService implements GroupChangingService<PersistentGroup
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Skupina s tímto id neexistuje");
         GroupTable groupTable = groupTableOptional.get();
 
+        if (groupTable.getState() == GroupState.ARCHIVED) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Skupina je archivovaná, nelze do ní přidávat členy");
+        }
+
         Optional<UserTable> userTableOptional = userRepository.findById(userId);
         if (userTableOptional.isEmpty())
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Uživatel s tímto id neexistuje");
