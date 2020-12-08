@@ -44,7 +44,7 @@ public class UserTable implements UserInterface, PersistentUser, UserReference {
 
     private UserState state;
 
-    @ManyToMany(mappedBy = "users", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @ManyToMany(mappedBy = "users", fetch = FetchType.EAGER, cascade = {CascadeType.REMOVE, CascadeType.PERSIST})
     private List<GroupTable> groups = new ArrayList<>();
 
     public void addGroup(GroupTable group) {

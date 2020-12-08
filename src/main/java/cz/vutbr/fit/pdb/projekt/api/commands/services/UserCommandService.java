@@ -16,6 +16,8 @@ import cz.vutbr.fit.pdb.projekt.features.helperInterfaces.persistent.PersistentU
 import cz.vutbr.fit.pdb.projekt.features.nosqlfeatures.group.GroupDocument;
 import cz.vutbr.fit.pdb.projekt.features.nosqlfeatures.user.UserDocument;
 import cz.vutbr.fit.pdb.projekt.features.nosqlfeatures.user.UserDocumentRepository;
+import cz.vutbr.fit.pdb.projekt.features.nosqlfeatures.user.embedded.GroupEmbedded;
+import cz.vutbr.fit.pdb.projekt.features.sqlfeatures.group.GroupRepository;
 import cz.vutbr.fit.pdb.projekt.features.sqlfeatures.user.UserRepository;
 import cz.vutbr.fit.pdb.projekt.features.sqlfeatures.user.UserState;
 import cz.vutbr.fit.pdb.projekt.features.sqlfeatures.user.UserTable;
@@ -29,6 +31,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 import static org.springframework.data.mongodb.core.query.Criteria.where;
@@ -38,6 +42,7 @@ import static org.springframework.data.mongodb.core.query.Criteria.where;
 public class UserCommandService implements UserWithStateChangingService<PersistentUser> {
 
     private final UserRepository userRepository;
+    private final GroupRepository groupRepository;
     private final UserDocumentRepository userDocumentRepository;
     private final MongoTemplate mongoTemplate;
 
@@ -57,7 +62,7 @@ public class UserCommandService implements UserWithStateChangingService<Persiste
     }
 
     @Transactional
-    public ResponseEntity<?> updateUser(Integer userId, UpdateUserDto updateUserDto) {
+    public ResponseEntity<?> updateUser(int userId, UpdateUserDto updateUserDto) {
         Optional<UserTable> userTableOptional = userRepository.findById(userId);
         if (userTableOptional.isEmpty())
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Tento uživatel neexistuje");
@@ -173,6 +178,21 @@ public class UserCommandService implements UserWithStateChangingService<Persiste
             persistentUserInterface.setBirthDate(userInterface.getBirthDate());
             persistentUserInterface.setSex(userInterface.getSex());
             persistentUserInterface.setState(userInterface.getState());
+        }
+
+        if (user instanceof UserTable) {
+            ((UserTable) persistentUserInterface).setGroups(((UserTable) userInterface).getGroups());
+        } else if (user instanceof UserDocument) {
+            List<GroupEmbedded> groupMemberEmbeddings = new ArrayList<>();
+            List<GroupEmbedded> groupAdminEmbeddings = new ArrayList<>();
+            ((UserTable) userInterface).getGroups().forEach(group -> {
+                groupMemberEmbeddings.add(new GroupEmbedded(group.getId(), group.getName()));
+            });
+            groupRepository.findAllByCreator_Id(userInterface.getId()).forEach(group -> {
+                groupAdminEmbeddings.add(new GroupEmbedded(group.getId(), group.getName()));
+            });
+            ((UserDocument) persistentUserInterface).setGroupsMember(groupMemberEmbeddings);
+            ((UserDocument) persistentUserInterface).setGroupsAdmin(groupAdminEmbeddings);
         }
         return (PersistentUser) persistentUserInterface;
     }
