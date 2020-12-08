@@ -342,18 +342,18 @@ public class GroupCommandService implements GroupChangingService<PersistentGroup
 
     private void updateNameOfGroupInUsersGroupsAdmin(GroupDocument groupDocument) {
         mongoTemplate.updateMulti(
-                new Query(where("groups_member.id").is(groupDocument.getId())),
+                new Query(where("groupsMember.id").is(groupDocument.getId())),
                 new Update()
-                        .set("groups_member.$.name", groupDocument.getName()),
+                        .set("groupsMember.$.name", groupDocument.getName()),
                 UserDocument.class
         );
     }
 
     private void updateNameOfGroupInUsersGroupsMember(GroupDocument groupDocument) {
         mongoTemplate.updateMulti(
-                new Query(where("groups_admin.id").is(groupDocument.getId())),
+                new Query(where("groupsAdmin.id").is(groupDocument.getId())),
                 new Update()
-                        .set("groups_admin.$.name", groupDocument.getName()),
+                        .set("groupsAdmin.$.name", groupDocument.getName()),
                 UserDocument.class
         );
     }
@@ -362,16 +362,16 @@ public class GroupCommandService implements GroupChangingService<PersistentGroup
         mongoTemplate.updateMulti(
                 new Query(),
                 new Update()
-                        .pull("groups_member", Query.query(Criteria.where("groups_member.$id").is(groupDocument.getId()))),
+                        .pull("groupsMember", Query.query(Criteria.where("groupsMember.$id").is(groupDocument.getId()))),
                 UserDocument.class
         );
     }
 
     private void removeGroupInUsersGroupsMember(GroupDocument groupDocument) {
         mongoTemplate.updateMulti(
-                new Query(where("groups_admin.id").is(groupDocument.getId())),
+                new Query(where("groupsAdmin.id").is(groupDocument.getId())),
                 new Update()
-                        .pull("groups_admin", Query.query(Criteria.where("groups_admin.$id").is(groupDocument.getId()))),
+                        .pull("groupsAdmin", Query.query(Criteria.where("groupsAdmin.$id").is(groupDocument.getId()))),
                 UserDocument.class
         );
     }
