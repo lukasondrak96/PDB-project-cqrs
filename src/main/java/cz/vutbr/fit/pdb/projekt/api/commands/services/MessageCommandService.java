@@ -16,6 +16,7 @@ import cz.vutbr.fit.pdb.projekt.features.nosqlfeatures.user.embedded.MessageEmbe
 import cz.vutbr.fit.pdb.projekt.features.sqlfeatures.message.MessageRepository;
 import cz.vutbr.fit.pdb.projekt.features.sqlfeatures.message.MessageTable;
 import cz.vutbr.fit.pdb.projekt.features.sqlfeatures.user.UserRepository;
+import cz.vutbr.fit.pdb.projekt.features.sqlfeatures.user.UserState;
 import cz.vutbr.fit.pdb.projekt.features.sqlfeatures.user.UserTable;
 import lombok.AllArgsConstructor;
 import org.greenrobot.eventbus.EventBus;
@@ -49,11 +50,19 @@ public class MessageCommandService implements CreateCommandService<PersistentMes
         }
         UserTable sender = userSenderOptional.get();
 
+        if (sender.getState() == UserState.DEACTIVATED) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Odesílatel má deaktivovaný účet, nelze mu zaslat nové zprávy.");
+        }
+
         Optional<UserTable> userRecipientOptional = userRepository.findById(newMessageDto.getRecipientId());
         if (userRecipientOptional.isEmpty()) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Příjemce s tímto id neexistuje");
         }
         UserTable recipient = userRecipientOptional.get();
+
+        if (recipient.getState() == UserState.DEACTIVATED) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Příjemce má deaktivovaný účet, nelze mu zaslat nové zprávy.");
+        }
 
         final MessageTable messageTable = new MessageTable(newMessageDto.getText(), sender, recipient);
         OracleCreatedEvent<PersistentMessage> oracleCreatedEvent = new OracleCreatedEvent<>(messageTable, this);

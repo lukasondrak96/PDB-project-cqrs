@@ -19,6 +19,7 @@ import cz.vutbr.fit.pdb.projekt.features.sqlfeatures.group.GroupTable;
 import cz.vutbr.fit.pdb.projekt.features.sqlfeatures.post.PostRepository;
 import cz.vutbr.fit.pdb.projekt.features.sqlfeatures.post.PostTable;
 import cz.vutbr.fit.pdb.projekt.features.sqlfeatures.user.UserRepository;
+import cz.vutbr.fit.pdb.projekt.features.sqlfeatures.user.UserState;
 import cz.vutbr.fit.pdb.projekt.features.sqlfeatures.user.UserTable;
 import lombok.AllArgsConstructor;
 import org.greenrobot.eventbus.EventBus;
@@ -51,6 +52,10 @@ public class PostCommandService implements DeleteCommandService<PersistentPost> 
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Uživatel s tímto id neexistuje");
         }
         UserTable creator = userOptional.get();
+
+        if (creator.getState() == UserState.DEACTIVATED) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Uživatel má deaktivovaný účet, nelze vytvořit nový příspěvek.");
+        }
 
         Optional<GroupTable> groupOptional = groupRepository.findById(newPostDto.getGroupId());
         if (groupOptional.isEmpty()) {

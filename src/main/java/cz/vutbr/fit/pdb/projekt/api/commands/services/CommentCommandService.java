@@ -19,6 +19,7 @@ import cz.vutbr.fit.pdb.projekt.features.sqlfeatures.comment.CommentTable;
 import cz.vutbr.fit.pdb.projekt.features.sqlfeatures.post.PostRepository;
 import cz.vutbr.fit.pdb.projekt.features.sqlfeatures.post.PostTable;
 import cz.vutbr.fit.pdb.projekt.features.sqlfeatures.user.UserRepository;
+import cz.vutbr.fit.pdb.projekt.features.sqlfeatures.user.UserState;
 import cz.vutbr.fit.pdb.projekt.features.sqlfeatures.user.UserTable;
 import lombok.AllArgsConstructor;
 import org.greenrobot.eventbus.EventBus;
@@ -51,6 +52,10 @@ public class CommentCommandService implements DeleteCommandService<PersistentCom
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Uživatel s tímto id neexistuje");
         }
         UserTable creator = userOptional.get();
+
+        if (creator.getState() == UserState.DEACTIVATED) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Uživatel má deaktivovaný účet, nelze vytvořit nový komentář.");
+        }
 
         Optional<PostTable> postOptional = postRepository.findById(newCommentDto.getPostId());
         if (postOptional.isEmpty()) {

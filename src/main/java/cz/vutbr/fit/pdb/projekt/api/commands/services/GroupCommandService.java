@@ -22,6 +22,7 @@ import cz.vutbr.fit.pdb.projekt.features.sqlfeatures.group.GroupRepository;
 import cz.vutbr.fit.pdb.projekt.features.sqlfeatures.group.GroupState;
 import cz.vutbr.fit.pdb.projekt.features.sqlfeatures.group.GroupTable;
 import cz.vutbr.fit.pdb.projekt.features.sqlfeatures.user.UserRepository;
+import cz.vutbr.fit.pdb.projekt.features.sqlfeatures.user.UserState;
 import cz.vutbr.fit.pdb.projekt.features.sqlfeatures.user.UserTable;
 import lombok.AllArgsConstructor;
 import org.greenrobot.eventbus.EventBus;
@@ -63,6 +64,10 @@ public class GroupCommandService implements GroupChangingService<PersistentGroup
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Uživatel s tímto id neexistuje");
         }
         UserTable creator = userOptional.get();
+
+        if (creator.getState() == UserState.DEACTIVATED) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Uživatel má deaktivovaný účet, nelze vytvořit novou skupinu.");
+        }
 
         final GroupTable groupTable = new GroupTable(newGroupDto.getName(), newGroupDto.getDescription(), newGroupDto.getState(), creator);
         OracleCreatedEvent<PersistentGroup> oracleCreatedEvent = new OracleCreatedEvent<>(groupTable, this);
@@ -130,6 +135,10 @@ public class GroupCommandService implements GroupChangingService<PersistentGroup
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Uživatel s tímto id neexistuje");
         UserTable userTable = userTableOptional.get();
 
+        if (userTable.getState() == UserState.DEACTIVATED) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Uživatel má deaktivovaný účet, nelze ho jmenovat správcem");
+        }
+
         GroupAdminChangedEvent<PersistentGroup> groupAdminChangedEvent = new GroupAdminChangedEvent<>(groupTable, userTable, this);
         subscribeEventToOracleAndMongo(groupAdminChangedEvent);
 
@@ -147,6 +156,10 @@ public class GroupCommandService implements GroupChangingService<PersistentGroup
         if (userTableOptional.isEmpty())
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Uživatel s tímto id neexistuje");
         UserTable userTable = userTableOptional.get();
+
+        if (userTable.getState() == UserState.DEACTIVATED) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Uživatel má deaktivovaný účet, nelze ho přidat do skupiny");
+        }
 
         groupTable.addUser(userTable);
 

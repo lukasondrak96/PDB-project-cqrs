@@ -115,6 +115,11 @@ public class UserCommandService implements UserWithStateChangingService<Persiste
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Tento uživatel nemá aktivovaný účet");
         }
 
+        if (!userTable.getGroups().isEmpty()) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Nelze deaktivovat účet, dokud spravujete nějakou skupinu." +
+                    "Předejte správcovství svých skupin někomu jinému nebo je zrušte.");
+        }
+
         UserDeactivatedEvent<PersistentUser> userDeactivatedEvent = new UserDeactivatedEvent<>(userTable, this);
         subscribeChangeEventToOracleAndMongo(userDeactivatedEvent);
 
